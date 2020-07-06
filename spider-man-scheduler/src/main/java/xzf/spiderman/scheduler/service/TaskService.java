@@ -14,6 +14,8 @@ import xzf.spiderman.scheduler.entity.Task;
 import xzf.spiderman.scheduler.entity.TaskArg;
 import xzf.spiderman.scheduler.repository.TaskArgRepository;
 import xzf.spiderman.scheduler.repository.TaskRepository;
+import xzf.spiderman.scheduler.service.event.TaskDisabledEvent;
+import xzf.spiderman.scheduler.service.event.TaskEnabledEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,12 +27,14 @@ public class TaskService
     private TaskRepository taskRepository;
     @Autowired
     private TaskArgRepository taskArgRepository;
+    @Autowired
+    private EventPublisherRegistry eventPublisherRegistry;
 
     @Transactional
-    public void addTask(AddTaskReq req)
+    public void add(AddTaskReq req)
     {
         // biz checking
-        if( taskRepository.findById(req.getId()).orElse(null) != null ){
+        if( taskRepository.findById(req.getId()).isPresent() ){
             throw new BizException("task :"+req.getId()+"， 已存在。");
         }
 
@@ -44,11 +48,10 @@ public class TaskService
     }
 
     @Transactional
-    public void updateTask(UpdateTaskReq req)
+    public void update(UpdateTaskReq req)
     {
         // validation
-        Task task = taskRepository.findById(req.getId())
-                    .orElseThrow(()->new BizException("task " + req.getId() + ", 不存在。"));
+        Task task = getTask(req.getId());
 
         // update entities
         task.update(req);
@@ -64,7 +67,7 @@ public class TaskService
     @Transactional
     public void delete(String id)
     {
-        Task task = taskRepository.findById(id).orElseThrow(()->new BizException("task "+id+", 不存在"));
+        Task task = getTask(id);
         taskRepository.delete(task);
         taskArgRepository.deleteAllByTaskId(task.getId());
     }
@@ -96,10 +99,44 @@ public class TaskService
     @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
     public TaskData findById(String id)
     {
-        Task task = taskRepository.findById(id).orElseThrow(()->new BizException("task "+id+", 不存在"));
+        Task task = getTask(id);
         List<TaskArg> args = taskArgRepository.findAllByTaskId(id);
         TaskData ret = task.asTaskData(args);
         return ret;
     }
+
+    private Task getTask(String id)
+    {
+        Task task = taskRepository.findById(id).orElseThrow(()->new BizException("task "+id+", 不存在"));
+        return task;
+    }
+
+    @Transactional
+    public void enable(String id)
+    {
+        Task task = getTask(id);
+        task.setActiveFlag(Task.ACTIVE_FLAG_ENABLE);
+        taskRepository.save(task);
+
+        // 发布事件
+        eventPublisherRegistry.taskEventPublisher()
+                .publish(new TaskEnabledEvent(task));
+
+    }
+
+    @Transactional
+    public void disable(String id)
+    {
+        Task task = getTask(id);
+        task.setActiveFlag(Task.ACTIVE_FLAG_DISABLE);
+        taskRepository.save(task);
+
+        // 发布事件
+        eventPublisherRegistry.taskEventPublisher()
+                .publish(new TaskDisabledEvent(task));
+    }
+
+
+
 
 }

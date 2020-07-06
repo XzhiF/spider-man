@@ -23,14 +23,14 @@ public class TaskController
     @PostMapping("/scheduler/task/add")
     public Ret<Void> addTask(@Valid @RequestBody AddTaskReq req)
     {
-        taskService.addTask(req);
+        taskService.add(req);
         return Ret.success();
     }
 
     @PostMapping("/scheduler/task/update")
     public Ret<Void> addTask(@Valid @RequestBody UpdateTaskReq req)
     {
-        taskService.updateTask(req);
+        taskService.update(req);
         return Ret.success();
     }
 

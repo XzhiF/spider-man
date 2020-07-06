@@ -6,11 +6,15 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import xzf.spiderman.common.event.Event;
+import xzf.spiderman.common.event.EventListener;
 import xzf.spiderman.common.exception.BizException;
 import xzf.spiderman.scheduler.entity.Task;
 import xzf.spiderman.scheduler.entity.TaskArg;
 import xzf.spiderman.scheduler.repository.TaskArgRepository;
 import xzf.spiderman.scheduler.repository.TaskRepository;
+import xzf.spiderman.scheduler.service.event.TaskDisabledEvent;
+import xzf.spiderman.scheduler.service.event.TaskEnabledEvent;
 
 import java.util.List;
 import java.util.Set;
@@ -30,7 +34,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class ScheduleService
+public class ScheduleService implements EventListener
 {
     @Autowired
     private  Scheduler scheduler;
@@ -60,57 +64,74 @@ public class ScheduleService
     }
 
     @Transactional
-    public void scheduleTask(String taskId) throws SchedulerException
+    public void scheduleTask(String taskId)
     {
         Task task = getTask(taskId);
         scheduleTask(task);
     }
 
-    @Transactional
-    public void scheduleTask(Task task) throws SchedulerException
+    public void scheduleTask(Task task)
     {
-        List<TaskArg> args =  taskArgRepository.findAllByTaskId(task.getId());
+        try{
 
-        JobDetail job = JobBuilder
-                .newJob(  resolveClass(task.getJobClass()) )
-                .withIdentity(task.getId(), task.getGroupId())
-                .withDescription(task.getDescription())
-                .setJobData( new JobDataMap(TaskArg.toMap(args)) )
-                .storeDurably()
-                .build();
+            List<TaskArg> args =  taskArgRepository.findAllByTaskId(task.getId());
 
-        // TASK -> ScheduleClass ->
-        // TASK -> ScheduleProps ->
-        // ---> SchedulerBuilder
+            JobDetail job = JobBuilder
+                    .newJob(  resolveClass(task.getJobClass()) )
+                    .withIdentity(task.getId(), task.getGroupId())
+                    .withDescription(task.getDescription())
+                    .setJobData( new JobDataMap(TaskArg.toMap(args)) )
+                    .storeDurably()
+                    .build();
 
-        Trigger trigger =  TriggerBuilder
-                .newTrigger()
-                .withIdentity(task.getId()+".trigger", task.getGroupId())
-                .withSchedule(createScheduleBuilder(task))
-                .build();
 
-        scheduler.scheduleJob(job, trigger);
+            Trigger trigger =  TriggerBuilder
+                    .newTrigger()
+                    .withIdentity(task.getId()+".trigger", task.getGroupId())
+                    .withSchedule(createScheduleBuilder(task))
+                    .build();
 
-        //
-        task.setStatus(Task.STATUS_WAITING);
-        taskRepository.save(task);
+            scheduler.scheduleJob(job, trigger);
+
+            //
+            task.setStatus(Task.STATUS_WAITING);
+            taskRepository.save(task);
+
+
+        }
+        catch (Exception e) {
+            log.error("Task " + task.getId()+", 启动调度失败。 " + e.getMessage(), e);
+            throw new BizException("Task " + task.getId()+", 启动调度失败。 " + e.getMessage(), e);
+        }
+
     }
 
     @Transactional
-    public void unscheduleTask(String taskId) throws SchedulerException
+    public void unscheduleTask(String taskId)
     {
         Task task = getTask(taskId);
-
-        TriggerKey triggerKey = new TriggerKey(task.getId()+".trigger", task.getGroupId());
-        boolean success = scheduler.unscheduleJob(triggerKey);
-        if(!success){
-            throw new BizException("Task " + taskId + ", 停止失败：未找到对应的触发器。");
-        }
-        log.info("unschedule task " + taskId);
-
-        task.setStatus(Task.STATUS_STOP);
-        taskRepository.save(task);
+        unscheduleTask(task);
     }
+
+    public void unscheduleTask(Task task)
+    {
+        try{
+            TriggerKey triggerKey = new TriggerKey(task.getId()+".trigger", task.getGroupId());
+            boolean success = scheduler.unscheduleJob(triggerKey);
+            if(!success){
+                throw new BizException("Task " + task.getId() + ", 停止失败：未找到对应的触发器。");
+            }
+            log.info("unschedule task " + task.getId());
+
+            task.setStatus(Task.STATUS_STOP);
+            taskRepository.save(task);
+        }
+        catch (Exception e){
+            log.error("Task " + task.getId()+", 停止调度失败。 " + e.getMessage(), e);
+            throw new BizException("Task " + task.getId()+", 停止调度失败。 " + e.getMessage(), e);
+        }
+    }
+
 
     @Transactional
     public void unscheduleAllTasks() throws SchedulerException
@@ -172,6 +193,26 @@ public class ScheduleService
             return (Class<? extends Job>) Class.forName(className);
         } catch (ClassNotFoundException e) {
             throw new BizException("任务类 JobClass" + className + ", 未找到。");
+        }
+    }
+
+    @Override
+    public boolean supportEventType(Class<? extends Event> clazz)
+    {
+        return TaskDisabledEvent.class.equals(clazz)
+                || TaskEnabledEvent.class.equals(clazz);
+    }
+
+    @Override
+    @Transactional
+    public void onEvent(Event event)
+    {
+        if(event instanceof TaskEnabledEvent) {
+            scheduleTask( ((TaskEnabledEvent)event).getTask() );
+        }
+
+        if(event instanceof TaskDisabledEvent) {
+            unscheduleTask( ((TaskDisabledEvent)event).getTask() );
         }
     }
 }
