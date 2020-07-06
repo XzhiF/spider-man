@@ -6,7 +6,7 @@ import org.springframework.beans.BeanUtils;
 import xzf.spiderman.scheduler.data.AddTaskReq;
 import xzf.spiderman.scheduler.data.TaskArgData;
 import xzf.spiderman.scheduler.data.TaskData;
-import xzf.spiderman.scheduler.data.UpdateTaskReq;
+import xzf.spiderman.scheduler.data.UptTaskReq;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -108,7 +108,7 @@ public class Task implements Serializable
         return  results;
     }
 
-    public void update(UpdateTaskReq req)
+    public void update(UptTaskReq req)
     {
         this.setGroupId(req.getGroupId());
         this.setName(req.getName());

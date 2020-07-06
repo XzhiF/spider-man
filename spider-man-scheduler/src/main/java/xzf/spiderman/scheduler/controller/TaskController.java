@@ -6,10 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import xzf.spiderman.common.Ret;
-import xzf.spiderman.scheduler.data.AddTaskReq;
-import xzf.spiderman.scheduler.data.QryTaskReq;
-import xzf.spiderman.scheduler.data.TaskData;
-import xzf.spiderman.scheduler.data.UpdateTaskReq;
+import xzf.spiderman.scheduler.data.*;
+import xzf.spiderman.scheduler.service.ScheduleProducerService;
 import xzf.spiderman.scheduler.service.TaskService;
 
 import javax.validation.Valid;
@@ -20,6 +18,9 @@ public class TaskController
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private ScheduleProducerService scheduleProducerService;
+
     @PostMapping("/scheduler/task/add")
     public Ret<Void> addTask(@Valid @RequestBody AddTaskReq req)
     {
@@ -28,7 +29,7 @@ public class TaskController
     }
 
     @PostMapping("/scheduler/task/update")
-    public Ret<Void> addTask(@Valid @RequestBody UpdateTaskReq req)
+    public Ret<Void> addTask(@Valid @RequestBody UptTaskReq req)
     {
         taskService.update(req);
         return Ret.success();
@@ -48,7 +49,6 @@ public class TaskController
         return Ret.success(ret);
     }
 
-
     @PostMapping("/scheduler/task/delete/{id}")
     public Ret<Void> delete(@PathVariable("id") String id)
     {
@@ -56,4 +56,18 @@ public class TaskController
         return Ret.success();
     }
 
+
+    @PostMapping("/scheduler/task/enable/{id}")
+    public Ret<Void> enable(@PathVariable("id") String id)
+    {
+        scheduleProducerService.offer(new ScheCmd(ScheCmd.ENABLE , id));
+        return Ret.success();
+    }
+
+    @PostMapping("/scheduler/task/disable/{id}")
+    public Ret<Void> disable(@PathVariable("id") String id)
+    {
+        scheduleProducerService.offer(new ScheCmd(ScheCmd.ENABLE , id));
+        return Ret.success();
+    }
 }

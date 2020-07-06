@@ -10,7 +10,7 @@ import java.util.List;
  * Update 基础信息
  */
 @Data
-public class UpdateTaskReq
+public class UptTaskReq
 {
     @NotBlank(message = "ID不能为空")
     private String id;

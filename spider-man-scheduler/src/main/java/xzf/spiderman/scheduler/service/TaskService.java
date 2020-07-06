@@ -9,7 +9,7 @@ import xzf.spiderman.common.exception.BizException;
 import xzf.spiderman.scheduler.data.AddTaskReq;
 import xzf.spiderman.scheduler.data.QryTaskReq;
 import xzf.spiderman.scheduler.data.TaskData;
-import xzf.spiderman.scheduler.data.UpdateTaskReq;
+import xzf.spiderman.scheduler.data.UptTaskReq;
 import xzf.spiderman.scheduler.entity.Task;
 import xzf.spiderman.scheduler.entity.TaskArg;
 import xzf.spiderman.scheduler.repository.TaskArgRepository;
@@ -48,7 +48,7 @@ public class TaskService
     }
 
     @Transactional
-    public void update(UpdateTaskReq req)
+    public void update(UptTaskReq req)
     {
         // validation
         Task task = getTask(req.getId());
