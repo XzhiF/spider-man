@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>xzf</groupId>
+    <artifactId>spider-man</artifactId>
+    <packaging>pom</packaging>
+    <version>${revision}</version>
+    <modules>
+        <module>spider-man-dependencies</module>
+        <module>spider-man-parent</module>
+
+        <module>spider-man-common</module>
+
+        <module>spider-man-admin</module>
+        <module>spider-man-admin-client</module>
+        <module>spider-man-gateway</module>
+        <module>spider-man-scheduler</module>
+        <module>spider-man-scheduler-client</module>
+        <module>spider-man-worker</module>
+        <module>spider-man-worker-client</module>
+        <module>spider-man-starter-curator</module>
+    </modules>
+
+
+    <properties>
+        <revision>0.0.1.RELEASE</revision>
+    </properties>
+
+
+</project>

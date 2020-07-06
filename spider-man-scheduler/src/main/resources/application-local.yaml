@@ -1,0 +1,23 @@
+server:
+  port: 8082
+
+spring:
+  jackson:
+    default-property-inclusion: non_null
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql.spiderman.xzf:3306/scheduler?useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=TRUE
+    username: root
+    password: root
+  redis:
+    host: redis.spiderman.xzf
+    port: 6379
+    database: 0
+    timeout: 1000ms
+
+xzf:
+  spiderman:
+    curator:
+      connectionString: zk.spiderman.xzf:2181
+
+

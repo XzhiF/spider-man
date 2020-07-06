@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: spider-man-admin
+          uri: lb://spider-man-admin
+          predicates:
+            - Path=/admin/**
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true

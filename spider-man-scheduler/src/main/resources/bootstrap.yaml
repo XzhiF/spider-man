@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: spider-man-scheduler
+  cloud:
+    nacos:
+      server-addr: nacos.spiderman.xzf:8848
+      config:
+        group: DEFAULT_GROUP
+        file-extension: yaml
+
+
