@@ -3,6 +3,7 @@ package xzf.spiderman.scheduler.data;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 public class ScheCmd implements Serializable
@@ -18,11 +19,21 @@ public class ScheCmd implements Serializable
     private Integer action = 0;
     private String taskId;
 
+    private String uuid;
+    private Integer retryTimes;
+    private Integer maxRetires;
+    private Integer retryWaitingSeconds;
+
     public ScheCmd() {
     }
 
     public ScheCmd(Integer action, String taskId) {
         this.action = action;
         this.taskId = taskId;
+
+        this.uuid = UUID.randomUUID().toString();
+        this.retryTimes = 0;
+        this.maxRetires = 3;
+        this.retryWaitingSeconds = 3;
     }
 }

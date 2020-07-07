@@ -39,7 +39,7 @@ public class EventPublisher
 
     public EventPublisher subscribe(Class<? extends  Event> clazz, EventListener listener, boolean allowDuplicate)
     {
-        if(listener.supportEventType(clazz)){
+        if(!listener.supportEventType(clazz)){
             throw new BizException("Listener"+listener.getClass().getSimpleName()+", 不支持事件类型:"+ clazz.getSimpleName() );
         }
 

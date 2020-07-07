@@ -18,6 +18,7 @@
 > [记录自己写一个小Java爬虫项目-0013-Task CRUD-3-修改查询删除](https://www.bilibili.com/video/BV1NC4y1h7Gu/) <br/>
 > [记录自己写一个小Java爬虫项目-0014-简单集成quartz](https://www.bilibili.com/video/BV1ih411o77r/) <br/>
 > [记录自己写一个小Java爬虫项目-0015-Task跟Quartz-集成-1](https://www.bilibili.com/video/BV1wa4y1a7D3/) <br/>
+> [记录自己写一个小Java爬虫项目-0016-Task跟Quartz-集成-2](https://www.bilibili.com/video/BV1tZ4y1u7Sf/) <br/>
+> [记录自己写一个小Java爬虫项目-0017-Task跟Quartz-集成-3](https://www.bilibili.com/video/BV1Gk4y1B7JS/) <br/>
 >
-> 
 

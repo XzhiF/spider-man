@@ -7,7 +7,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import xzf.spiderman.common.Ret;
 import xzf.spiderman.scheduler.data.*;
-import xzf.spiderman.scheduler.service.ScheduleProducerService;
+import xzf.spiderman.scheduler.service.ScheCmdProducerService;
 import xzf.spiderman.scheduler.service.TaskService;
 
 import javax.validation.Valid;
@@ -19,7 +19,7 @@ public class TaskController
     private TaskService taskService;
 
     @Autowired
-    private ScheduleProducerService scheduleProducerService;
+    private ScheCmdProducerService scheCmdProducerService;
 
     @PostMapping("/scheduler/task/add")
     public Ret<Void> addTask(@Valid @RequestBody AddTaskReq req)
@@ -60,14 +60,14 @@ public class TaskController
     @PostMapping("/scheduler/task/enable/{id}")
     public Ret<Void> enable(@PathVariable("id") String id)
     {
-        scheduleProducerService.offer(new ScheCmd(ScheCmd.ENABLE , id));
+        scheCmdProducerService.offer(new ScheCmd(ScheCmd.ENABLE , id));
         return Ret.success();
     }
 
     @PostMapping("/scheduler/task/disable/{id}")
     public Ret<Void> disable(@PathVariable("id") String id)
     {
-        scheduleProducerService.offer(new ScheCmd(ScheCmd.ENABLE , id));
+        scheCmdProducerService.offer(new ScheCmd(ScheCmd.DISABLE , id));
         return Ret.success();
     }
 }

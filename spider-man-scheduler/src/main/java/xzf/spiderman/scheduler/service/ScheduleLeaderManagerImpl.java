@@ -92,6 +92,7 @@ public class ScheduleLeaderManagerImpl implements LeaderSelectorListener, Schedu
     public void close() throws IOException
     {
         try {
+            listeners.forEach(l->l.onClose(this));
             leaderSelector.close();
         }finally {
             semaphore.release();

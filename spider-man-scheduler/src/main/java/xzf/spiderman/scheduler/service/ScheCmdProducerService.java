@@ -13,7 +13,7 @@ import xzf.spiderman.scheduler.data.ScheCmd;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class ScheduleProducerService implements InitializingBean
+public class ScheCmdProducerService implements InitializingBean
 {
     @Autowired
     private RedissonClient redisson;
@@ -38,6 +38,5 @@ public class ScheduleProducerService implements InitializingBean
     public void afterPropertiesSet() throws Exception
     {
         queue = redisson.getBoundedBlockingQueue(SchedulerConst.SCHEDULE_QUEUE_NAME);
-        queue.trySetCapacity(SchedulerConst.SCHEDULE_QUEUE_CAPACITY);
     }
 }

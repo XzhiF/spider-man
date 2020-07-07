@@ -9,4 +9,6 @@ public interface ScheduleLeaderListener
     default void onFirstConnected(ScheduleLeaderManager manager) {}
 
     default void onDisconnected(ScheduleLeaderManager manager) {}
+
+    default void onClose(ScheduleLeaderManager manager) {}
 }

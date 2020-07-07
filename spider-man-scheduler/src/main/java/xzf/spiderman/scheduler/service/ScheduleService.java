@@ -150,28 +150,34 @@ public class ScheduleService implements EventListener
 
 
     @Transactional
-    public void triggerTask(String taskId) throws SchedulerException
+    public void triggerTask(String taskId)
     {
-        Task task = getTask(taskId);
+        try{
+            Task task = getTask(taskId);
 
-        JobKey jobKey = new JobKey(task.getId(), task.getGroupId());
+            JobKey jobKey = new JobKey(task.getId(), task.getGroupId());
 
-        if (!scheduler.checkExists(jobKey)) {
+            if (!scheduler.checkExists(jobKey)) {
 
-            List<TaskArg> args =  taskArgRepository.findAllByTaskId(task.getId());
+                List<TaskArg> args =  taskArgRepository.findAllByTaskId(task.getId());
 
-            JobDetail job = JobBuilder
-                    .newJob(  resolveClass(task.getJobClass()) )
-                    .withIdentity(task.getId(), task.getGroupId())
-                    .withDescription(task.getDescription())
-                    .setJobData( new JobDataMap(TaskArg.toMap(args)) )
-                    .storeDurably()
-                    .build();
+                JobDetail job = JobBuilder
+                        .newJob(  resolveClass(task.getJobClass()) )
+                        .withIdentity(task.getId(), task.getGroupId())
+                        .withDescription(task.getDescription())
+                        .setJobData( new JobDataMap(TaskArg.toMap(args)) )
+                        .storeDurably()
+                        .build();
 
-            scheduler.addJob(job, true);
+                scheduler.addJob(job, true);
+            }
+
+            scheduler.triggerJob(jobKey);
         }
-
-        scheduler.triggerJob(jobKey);
+        catch (Exception e){
+            log.error("Task " + taskId+", Triiger调度失败。 " + e.getMessage(), e);
+            throw new BizException("Task " + taskId+", Trigger调度失败。 " + e.getMessage(), e);
+        }
     }
 
 
