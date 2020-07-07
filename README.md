@@ -20,5 +20,8 @@
 > [记录自己写一个小Java爬虫项目-0015-Task跟Quartz-集成-1](https://www.bilibili.com/video/BV1wa4y1a7D3/) <br/>
 > [记录自己写一个小Java爬虫项目-0016-Task跟Quartz-集成-2](https://www.bilibili.com/video/BV1tZ4y1u7Sf/) <br/>
 > [记录自己写一个小Java爬虫项目-0017-Task跟Quartz-集成-3](https://www.bilibili.com/video/BV1Gk4y1B7JS/) <br/>
+> [记录自己写一个小Java爬虫项目-0018-Scheduler做主备的思路](https://www.bilibili.com/video/BV1wa4y1a7Nb/)<br/>
+> [记录自己写一个小Java爬虫项目-0019-Redis Zookeeper简单安装](https://www.bilibili.com/video/BV1Cg4y1v7XK/)<br/>
+> [记录自己写一个小Java爬虫项目-0020-Redisson跟Curator集成](https://www.bilibili.com/video/BV1Q5411Y7y7/) <br/>
 >
 
