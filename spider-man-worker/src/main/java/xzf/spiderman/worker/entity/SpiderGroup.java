@@ -4,16 +4,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "spider_group")
-public class SpiderGroup
+public class SpiderGroup implements Serializable
 {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
     @Column(name = "spider_group_id")
     private String id;
 

@@ -7,3 +7,8 @@ spring:
     url: jdbc:mysql://mysql.spiderman.xzf:3306/worker?useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=TRUE
     username: root
     password: root
+  redis:
+    host: redis.spiderman.xzf
+    port: 6379
+    database: 0
+    timeout: 10000ms

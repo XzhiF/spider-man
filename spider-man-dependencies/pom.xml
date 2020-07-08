@@ -19,6 +19,8 @@
         <fastjson.version>1.2.58</fastjson.version>
         <redisson.version>3.13.0</redisson.version>
         <curator.version>5.0.0</curator.version>
+        <webmagic.version>0.7.3</webmagic.version>
+        <hessian.version>4.0.63</hessian.version>
     </properties>
 
 
@@ -75,6 +77,29 @@
                 <version>${curator.version}</version>
             </dependency>
 
+
+            <dependency>
+                <groupId>us.codecraft</groupId>
+                <artifactId>webmagic-core</artifactId>
+                <version>${webmagic.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>us.codecraft</groupId>
+                <artifactId>webmagic-extension</artifactId>
+                <version>${webmagic.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.caucho</groupId>
+                <artifactId>hessian</artifactId>
+                <version>${hessian.version}</version>
+            </dependency>
 
         </dependencies>
 

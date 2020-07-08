@@ -23,5 +23,7 @@
 > [记录自己写一个小Java爬虫项目-0018-Scheduler做主备的思路](https://www.bilibili.com/video/BV1wa4y1a7Nb/)<br/>
 > [记录自己写一个小Java爬虫项目-0019-Redis Zookeeper简单安装](https://www.bilibili.com/video/BV1Cg4y1v7XK/)<br/>
 > [记录自己写一个小Java爬虫项目-0020-Redisson跟Curator集成](https://www.bilibili.com/video/BV1Q5411Y7y7/) <br/>
+> [记录自己写一个小Java爬虫项目-0021-Scheudler模块选举-1](https://www.bilibili.com/video/BV1Ep4y1S7Wp/) <br/>
+> [记录自己写一个小Java爬虫项目-0022-Scheduler模块选举-2](https://www.bilibili.com/video/BV18z4y1D7WZ/) <br/>
 >
 
