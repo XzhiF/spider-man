@@ -123,7 +123,7 @@ public class ScheduleService implements EventListener
             }
             log.info("unschedule task " + task.getId());
 
-            task.setStatus(Task.STATUS_STOP);
+            task.setStatus(Task.STATUS_STOPED);
             taskRepository.save(task);
         }
         catch (Exception e){

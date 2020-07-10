@@ -81,6 +81,7 @@ public class WorkerSpider implements Runnable, Task
     private boolean needWaitNewUrl = false; // 判断是否需要当poll结果为空时进行阻塞等待
     private AtomicInteger pollTimeoutCount = new AtomicInteger(0); //记录连续poll结果为空的次数
     private int maxPollTimeoutCount = 3; // 记录最大连续poll结果都为空的次数
+    private WorkerSpiderLifeCycleListener lifeCycleListener = WorkerSpiderLifeCycleListener.DEFAULT;
 
 
     /**
@@ -278,15 +279,22 @@ public class WorkerSpider implements Runnable, Task
     @Override
     public void run() {
 
+        lifeCycleListener.onBeforeStart(this);
+
         checkRunningStat();
         initComponent();
         logger.info("Spider {} started!",getUUID());
         while (!Thread.currentThread().isInterrupted() && stat.get() == STAT_RUNNING) {
 
             final Request request = scheduler.poll(this);
+            lifeCycleListener.onRequestPolled(this,request);
 
             if (request == null) {
+
                 pollTimeoutCount.incrementAndGet();
+                if(canClose()){
+                    lifeCycleListener.onCanCloseCondition(this);
+                }
 
                 if (threadPool.getThreadAlive() == 0 && exitWhenComplete) {
                     break;
@@ -350,6 +358,7 @@ public class WorkerSpider implements Runnable, Task
     }
 
     public void close() {
+        lifeCycleListener.onBeforeClose(this);
         destroyEach(downloader);
         destroyEach(pageProcessor);
         destroyEach(scheduler);
@@ -357,6 +366,7 @@ public class WorkerSpider implements Runnable, Task
             destroyEach(pipeline);
         }
         threadPool.shutdown();
+        lifeCycleListener.onAfterClose(this);
     }
 
     private void destroyEach(Object object) {
@@ -768,4 +778,17 @@ public class WorkerSpider implements Runnable, Task
         return this;
     }
 
+    public WorkerSpider setLifeCycleListener(WorkerSpiderLifeCycleListener lifeCycleListener) {
+
+        this.lifeCycleListener = lifeCycleListener;
+        if(this.lifeCycleListener==null){
+            this.lifeCycleListener = WorkerSpiderLifeCycleListener.DEFAULT;
+        }
+        return this;
+    }
+
+    public WorkerSpiderLifeCycleListener getLifeCycleListener()
+    {
+        return lifeCycleListener;
+    }
 }

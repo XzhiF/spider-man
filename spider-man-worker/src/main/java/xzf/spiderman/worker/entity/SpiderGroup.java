@@ -2,17 +2,19 @@ package xzf.spiderman.worker.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
+@ToString
 @Entity
 @Table(name = "spider_group")
 public class SpiderGroup implements Serializable
 {
-
     @Id
     @Column(name = "spider_group_id")
     private String id;
@@ -22,4 +24,7 @@ public class SpiderGroup implements Serializable
 
     @Column(name = "spider_group_desc")
     private String desc;
+
+    @Column(name = "create_time")
+    private Date createTime;
 }

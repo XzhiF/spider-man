@@ -78,7 +78,7 @@ public class ScheduleTaskJobListener implements JobListener
         if(Task.ACTIVE_FLAG_ENABLE == task.getActiveFlag().intValue()) {
             task.setStatus(Task.STATUS_WAITING);
         } else {
-            task.setStatus(Task.STATUS_STOP);
+            task.setStatus(Task.STATUS_STOPED);
         }
         task.setLastRunningTime(new Date());
         if(jobException != null){

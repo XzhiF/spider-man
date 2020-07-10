@@ -22,11 +22,7 @@
             <artifactId>spider-man-common</artifactId>
             <version>${revision}</version>
         </dependency>
-        <dependency>
-            <groupId>xzf</groupId>
-            <artifactId>spider-man-starter-curator</artifactId>
-            <version>${revision}</version>
-        </dependency>
+
 
 
         <dependency>

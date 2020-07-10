@@ -5,7 +5,7 @@ package xzf.spiderman.worker.service;
  *
  * 2.维护一条线程，管理我们的WorkerSpider，他的start/stop方法，由Boss来通过http调用
  *
- * 3.维护另一条线程，监控WorkerSpider的canClose
+ * 3.通过WorkerSpider的listener坚挺 canClose事件
  *   当 canClose为真的时候。 更新zk节点，设置为completed
  *
  */
