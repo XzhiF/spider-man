@@ -26,6 +26,7 @@
 > [记录自己写一个小Java爬虫项目-0021-Scheudler模块选举-1](https://www.bilibili.com/video/BV1Ep4y1S7Wp/) <br/>
 > [记录自己写一个小Java爬虫项目-0022-Scheduler模块选举-2](https://www.bilibili.com/video/BV18z4y1D7WZ/) <br/>
 > [记录自己写一个小Java爬虫项目-0023-Service层次依赖接耦](https://www.bilibili.com/video/BV11t4y1Q7P4/)<br/>
->
+> [记录自己写一个小Java爬虫项目-0024-ScheCmd生产消费队列实现-1](https://www.bilibili.com/video/BV1YC4y1h7Mo/)<br/>
+> [记录自己写一个小Java爬虫项目-0025-ScheCmd生产消费队列实现-2](https://www.bilibili.com/video/BV1dt4y1Q7fk/) <br/>
 >
 
