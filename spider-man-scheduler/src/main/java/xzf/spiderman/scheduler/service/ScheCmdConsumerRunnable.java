@@ -19,8 +19,6 @@ public class ScheCmdConsumerRunnable implements Runnable
     private ApplicationServiceRegistry registry;
     private RBoundedBlockingQueue<ScheCmd> queue;
 
-    private boolean isPolling = false;
-
     private Map<Integer, CmdHandler> cmdHandlers = new HashMap<>();
 
     private interface CmdHandler
@@ -45,37 +43,27 @@ public class ScheCmdConsumerRunnable implements Runnable
         cmdHandlers.put(TRIGGER, new TriggerCmdHandler());
     }
 
-
-
     @Override
     public void run()
     {
         while (true)
         {
             if(Thread.interrupted()){
+                log.info("ScheCmdConsumerRunnable done . currentThread="+Thread.currentThread());
                 break;
             }
 
-            ScheCmd cmd = null;
             try
             {
-                cmd = queue.poll(10, TimeUnit.MINUTES);
-                isPolling = false;
+                ScheCmd cmd = queue.poll(10, TimeUnit.MINUTES);
 
                 if(cmd != null) {
                     execCmd(cmd);
-                }
-                else{
+                } else {
                     log.info("ScheCmdConsumer, 5秒钟未有任务消费。"+SchedulerConst.SCHEDULE_QUEUE_NAME);
                 }
-                isPolling = true;
             }
             catch (InterruptedException e) {
-
-                // 简单处理
-                if(Thread.interrupted() && !isPolling && cmd != null){
-                    execCmd(cmd);
-                }
 
                 if(!Thread.interrupted()){
                     log.error("消费队列被中断,请检查Redis或网络是否异常" + e.getMessage(), e);
@@ -85,14 +73,18 @@ public class ScheCmdConsumerRunnable implements Runnable
                     } catch (InterruptedException interruptedException) {}
                 }
             }
+            catch (Exception e){
+                handleUnknownException(e);
+            }
 
         }
     }
 
-    public boolean isPolling()
-    {
-        return isPolling;
+    private void handleUnknownException(Exception e) {
+        log.error("发生未知异常."+e.getMessage(), e);
+        // ...
     }
+
 
     private void execCmd(ScheCmd cmd)
     {
@@ -116,11 +108,6 @@ public class ScheCmdConsumerRunnable implements Runnable
     private void handleExecException(Exception e) {
         log.error("execCmd失败."+e.getMessage(), e);
         // putError Result
-
-        if(e instanceof RetCodeException){
-            throw (RetCodeException)e;
-        }
-        throw new BizException("消费ScheCmd失败"+e.getMessage(),e);
     }
 
 

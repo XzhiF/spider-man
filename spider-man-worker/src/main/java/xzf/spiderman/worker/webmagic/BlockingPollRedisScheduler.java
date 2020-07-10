@@ -1,5 +1,7 @@
 package xzf.spiderman.worker.webmagic;
 
+import io.lettuce.core.RedisCommandInterruptedException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Task;
@@ -8,9 +10,16 @@ import us.codecraft.webmagic.scheduler.MonitorableScheduler;
 import us.codecraft.webmagic.scheduler.component.DuplicateRemover;
 import xzf.spiderman.worker.configuration.HessianRedisTemplate;
 
-public class SpiderManRedisScheduler extends DuplicateRemovedScheduler implements MonitorableScheduler, DuplicateRemover
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
+public class BlockingPollRedisScheduler extends DuplicateRemovedScheduler implements MonitorableScheduler, DuplicateRemover
 {
-    protected HessianRedisTemplate redisTemplate;
+    private HessianRedisTemplate redisTemplate;
+    private final long pollTimeout;
+    private final TimeUnit pollTimeunit;
 
     private static final String QUEUE_PREFIX = "queue_";
 
@@ -19,8 +28,10 @@ public class SpiderManRedisScheduler extends DuplicateRemovedScheduler implement
     private static final String ITEM_PREFIX = "item_";
 
 
-    public SpiderManRedisScheduler(HessianRedisTemplate redisTemplate) {
+    public BlockingPollRedisScheduler(HessianRedisTemplate redisTemplate, long pollTimeout, TimeUnit pollTimeunit) {
         this.redisTemplate = redisTemplate;
+        this.pollTimeout = pollTimeout;
+        this.pollTimeunit = pollTimeunit;
         setDuplicateRemover(this);
     }
 
@@ -39,7 +50,12 @@ public class SpiderManRedisScheduler extends DuplicateRemovedScheduler implement
     }
 
     @Override
-    protected void pushWhenNoDuplicate(Request request, Task task) {
+    protected void pushWhenNoDuplicate(Request request, Task task)
+    {
+        if(request == null || request.getUrl() == null){
+            log.warn("request = " + request + ", or request url is null " ) ;
+            return ;
+        }
 
         this.redisTemplate.opsForList().rightPush(getQueueKey(task), request.getUrl());
         if (request.getExtras() != null) {
@@ -51,32 +67,44 @@ public class SpiderManRedisScheduler extends DuplicateRemovedScheduler implement
     }
 
     @Override
-    public synchronized Request poll(Task task) {
+    public Request poll(Task task)
+    {
+        Object urlObj = blockingPoll(task);
 
-//        Jedis jedis = pool.getResource();
-//        String url = jedis.lpop(getQueueKey(task));
-        Object popUrl = this.redisTemplate.opsForList().leftPop(getQueueKey(task));
-        if (popUrl == null) {
+        if (urlObj == null) {
             return null;
         }
-        String url = popUrl.toString();
+
+        String url = urlObj.toString();
         String key = ITEM_PREFIX + task.getUUID();
         String field = DigestUtils.sha1Hex(url);
-//        byte[] bytes = jedis.hget(key.getBytes(), field.getBytes());
-//        if (bytes != null) {
-//            Request o = JSON.parseObject(new String(bytes), Request.class);
-//            return o;
-//        }
+
         Request o = (Request) this.redisTemplate.opsForHash().get(key, field);
         if(o != null){
             return o;
         }
 
-
         Request request = new Request(url);
         return request;
-
     }
+
+
+    private Object blockingPoll(Task task)
+    {
+        Object popUrl = null;
+
+        try {
+            popUrl = this.redisTemplate.opsForList().leftPop(getQueueKey(task), pollTimeout, pollTimeunit);
+        }catch (RedisCommandInterruptedException e){
+            if(Thread.interrupted()){
+                log.info("redisTemplate.leftPop 被正常中断。");
+            }else {
+                log.error("redisTemplate.leftPop 被意外中断， 请检查程序", e);
+            }
+        }
+        return popUrl;
+    }
+
 
     protected String getSetKey(Task task) {
         return SET_PREFIX + task.getUUID();

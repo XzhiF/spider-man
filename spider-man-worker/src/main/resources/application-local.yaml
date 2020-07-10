@@ -11,4 +11,4 @@ spring:
     host: redis.spiderman.xzf
     port: 6379
     database: 0
-    timeout: 10000ms
+    timeout: 100s

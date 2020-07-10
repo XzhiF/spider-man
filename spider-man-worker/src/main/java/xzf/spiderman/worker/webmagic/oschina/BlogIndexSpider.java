@@ -4,7 +4,9 @@ import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import xzf.spiderman.worker.configuration.HessianRedisTemplate;
-import xzf.spiderman.worker.webmagic.SpiderManRedisScheduler;
+import xzf.spiderman.worker.webmagic.BlockingPollRedisScheduler;
+
+import java.util.concurrent.TimeUnit;
 
 public class BlogIndexSpider
 {
@@ -22,7 +24,7 @@ public class BlogIndexSpider
 
         Spider.create(new BlogIndexProcessor())
                 .addRequest(request)
-                .setScheduler(new SpiderManRedisScheduler(hessianRedisTemplate))
+                .setScheduler(new BlockingPollRedisScheduler(hessianRedisTemplate, 1, TimeUnit.MINUTES))
                 .addPipeline(new ConsolePipeline())
                 .run();
 
