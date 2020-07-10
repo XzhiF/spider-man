@@ -36,10 +36,13 @@ public class SpiderCnf
     @JoinColumn(name = "spider_group_id")
     private SpiderGroup group;
 
-    //
     @ManyToOne
     @JoinColumn(name = "spider_server_id")
     private SpiderServer server;
+
+    @ManyToOne
+    @JoinColumn(name = "spider_store_id")
+    private SpiderStore store;
 
     @Column(name = "spider_name")
     private String name;
@@ -53,6 +56,12 @@ public class SpiderCnf
     @Column(name = "spider_desc")
     private String desc;
 
+    @Column(name = "processor")
+    private String processor;
+
+    @Column(name = "stop_condition_count")
+    private Integer stopConditionCount;
+
     @Column(name = "status")
     private Integer status;
 
@@ -65,7 +74,8 @@ public class SpiderCnf
 
     public static SpiderCnf create(AddSpiderCnfReq req,
                                    SpiderGroup group,
-                                   SpiderServer server)
+                                   SpiderServer server,
+                                   SpiderStore store)
     {
         SpiderCnf ret = new SpiderCnf();
 
@@ -74,9 +84,12 @@ public class SpiderCnf
         ret.setType(req.getType());
         ret.setParams(req.getParams());
         ret.setDesc(req.getDesc());
+        ret.setProcessor(req.getProcessor());
+        ret.setStopConditionCount(req.getStopConditionCount());
 
         ret.setServer(server);
         ret.setGroup(group);
+        ret.setStore(store);
 
         ret.setStatus(STATUS_STOPED);
         ret.setActiveFlag(ACTIVE_FLAG_ENABLE);

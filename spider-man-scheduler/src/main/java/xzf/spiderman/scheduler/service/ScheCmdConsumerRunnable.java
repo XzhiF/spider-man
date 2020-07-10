@@ -55,7 +55,7 @@ public class ScheCmdConsumerRunnable implements Runnable
 
             try
             {
-                ScheCmd cmd = queue.poll(10, TimeUnit.MINUTES);
+                ScheCmd cmd = queue.poll(3, TimeUnit.MINUTES);
 
                 if(cmd != null) {
                     execCmd(cmd);

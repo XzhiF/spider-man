@@ -1,5 +1,7 @@
 package xzf.spiderman.worker.service;
 
+import xzf.spiderman.worker.entity.SpiderCnf;
+
 /**
  * 1. 选举出boss
  *
@@ -14,6 +16,25 @@ package xzf.spiderman.worker.service;
  */
 public class Boss
 {
+    private SpiderCnf cnf;
 
+
+ /**
+  *
+  * 1. 根据groupId -> 查找到所有爬虫
+  *
+  * 2. nacos discovery -> spider-man-worker-> 服务器
+  *
+  * 3. filter -> server-host:port. available spider-server
+  *
+  * 4. log ->
+  *
+  * 5. startup
+  *
+  * 6. watch zk path.  stopAll
+  *
+  * startup ->
+  *
+ */
 
 }

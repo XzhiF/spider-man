@@ -13,7 +13,7 @@ spring:
     host: redis.spiderman.xzf
     port: 6379
     database: 0
-    timeout: 1000ms
+    timeout: 210s
 
 xzf:
   spiderman:

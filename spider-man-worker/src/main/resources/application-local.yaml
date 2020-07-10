@@ -11,4 +11,10 @@ spring:
     host: redis.spiderman.xzf
     port: 6379
     database: 0
-    timeout: 100s
+    timeout: 120s
+
+xzf:
+  spiderman:
+    worker:
+      poll-timeout: 100
+      poll-timeunit: SECONDS

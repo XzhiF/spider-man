@@ -8,9 +8,11 @@ import xzf.spiderman.worker.data.AddSpiderCnfReq;
 import xzf.spiderman.worker.entity.SpiderCnf;
 import xzf.spiderman.worker.entity.SpiderGroup;
 import xzf.spiderman.worker.entity.SpiderServer;
+import xzf.spiderman.worker.entity.SpiderStore;
 import xzf.spiderman.worker.repository.SpiderCnfRepository;
 import xzf.spiderman.worker.repository.SpiderGroupRepository;
 import xzf.spiderman.worker.repository.SpiderServerRepository;
+import xzf.spiderman.worker.repository.SpiderStoreRepository;
 
 @Service
 public class SpiderCnfService
@@ -24,6 +26,9 @@ public class SpiderCnfService
     @Autowired
     private SpiderGroupRepository spiderGroupRepository;
 
+    @Autowired
+    private SpiderStoreRepository spiderStoreRepository;
+
 
     @Transactional
     public void add(AddSpiderCnfReq req)
@@ -34,7 +39,8 @@ public class SpiderCnfService
 
         SpiderServer server = spiderServerRepository.getOne(req.getServerId());
         SpiderGroup group = spiderGroupRepository.getOne(req.getGroupId());
-        SpiderCnf cnf = SpiderCnf.create(req, group, server);
+        SpiderStore store = spiderStoreRepository.getOne(req.getStoreId());
+        SpiderCnf cnf = SpiderCnf.create(req, group, server,store);
         spiderCnfRepository.save(cnf);
     }
 
