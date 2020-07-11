@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xzf.spiderman.scheduler.service.*;
+import xzf.spiderman.starter.curator.leader.LeaderManager;
+import xzf.spiderman.starter.curator.leader.LeaderManagerListener;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -49,7 +51,7 @@ public class ScheduleBootstrapConfiguration
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        ScheduleLeaderManager manager = new ScheduleLeaderManagerImpl(curator, id);
+        ScheduleLeaderManager manager = new ScheduleLeaderManager(curator, id);
 
         manager.addListener(quartzScheduleLeaderListener());
         manager.addListener(scheCmdConsumerScheduleLeaderListener());
@@ -86,9 +88,10 @@ public class ScheduleBootstrapConfiguration
 
 
 
-    public ScheduleLeaderListener quartzScheduleLeaderListener()
+    public LeaderManagerListener<ScheduleLeaderManager> quartzScheduleLeaderListener()
     {
-        return new ScheduleLeaderListener(){
+        return new LeaderManagerListener<ScheduleLeaderManager>()
+        {
             @Override
             public void takeLeadership(ScheduleLeaderManager manager) throws Exception {
                 log.info("Quartz.ScheduleService ScheduleLeaderListener takeLeadership...");
@@ -127,10 +130,10 @@ public class ScheduleBootstrapConfiguration
     }
 
 
-    public ScheduleLeaderListener scheCmdConsumerScheduleLeaderListener()
+    public LeaderManagerListener<ScheduleLeaderManager> scheCmdConsumerScheduleLeaderListener()
     {
         ScheCmdConsumerBootstrap bootstrap = new ScheCmdConsumerBootstrap(scheCmdConsumerRunnableFactory);
-        return new ScheduleLeaderListener(){
+        return new LeaderManagerListener<ScheduleLeaderManager>(){
 
             @Override
             public void takeLeadership(ScheduleLeaderManager manager) throws Exception {

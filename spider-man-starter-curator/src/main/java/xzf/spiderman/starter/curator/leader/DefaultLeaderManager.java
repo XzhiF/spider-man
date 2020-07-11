@@ -1,12 +1,11 @@
-package xzf.spiderman.scheduler.service;
+package xzf.spiderman.starter.curator.leader;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListener;
 import org.apache.curator.framework.state.ConnectionState;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextClosedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,27 +13,33 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 
-@Slf4j
-public class ScheduleLeaderManagerImpl implements LeaderSelectorListener, ScheduleLeaderManager, ApplicationListener<ContextClosedEvent>
+public class DefaultLeaderManager implements LeaderSelectorListener, LeaderManager
 {
-    public static final String PATH = "/scheduler/leader-selector";
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
+    public static final String DEFAULT_PATH = "/curator/leader-manager";
+
     private final Semaphore semaphore = new Semaphore(0);
     private final LeaderSelector leaderSelector;
+    private final String path;
 
-    private final List<ScheduleLeaderListener> listeners = new ArrayList<>();
+    private final List<LeaderManagerListener<LeaderManager>> listeners = new ArrayList<>();
 
-    public ScheduleLeaderManagerImpl(CuratorFramework client, String id)
+    public DefaultLeaderManager(CuratorFramework client, String path, String id, boolean autoRequeue)
     {
-        this.leaderSelector = new LeaderSelector(client, PATH, this);
+        this.path = path == null ? DEFAULT_PATH : path;
+        this.leaderSelector = new LeaderSelector(client, path, this);
         this.leaderSelector.setId(id);
-        this.leaderSelector.autoRequeue();
+        if(autoRequeue) {
+            this.leaderSelector.autoRequeue();
+        }
     }
 
     @Override
     public void takeLeadership(CuratorFramework client) throws Exception
     {
-        log.info("ScheduleLeaderManager " + getId()+ ": takeLeadership");
-        for (ScheduleLeaderListener listener : listeners) {
+        log.info(this.getClass().getSimpleName() + " - " + getId()+ ": takeLeadership");
+        for (LeaderManagerListener listener : listeners) {
             listener.takeLeadership(this);
         }
         semaphore.acquire();
@@ -78,13 +83,18 @@ public class ScheduleLeaderManagerImpl implements LeaderSelectorListener, Schedu
     }
 
     @Override
+    public String getPath() {
+        return path;
+    }
+
+    @Override
     public boolean hasLeadership()
     {
         return leaderSelector.hasLeadership();
     }
 
     @Override
-    public void addListener(ScheduleLeaderListener listener) {
+    public void addListener(LeaderManagerListener listener) {
         listeners.add(listener);
     }
 
@@ -99,11 +109,4 @@ public class ScheduleLeaderManagerImpl implements LeaderSelectorListener, Schedu
         }
     }
 
-    @Override
-    public void onApplicationEvent(ContextClosedEvent event) {
-        try {
-            close();
-        } catch (IOException ignore) {
-        }
-    }
 }

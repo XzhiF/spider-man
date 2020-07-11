@@ -37,9 +37,12 @@ ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `worker`.`spider_store` (
   `spider_store_id` VARCHAR(30) NOT NULL,
-  `host` VARCHAR(255) NOT NULL,
-  `port` INT NOT NULL,
-  `table` VARCHAR(60) NOT NULL,
+  `host` VARCHAR(255) NULL,
+  `port` INT NULL,
+  `table_name` VARCHAR(60) NOT NULL,
   `type` INT NOT NULL DEFAULT 1 COMMENT '1 mongo',
+  `url` VARCHAR(255) NULL,
+  `username` VARCHAR(45) NULL,
+  `password` VARCHAR(45) NULL,
   PRIMARY KEY (`spider_store_id`))
 ENGINE = InnoDB;
