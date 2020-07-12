@@ -3,12 +3,15 @@ package xzf.spiderman.starter.curator.leader;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListener;
+import org.apache.curator.framework.recipes.leader.Participant;
 import org.apache.curator.framework.state.ConnectionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xzf.spiderman.common.exception.BizException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -96,6 +99,24 @@ public class DefaultLeaderManager implements LeaderSelectorListener, LeaderManag
     @Override
     public void addListener(LeaderManagerListener listener) {
         listeners.add(listener);
+    }
+
+    @Override
+    public Collection<Participant> getParticipants() {
+        try {
+            return leaderSelector.getParticipants();
+        } catch (Exception e) {
+            throw new BizException("获取选举的成员失败。" + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Participant getLeader() {
+        try {
+            return leaderSelector.getLeader();
+        } catch (Exception e) {
+            throw new BizException("获取选举的Leader失败。" + e.getMessage(), e);
+        }
     }
 
     @Override

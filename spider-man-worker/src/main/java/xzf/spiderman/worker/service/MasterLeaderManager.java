@@ -7,11 +7,11 @@ import xzf.spiderman.starter.curator.leader.DefaultLeaderManager;
 
 import java.io.IOException;
 
-public class BossLeaderManager extends DefaultLeaderManager implements ApplicationListener<ContextClosedEvent>
+public class MasterLeaderManager extends DefaultLeaderManager implements ApplicationListener<ContextClosedEvent>
 {
-    public static final String PATH = "/workder/leader-selector";
+    public static final String PATH = "/worker/leader-selector";
 
-    public BossLeaderManager(CuratorFramework client, String id) {
+    public MasterLeaderManager(CuratorFramework client, String id) {
         super(client, PATH, id, true);
     }
 

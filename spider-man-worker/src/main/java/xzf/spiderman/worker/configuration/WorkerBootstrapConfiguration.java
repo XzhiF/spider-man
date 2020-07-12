@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xzf.spiderman.starter.curator.leader.LeaderManager;
 import xzf.spiderman.starter.curator.leader.LeaderManagerListener;
-import xzf.spiderman.worker.service.BossLeaderManager;
+import xzf.spiderman.worker.service.MasterLeaderManager;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -29,7 +29,7 @@ public class WorkerBootstrapConfiguration
     private CuratorFramework curator;
 
     @Bean
-    public BossLeaderManager bossLeaderManager()
+    public MasterLeaderManager bossLeaderManager()
     {
         String id = "";
 
@@ -39,7 +39,7 @@ public class WorkerBootstrapConfiguration
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        BossLeaderManager manager = new BossLeaderManager(curator, id);
+        MasterLeaderManager manager = new MasterLeaderManager(curator, id);
 
         manager.addListener(new LeaderManagerListener() {
             @Override
@@ -52,25 +52,25 @@ public class WorkerBootstrapConfiguration
     }
 
     @Bean
-    public BossCommandLineRunner bossCommandLineRunner(BossLeaderManager bossLeaderManager)
+    public BossCommandLineRunner bossCommandLineRunner(MasterLeaderManager masterLeaderManager)
     {
-        return new BossCommandLineRunner(bossLeaderManager);
+        return new BossCommandLineRunner(masterLeaderManager);
     }
 
 
     public class BossCommandLineRunner implements CommandLineRunner
     {
-        private BossLeaderManager bossLeaderManager;
+        private MasterLeaderManager masterLeaderManager;
 
-        public BossCommandLineRunner(BossLeaderManager bossLeaderManager) {
-            this.bossLeaderManager = bossLeaderManager;
+        public BossCommandLineRunner(MasterLeaderManager masterLeaderManager) {
+            this.masterLeaderManager = masterLeaderManager;
         }
 
         @Override
         public void run(String... args) throws Exception {
 
             log.info("BossLeaderManager is starting..." + LocalDateTime.now().toString());
-            bossLeaderManager.start();
+            masterLeaderManager.start();
             log.info("BossLeaderManager is started..." + LocalDateTime.now().toString());
         }
     }

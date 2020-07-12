@@ -14,7 +14,7 @@ import xzf.spiderman.worker.entity.SpiderCnf;
  * 5. 假如监听到zk工作目录的所有worker completed = true ，遍历发布stop消息给爬虫(http)
  *
  */
-public class Boss
+public class Master
 {
     private SpiderCnf cnf;
 
