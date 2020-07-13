@@ -1,6 +1,5 @@
 package xzf.spiderman.worker.controller;
 
-import com.alibaba.nacos.client.naming.NacosNamingService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.leader.Participant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import xzf.spiderman.common.Ret;
 import xzf.spiderman.common.exception.BizException;
-import xzf.spiderman.worker.data.StartTaskReq;
+import xzf.spiderman.worker.data.SubmitSpiderReq;
 import xzf.spiderman.worker.feign.SpiderMasterFeignService;
 import xzf.spiderman.worker.service.MasterLeaderManager;
 
@@ -28,8 +27,8 @@ public class SpiderMasterController implements SpiderMasterFeignService
 
 
     @Override
-    @PostMapping("/start-task")
-    public Ret<String> startTask(StartTaskReq req)
+    @PostMapping("/submit-spider")
+    public Ret<String> submitSpider(SubmitSpiderReq req)
     {
         if (masterLeaderManager.hasLeadership()) {
             // 直接处理
@@ -42,10 +41,10 @@ public class SpiderMasterController implements SpiderMasterFeignService
 
 
     //---
-    @PostMapping("/start-task-by-master")
-    public Ret<String> startTaskByMasterServer(StartTaskReq req)
+    @PostMapping("/submit-spider-by-master")
+    public Ret<String> submitSpiderByMaster(SubmitSpiderReq req)
     {
-        log.info(".... startTaskByMasterServer handle");
+        log.info(".... submitSpiderByMaster handle");
 
         if (!masterLeaderManager.hasLeadership()) {
             throw new BizException("错误的转发。不是Leader节点。 ");
@@ -55,17 +54,17 @@ public class SpiderMasterController implements SpiderMasterFeignService
     }
 
 
-    private Ret<String> forwardToMasterServer(StartTaskReq req)
+    private Ret<String> forwardToMasterServer(SubmitSpiderReq req)
     {
         Participant leader = masterLeaderManager.getLeader();
         String hostAndPort = leader.getId();
 
-        String url = "http://"+hostAndPort+"/worker/spider-master/start-task-by-master";
+        String url = "http://"+hostAndPort+"/worker/spider-master/submit-spider-by-master";
 
         MultiValueMap<String, String> headers = new HttpHeaders();
         headers.add("Content-Type","application/json");
 
-        HttpEntity<StartTaskReq> postEntity = new HttpEntity<>(req, headers);
+        HttpEntity<SubmitSpiderReq> postEntity = new HttpEntity<>(req, headers);
 
         RestTemplate restTemplate = new RestTemplate();
 

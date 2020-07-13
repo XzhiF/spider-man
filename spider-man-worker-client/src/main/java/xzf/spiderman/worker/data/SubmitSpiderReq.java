@@ -4,10 +4,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import javax.validation.constraints.NotBlank;
+
 @Data
 @NoArgsConstructor
 @ToString
-public class StartTaskReq
+public class SubmitSpiderReq
 {
-    private String spiderGroupId;
+    @NotBlank
+    private String groupId;
 }

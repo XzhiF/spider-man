@@ -1,6 +1,7 @@
 package xzf.spiderman.worker.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import xzf.spiderman.worker.data.AddSpiderCnfReq;
@@ -13,6 +14,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @ToString
+@EqualsAndHashCode(of = "id")
 public class SpiderCnf
 {
     public static final int STATUS_STOPED = 0;
@@ -97,6 +99,9 @@ public class SpiderCnf
 
         return ret;
     }
+
+
+
 }
 
 

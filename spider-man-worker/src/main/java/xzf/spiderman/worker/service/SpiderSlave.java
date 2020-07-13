@@ -9,7 +9,7 @@ package xzf.spiderman.worker.service;
  *   当 canClose为真的时候。 更新zk节点，设置为completed
  *
  */
-public class Slave
+public class SpiderSlave
 {
     // 操作zk方法
     public void sendCompleted()
