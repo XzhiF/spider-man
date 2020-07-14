@@ -37,8 +37,7 @@ public class SpiderMasterService
     @Autowired
     private CuratorFramework curator;
 
-    @Autowired
-    private SpiderMaster spiderMaster;
+    private SpiderMaster spiderMaster; // TODO
 
 
     // 1. init
@@ -82,8 +81,6 @@ public class SpiderMasterService
         }
     }
 
-
-
     //
     @Transactional
     public String submitSpider(SubmitSpiderReq req)
@@ -98,7 +95,7 @@ public class SpiderMasterService
         List<SpiderCnf> availableCnfs = getAvailableCnfServers(cnfs);
 
         // 4. 使用spiderMaster进行分发任务，并监听停止事件
-        spiderMaster.submit( spiderId, req.getGroupId(), availableCnfs );
+        spiderMaster.submit( new SpiderKey(spiderId, req.getGroupId()), availableCnfs );
 
         //
         return spiderId;

@@ -20,17 +20,22 @@ public class SpiderTaskStore
         this.redisTemplate = redisTemplate;
     }
 
-    private final Map<String, Map<String,SpiderTaskData>> data = new HashMap<>();
+    // Map{ spiderKey : Map{ cnfId : spiderData }  }
+    private final Map<SpiderKey, Map<String,SpiderTaskData>> data = new HashMap<>();
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
 
-    public void put(String spiderTaskId, Map<String,SpiderTaskData> tasks)
+    private String redisKey(SpiderKey key){
+        return REDIS_SPIDER_TASK_KEY+":"+key.getGroupId();
+    }
+
+    public void put(SpiderKey key, Map<String,SpiderTaskData> tasks)
     {
         lock.writeLock().lock();
         try{
-            data.put(spiderTaskId, tasks);
-            redisTemplate.opsForHash().put(REDIS_SPIDER_TASK_KEY, spiderTaskId, tasks);
+            data.put(key, tasks);
+            redisTemplate.opsForHash().put(redisKey(key), key.getSpiderId(), tasks);
         }
         finally {
             lock.writeLock().unlock();
@@ -38,43 +43,43 @@ public class SpiderTaskStore
     }
 
 
-    public void update(String spiderTaskId, SpiderTaskData task)
+    public void update(SpiderKey key, SpiderTaskData task)
     {
         lock.writeLock().lock();
 
         try {
-            Map<String, SpiderTaskData> taskMap = data.get(spiderTaskId);
+            Map<String, SpiderTaskData> taskMap = data.get(key);
 
             SpiderTaskData src = taskMap.get(task.getCnfId());
             src.setStatus(task.getStatus());
 
-            redisTemplate.opsForHash().put(REDIS_SPIDER_TASK_KEY, spiderTaskId, taskMap);
+            redisTemplate.opsForHash().put(redisKey(key), key.getSpiderId(), taskMap);
         }finally {
             lock.writeLock().unlock();;
         }
     }
 
-    public void remove(String spiderTaskId, SpiderTaskData task)
+    public void remove(SpiderKey key, SpiderTaskData task)
     {
         lock.writeLock().lock();
 
         try {
-            Map<String, SpiderTaskData> taskMap = data.get(spiderTaskId);
+            Map<String, SpiderTaskData> taskMap = data.get(key);
 
             taskMap.remove(task.getCnfId());
 
-            redisTemplate.opsForHash().put(REDIS_SPIDER_TASK_KEY, spiderTaskId, taskMap);
+            redisTemplate.opsForHash().put(redisKey(key), key.getSpiderId(), taskMap);
         }finally {
             lock.writeLock().unlock();
         }
     }
 
 
-    public List<SpiderTaskData> getTasks(String spiderTaskId)
+    public List<SpiderTaskData> getTasks(SpiderKey key)
     {
         lock.readLock().lock();
         try {
-            return new ArrayList<>(data.get(spiderTaskId).values());
+            return new ArrayList<>(data.get(key).values());
         }finally {
             lock.readLock().unlock();
         }

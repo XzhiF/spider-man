@@ -14,35 +14,40 @@ import java.util.List;
 
 public class SpiderWatcher
 {
-    private SpiderTaskStore store;
-    private CuratorFramework curator;
-    private String spiderId;
-    private String groupId;
+    private final SpiderTaskStore store;
+    private final CuratorFramework curator;
+    private final SpiderKey key;
 
     private final String basePath;
     private final String watchingPath;
+
+    private final PreCloseCallback preCloseCallback;
     private final CloseCallback closeCallback;
 
     private CuratorCache curatorCache;
 
-    public interface CloseCallback
+    public interface PreCloseCallback
     {
         void call();
     }
 
+    private interface CloseCallback
+    {
+        void call();
+    }
 
-    public SpiderWatcher(CuratorFramework curator, SpiderTaskStore store, String spiderId, String groupId, CloseCallback closeCallback) {
+    public SpiderWatcher(CuratorFramework curator, SpiderTaskStore store, SpiderKey key, PreCloseCallback preCloseCallback,CloseCallback closeCallback) {
         this.store = store;
         this.curator = curator;
-        this.spiderId = spiderId;
-        this.groupId = groupId;
+        this.key = key;
+        this.preCloseCallback = preCloseCallback;
         this.closeCallback = closeCallback;
 
         this.basePath = WorkerConst.ZK_SPIDER_TASK_BASE_PATH;
-        this.watchingPath = basePath+"/"+groupId+"/"+spiderId;
+        this.watchingPath = basePath+"/"+key.getGroupId()+"/"+key.getSpiderId();
     }
 
-    public void start()
+    public void watchAutoClose()
     {
         // 1. create path
         createWatchingPath();
@@ -55,18 +60,29 @@ public class SpiderWatcher
 
     public void close()
     {
+        // 1. close掉 cache
         curatorCache.close();
-        this.closeCallback.call();
+
+        // 2.清理zk节点
+        deleteWatchingPath();
+    }
+
+    private void deleteWatchingPath()
+    {
+        try  {
+            curator.delete().deletingChildrenIfNeeded().forPath("watchingPath");
+        }
+        catch (Exception e)  {
+            throw new BizException("curator carete "+ watchingPath + " 失败。" + e.getMessage(), e);
+        }
     }
 
     public void createWatchingPath()
     {
-        try
-        {
+        try {
             curator.create().withMode(CreateMode.PERSISTENT).forPath(watchingPath);
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             throw new BizException("curator carete "+ watchingPath + " 失败。" + e.getMessage(), e);
         }
     }
@@ -79,37 +95,116 @@ public class SpiderWatcher
             switch (type){
                 case NODE_CREATED:  // slave端来做的create操作
                     // 1. update -> init,  是不是running
-                    SpiderTaskData task1 = JSON.parseObject(data.getData(),SpiderTaskData.class);
-                    store.update(spiderId, task1);
-
+                    onNodeCreated(data);
                     break;
 
                 case NODE_CHANGED:
-
-                    // 1. update 是不是stop
-                    SpiderTaskData task2 = JSON.parseObject(data.getData(),SpiderTaskData.class);
-                    store.update(spiderId, task2);
-
-                    // 2. 检查伙store,所有task是不是都是stopped了， 如果的话，dispatch-> slave-> stop
-                    if(isAllCanStop(store.getTasks(spiderId))){
-                        close();
-                    }
+                    // 1. update
+                    // 2. 判断canClose
+                    // 3. 处理已经close
+                    onNodeChanged(data);
                     break;
 
                 case NODE_DELETED:
-                    // TODO , delete证明宕机了
-                    SpiderTaskData task3 = JSON.parseObject(data.getData(),SpiderTaskData.class);
-                    store.remove(spiderId, task3);
-
+                    // 节点宕机
+                    onNodeDelete(data);
                     break;
                 default:break;
             }
         }
     }
 
-    private boolean isAllCanStop(List<SpiderTaskData> tasks)
+
+    private void onNodeCreated(ChildData data)
     {
-        return ! (tasks.stream().filter(t->t.getStatus()<SpiderTaskData.CAN_STOP).findAny().isPresent());
+        SpiderTaskData task = JSON.parseObject(data.getData(),SpiderTaskData.class);
+        store.update(key.getSpiderId(), task);
+    }
+
+    private void onNodeChanged(ChildData data)
+    {
+        // 1. update 是不是stop
+        SpiderTaskData task = JSON.parseObject(data.getData(),SpiderTaskData.class);
+        store.update(key.getSpiderId(), task);
+
+        // 2. 检查是否都达到close条件
+        if(isAllStatusCanClose(store.getTasks(key.getSpiderId()))) {
+            if(preCloseCallback != null){ preCloseCallback.call();}
+        }
+
+        // 3. 检查爬虫是否都关闭了
+        if(isAllStatusClosed(store.getTasks(key.getSpiderId()))){
+            close();
+            if(closeCallback!=null){ closeCallback.call(); }
+        }
+    }
+
+    private void onNodeDelete(ChildData data)
+    {
+        SpiderTaskData task = JSON.parseObject(data.getData(),SpiderTaskData.class);
+        store.remove(key.getSpiderId(), task);
+    }
+
+    private boolean isAllStatusCanClose(List<SpiderTaskData> tasks)
+    {
+        return ! (tasks.stream().filter(t->t.getStatus() != SpiderTaskData.STATUS_CAN_CLOSE).findAny().isPresent());
+    }
+
+    private boolean isAllStatusClosed(List<SpiderTaskData> tasks)
+    {
+        return ! (tasks.stream().filter(t->t.getStatus() != SpiderTaskData.STATUS_CLOSED).findAny().isPresent());
+    }
+
+
+    public static Builder builder(CuratorFramework curator)
+    {
+        return new Builder(curator);
+    }
+
+    public static class Builder
+    {
+        private CuratorFramework curator;
+        private SpiderTaskStore store;
+        private SpiderKey key;
+        private PreCloseCallback preCloseCallback;
+        private CloseCallback closeCallback;
+
+        public Builder(CuratorFramework curator)
+        {
+            this.curator = curator;
+        }
+
+        public Builder withStore(SpiderTaskStore store)
+        {
+            this.store = store;
+            return this;
+        }
+
+
+        public Builder withKey(SpiderKey key)
+        {
+            this.key = key;
+            return this;
+        }
+
+        public Builder preCloseCallback(PreCloseCallback preCloseCallback)
+        {
+            this.preCloseCallback = preCloseCallback;
+            return this;
+        }
+
+        public Builder closeCallback(CloseCallback closeCallback)
+        {
+            this.closeCallback = closeCallback;
+            return this;
+        }
+
+
+        public SpiderWatcher build()
+        {
+            return new SpiderWatcher(curator,store,key,preCloseCallback,closeCallback);
+        }
+
     }
 
 }

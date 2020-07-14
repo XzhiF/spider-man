@@ -5,6 +5,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import xzf.spiderman.worker.data.CloseSpiderReq;
 import xzf.spiderman.worker.data.StartSpiderReq;
 import xzf.spiderman.worker.entity.SpiderCnf;
 import xzf.spiderman.worker.entity.SpiderServer;
@@ -12,29 +13,36 @@ import xzf.spiderman.worker.entity.SpiderServer;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 public class SpiderDispatcher
 {
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private List<SpiderCnf> cnfs;
-    private String spiderId;
-    private String groupId;
+    private final List<SpiderCnf> cnfs;
+    private final SpiderKey key;
 
 
     public SpiderDispatcher(
-            String spiderId,
-            String groupId,
+            SpiderKey key,
             List<SpiderCnf> cnfs)
     {
-        this.spiderId = spiderId;
-        this.groupId = groupId;
+        this.key = key;
         this.cnfs = cnfs;
 
     }
 
-
     public void dispatchStart()
+    {
+        dispatch(cnf->()->startSpiderRequest(cnf));
+    }
+
+    public void dispatchClose()
+    {
+        dispatch(cnf->()->closeSpiderRequest(cnf));
+    }
+
+    private void dispatch(Function<SpiderCnf,Runnable> func)
     {
         int availableSize = cnfs.size();
 
@@ -49,13 +57,15 @@ public class SpiderDispatcher
 
             for (SpiderCnf cnf : cnfs)
             {
-                executorService.submit(()->startSpiderRequest(cnf));
+                Runnable r = func.apply(cnf);
+                executorService.submit(r);
             }
         }
         finally {
             executorService.shutdown();
         }
     }
+
 
     public void startSpiderRequest(SpiderCnf cnf)
     {
@@ -65,7 +75,7 @@ public class SpiderDispatcher
 
         StartSpiderReq startSpiderReq = new StartSpiderReq();
         startSpiderReq.setCnfId(cnf.getId());
-        startSpiderReq.setSpiderId(spiderId);
+        startSpiderReq.setSpiderId(key.getSpiderId());
 
         String url = "http://"+host+":"+port+"/worker/spider-slave/start-spider";
         MultiValueMap<String, String> headers = new HttpHeaders();
@@ -75,11 +85,23 @@ public class SpiderDispatcher
         restTemplate.postForEntity(url, postEntity, Void.class);
     }
 
-    public void dispatchStop()
+    public void closeSpiderRequest(SpiderCnf cnf)
     {
-        // TODO
-    }
+        SpiderServer server = cnf.getServer();
+        String host = server.getHost();
+        Integer port = server.getPort();
 
+        CloseSpiderReq closeSpiderReq = new CloseSpiderReq();
+        closeSpiderReq.setCnfId(cnf.getId());
+        closeSpiderReq.setSpiderId(key.getSpiderId());
+
+        String url = "http://"+host+":"+port+"/worker/spider-slave/close-spider";
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        headers.add("Content-Type","application/json");
+        HttpEntity<CloseSpiderReq> postEntity = new HttpEntity<>(closeSpiderReq, headers);
+
+        restTemplate.postForEntity(url, postEntity, Void.class);
+    }
 
     private class  SpiderTaskHttpDispatcherThreadFactory implements ThreadFactory
     {
@@ -89,7 +111,7 @@ public class SpiderDispatcher
         @Override
         public Thread newThread(Runnable r)
         {
-            String name = "SpiderTaskHttpDispatcher-"+ groupId +"-worker-"+worker.incrementAndGet();
+            String name = "SpiderTaskHttpDispatcher-"+ key.getGroupId() +"-worker-"+worker.incrementAndGet();
             return new Thread(threadGroup, r, name);
         }
     }

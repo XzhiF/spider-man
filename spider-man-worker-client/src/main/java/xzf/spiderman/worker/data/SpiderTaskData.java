@@ -11,8 +11,8 @@ public class SpiderTaskData
 {
     public static final int STATUS_INIT = 0;
     public static final int STATUS_RUNNING = 1;
-    public static final int CAN_STOP = 2;
-    public static final int STATUS_STOPPED = 3;
+    public static final int STATUS_CAN_CLOSE = 2;
+    public static final int STATUS_CLOSED = 3;
 
     private String spiderId;
     private String groupId;

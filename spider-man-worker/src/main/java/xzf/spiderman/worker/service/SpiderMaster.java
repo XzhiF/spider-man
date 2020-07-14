@@ -31,56 +31,42 @@ public class SpiderMaster
         this.curator = curator;
     }
 
-    public void submit(String spiderId, String groupId, List<SpiderCnf> cnfs)
+    public void submit(SpiderKey key, List<SpiderCnf> cnfs)
     {
         // 1. 保存Task数据信息到store中
-        store.put(spiderId, buildInitSpiderTaskRuntimeData(spiderId, groupId, cnfs)); //init
+        store.put(key, buildInitSpiderTaskRuntimeData(key, cnfs)); //init
 
         // 2. 发送给slave，开始爬虫任务 ->  slave , zkCli -> create_path -> /worker/spider-task/{groupId}/{spiderId}/spider1-(data:ip,port, conf.  running)
-        SpiderDispatcher dispatcher = new SpiderDispatcher(spiderId, groupId, cnfs);
+        SpiderDispatcher dispatcher = new SpiderDispatcher(key, cnfs);
         dispatcher.dispatchStart();
 
         // 3. zk中创建目录，并监控
-        SpiderWatcher.CloseCallback closeCallback = () -> {
-            dispatcher.dispatchStop();
+        SpiderWatcher.PreCloseCallback preCloseCallback = () -> {
+            dispatcher.dispatchClose();
         };
-        SpiderWatcher watcher = new SpiderWatcher(curator, store, spiderId, groupId,closeCallback);
-        watcher.start();
+        SpiderWatcher watcher = SpiderWatcher.builder(curator)
+                .withStore(store)
+                .withKey(key)
+                .preCloseCallback(preCloseCallback)
+                .build();
+
+        watcher.watchAutoClose();
+
+
     }
 
-    private Map<String,SpiderTaskData> buildInitSpiderTaskRuntimeData(String spiderId, String groupId, List<SpiderCnf> cnfs)
+    private Map<String,SpiderTaskData> buildInitSpiderTaskRuntimeData(SpiderKey key, List<SpiderCnf> cnfs)
     {
         Map<String,SpiderTaskData> taskData = new HashMap<>();
         for (SpiderCnf cnf : cnfs) {
             SpiderTaskData data = new SpiderTaskData();
-            data.setSpiderId(spiderId);
-            data.setGroupId(groupId);
+            data.setSpiderId(key.getSpiderId());
+            data.setGroupId(key.getGroupId());
             data.setCnfId(cnf.getId());
             data.setStatus(SpiderTaskData.STATUS_INIT);
             taskData.put(cnf.getId(), data);
         }
         return taskData;
     }
-
-    // 往zk里面写数据的一个 zkOps, watch ->
-
-
- /**
-  *
-  * 1. 根据groupId -> 查找到所有爬虫
-  *
-  * 2. nacos discovery -> spider-man-worker-> 服务器
-  *
-  * 3. filter -> server-host:port. available spider-server
-  *
-  * 4. log ->
-  *
-  * 5. startup
-  *
-  * 6. watch zk path.  stopAll
-  *
-  * startup ->
-  *
- */
 
 }

@@ -28,5 +28,11 @@
 > [记录自己写一个小Java爬虫项目-0023-Service层次依赖接耦](https://www.bilibili.com/video/BV11t4y1Q7P4/) <br/>
 > [记录自己写一个小Java爬虫项目-0024-ScheCmd生产消费队列实现-1](https://www.bilibili.com/video/BV1YC4y1h7Mo/) <br/>
 > [记录自己写一个小Java爬虫项目-0025-ScheCmd生产消费队列实现-2](https://www.bilibili.com/video/BV1dt4y1Q7fk/) <br/>
+> [记录自己写一个小Java爬虫项目-0026-ScheCmd生产消费队列实现-3](https://www.bilibili.com/video/BV1fa4y1h7XU/) <br/>
+> [记录自己写一个小Java爬虫项目-0027-ScheCmd生产消费队列实现-4](https://www.bilibili.com/video/BV1jz4y1D7zA/) <br/>
+> [记录自己写一个小Java爬虫项目-0028-ScheCmd生产消费队列实现-5](https://www.bilibili.com/video/BV1Gz4y1D7hn/) <br/>
+> [记录自己写一个小Java爬虫项目-0029-ScheCmd生产消费队列实现-6](https://www.bilibili.com/video/BV1di4y1g7eZ/) <br/>
+> [记录自己写一个小Java爬虫项目-0030-简单集成webmagic-1](https://www.bilibili.com/video/BV1Mk4y1B7pR/) <br/>
+> [记录自己写一个小Java爬虫项目-0031-简单集成webmagic-2](https://www.bilibili.com/video/BV17z4y1D7Do/) <br/>
 >
 
