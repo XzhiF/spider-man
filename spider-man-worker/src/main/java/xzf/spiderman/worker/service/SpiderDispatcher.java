@@ -1,6 +1,7 @@
 package xzf.spiderman.worker.service;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
@@ -15,6 +16,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+@Slf4j
 public class SpiderDispatcher
 {
     private final RestTemplate restTemplate = new RestTemplate();
@@ -75,12 +77,15 @@ public class SpiderDispatcher
 
         StartSpiderReq startSpiderReq = new StartSpiderReq();
         startSpiderReq.setCnfId(cnf.getId());
+        startSpiderReq.setGroupId(key.getGroupId());
         startSpiderReq.setSpiderId(key.getSpiderId());
 
         String url = "http://"+host+":"+port+"/worker/spider-slave/start-spider";
         MultiValueMap<String, String> headers = new HttpHeaders();
         headers.add("Content-Type","application/json");
         HttpEntity<StartSpiderReq> postEntity = new HttpEntity<>(startSpiderReq, headers);
+
+        log.info("dispatch url: " + url);
 
         restTemplate.postForEntity(url, postEntity, Void.class);
     }
@@ -93,6 +98,7 @@ public class SpiderDispatcher
 
         CloseSpiderReq closeSpiderReq = new CloseSpiderReq();
         closeSpiderReq.setCnfId(cnf.getId());
+        closeSpiderReq.setGroupId(key.getGroupId());
         closeSpiderReq.setSpiderId(key.getSpiderId());
 
         String url = "http://"+host+":"+port+"/worker/spider-slave/close-spider";

@@ -1,6 +1,7 @@
 package xzf.spiderman.worker.service;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.CuratorCache;
@@ -12,6 +13,7 @@ import xzf.spiderman.worker.data.SpiderTaskData;
 
 import java.util.List;
 
+@Slf4j
 public class SpiderWatcher
 {
     private final SpiderTaskStore store;
@@ -31,7 +33,7 @@ public class SpiderWatcher
         void call();
     }
 
-    private interface CloseCallback
+    public interface CloseCallback
     {
         void call();
     }
@@ -65,12 +67,15 @@ public class SpiderWatcher
 
         // 2.清理zk节点
         deleteWatchingPath();
+
+        log.info("SpiderWatcher closed.");
     }
 
     private void deleteWatchingPath()
     {
         try  {
-            curator.delete().deletingChildrenIfNeeded().forPath("watchingPath");
+            curator.delete().deletingChildrenIfNeeded().forPath(watchingPath);
+            log.info("SpiderWatcher delete path : " + watchingPath);
         }
         catch (Exception e)  {
             throw new BizException("curator carete "+ watchingPath + " 失败。" + e.getMessage(), e);
@@ -81,9 +86,10 @@ public class SpiderWatcher
     {
         try {
             curator.create().withMode(CreateMode.PERSISTENT).forPath(watchingPath, new byte[0]);
+            log.info("SpiderWatcher create path : " + watchingPath);
         }
         catch (Exception e) {
-            throw new BizException("curator carete "+ watchingPath + " 失败。" + e.getMessage(), e);
+            throw new BizException("curator create "+ watchingPath + " 失败。" + e.getMessage(), e);
         }
     }
 

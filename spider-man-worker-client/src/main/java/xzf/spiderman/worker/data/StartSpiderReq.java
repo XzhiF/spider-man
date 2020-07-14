@@ -10,5 +10,6 @@ import lombok.ToString;
 public class StartSpiderReq
 {
     private String spiderId;
+    private String groupId;
     private String cnfId;
 }

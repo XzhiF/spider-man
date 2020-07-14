@@ -39,23 +39,28 @@ public class SpiderMaster implements EventListener
         // 1. 保存Task数据信息到store中
         store.put(key, buildInitSpiderTaskRuntimeData(key, cnfs)); //init
 
-        // 2. 发送给slave，开始爬虫任务 ->  slave , zkCli -> create_path -> /worker/spider-task/{groupId}/{spiderId}/spider1-(data:ip,port, conf.  running)
+        // 2.创建dispatcher
         SpiderDispatcher dispatcher = new SpiderDispatcher(key, cnfs);
-        dispatcher.dispatchStart();
 
         // 3. zk中创建目录，并监控
         SpiderWatcher.PreCloseCallback preCloseCallback = () -> {
             dispatcher.dispatchClose();
         };
+        SpiderWatcher.CloseCallback closeCallback = ()->{
+            store.remove(key);
+        };
         SpiderWatcher watcher = SpiderWatcher.builder(curator)
                 .withStore(store)
                 .withKey(key)
                 .preCloseCallback(preCloseCallback)
+                .closeCallback(closeCallback)
                 .build();
 
         watcher.watchAutoClose();
 
 
+        // 4. 发送给slave，开始爬虫任务 ->  slave , zkCli -> create_path -> /worker/spider-task/{groupId}/{spiderId}/spider1-(data:ip,port, conf.  running)
+        dispatcher.dispatchStart();
     }
 
     private Map<String,SpiderTaskData> buildInitSpiderTaskRuntimeData(SpiderKey key, List<SpiderCnf> cnfs)

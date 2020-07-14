@@ -56,6 +56,7 @@ public class WorkerBootstrapConfiguration
             public void takeLeadership(LeaderManager manager) throws Exception {
                 System.out.println("boss" + manager.getId()+", takeLeadership");
 
+                // TODO ...
                 spiderMasterService.initSpiderWorkspace();
                 spiderTaskStore.sync();
             }

@@ -80,6 +80,20 @@ public class SpiderTaskStore
         }
     }
 
+    public void remove(SpiderKey key)
+    {
+        lock.writeLock().lock();
+
+        try
+        {
+            data.remove(key);
+            redisTemplate.opsForHash().delete(REDIS_SPIDER_TASK_KEY, key.getSpiderId());
+        }
+        finally {
+            lock.writeLock().unlock();
+        }
+    }
+
     public void remove(SpiderKey key, SpiderTaskData task)
     {
         lock.writeLock().lock();
