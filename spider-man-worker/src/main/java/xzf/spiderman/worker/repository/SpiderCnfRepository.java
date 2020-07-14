@@ -9,7 +9,7 @@ import java.util.List;
 public interface SpiderCnfRepository extends JpaRepository<SpiderCnf,String>
 {
 
-    @Query("select s from SpiderCnf s where s.group.id = :groupId ")
+    @Query("select s from SpiderCnf s where s.group.id= ?1 ")
     List<SpiderCnf> findALlByGroupId(String groupId);
 
 }

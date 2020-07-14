@@ -1,32 +1,38 @@
 package xzf.spiderman.worker.service;
 
-import com.alibaba.nacos.api.annotation.NacosInjected;
+import com.alibaba.cloud.nacos.discovery.NacosServiceDiscovery;
 import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.naming.pojo.Instance;
-import com.alibaba.nacos.client.naming.NacosNamingService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xzf.spiderman.common.exception.BizException;
-import static xzf.spiderman.worker.configuration.WorkerConst.*;
 import xzf.spiderman.worker.data.SubmitSpiderReq;
 import xzf.spiderman.worker.entity.SpiderCnf;
 import xzf.spiderman.worker.entity.SpiderGroup;
 import xzf.spiderman.worker.repository.SpiderCnfRepository;
 import xzf.spiderman.worker.repository.SpiderGroupRepository;
+import xzf.spiderman.worker.service.event.SpiderSubmittedEvent;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
+import static xzf.spiderman.worker.configuration.WorkerConst.ZK_SPIDER_TASK_BASE_PATH;
 
 @Service
 @Slf4j
 public class SpiderMasterService
 {
-    @NacosInjected
-    private NacosNamingService nacosNamingService;
+    @Autowired
+    private NacosServiceDiscovery nacosServiceDiscovery;
 
     @Autowired
     private SpiderCnfRepository spiderCnfRepository;
@@ -37,7 +43,8 @@ public class SpiderMasterService
     @Autowired
     private CuratorFramework curator;
 
-    private SpiderMaster spiderMaster; // TODO
+    @Autowired
+    private EventPublisherRegistry eventPublisherRegistry;
 
 
     // 1. init
@@ -67,7 +74,7 @@ public class SpiderMasterService
 
     private void initSpiderTaskPath4Group(SpiderGroup group)
     {
-        String path = ZK_SPIDER_TASK_BASE_PATH + "/" + group;
+        String path = ZK_SPIDER_TASK_BASE_PATH + "/" + group.getId();
         try
         {
             if (curator.checkExists().forPath(path) == null)
@@ -94,10 +101,21 @@ public class SpiderMasterService
         // 3. 过滤了Server启动状态中的爬虫cnf
         List<SpiderCnf> availableCnfs = getAvailableCnfServers(cnfs);
 
-        // 4. 使用spiderMaster进行分发任务，并监听停止事件
-        spiderMaster.submit( new SpiderKey(spiderId, req.getGroupId()), availableCnfs );
+        if(availableCnfs.isEmpty()){
+            throw new BizException("没有可运行的爬虫服务器.group " + req.getGroupId());
+        }
 
-        //
+
+        // 4. 发布事件
+        SpiderSubmittedEvent spiderSubmittedEvent = SpiderSubmittedEvent.builder()
+                .key(new SpiderKey(spiderId, req.getGroupId()))
+                .allCnfs(cnfs)
+                .availableCnfs(availableCnfs)
+                .build();
+
+        eventPublisherRegistry.spiderMasterEventPublisher()
+                .publish(spiderSubmittedEvent);
+
         return spiderId;
     }
 
@@ -119,13 +137,22 @@ public class SpiderMasterService
         try
         {
             List<SpiderCnf> results = new ArrayList<>();
-            List<Instance> allInstances = nacosNamingService.getAllInstances("spider-man-worker");
+            List<ServiceInstance> allInstances = nacosServiceDiscovery.getInstances("spider-man-worker");
 
-            for (Instance instance : allInstances) {
+            for (ServiceInstance instance : allInstances) {
                 for (SpiderCnf cnf : cnfs) {
                     String host = cnf.getServer().getHost();
                     Integer port = cnf.getServer().getPort();
-                    if(instance.getIp().equals(host) && instance.getPort()==port.intValue()){
+
+                    if(host.equals("localhost"))
+                    {
+                        try {
+                            host = InetAddress.getLocalHost().getHostAddress();
+                        } catch (UnknownHostException e) {}
+                    }
+
+
+                    if(instance.getHost().equals(host) && instance.getPort()==port.intValue()){
                         results.add(cnf);
                         break;
                     }
@@ -135,12 +162,6 @@ public class SpiderMasterService
         } catch (NacosException e) {
             throw new BizException("解析Nacos可用实例失败");
         }
-    }
-
-    public static void main(String[] args)
-    {
-        System.out.println(Long.MAX_VALUE);
-        System.out.println("9223372036854775807".length());
     }
 
 }

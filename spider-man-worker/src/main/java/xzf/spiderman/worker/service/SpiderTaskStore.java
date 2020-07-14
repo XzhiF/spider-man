@@ -26,16 +26,37 @@ public class SpiderTaskStore
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
 
-    private String redisKey(SpiderKey key){
-        return REDIS_SPIDER_TASK_KEY+":"+key.getGroupId();
+    // 从redis，同步本地缓存
+    public void sync()
+    {
+        lock.writeLock().lock();
+        try {
+            data.clear();
+            Map<Object, Object> entries = redisTemplate.opsForHash().entries(REDIS_SPIDER_TASK_KEY);
+            for (Map.Entry<Object, Object> entry : entries.entrySet()) {
+                String spiderId = entry.getKey().toString();
+                Map<String, SpiderTaskData> tasks = (Map<String, SpiderTaskData>) entry.getValue();
+                if(tasks.isEmpty()){continue;}
+
+                String groupId = groupId(tasks);
+                data.put(new SpiderKey(spiderId, groupId), tasks);
+            }
+        }finally {
+            lock.writeLock().unlock();
+        }
     }
+
+    private String groupId(Map<String, SpiderTaskData> map){
+        return map.values().iterator().next().getGroupId();
+    }
+
 
     public void put(SpiderKey key, Map<String,SpiderTaskData> tasks)
     {
         lock.writeLock().lock();
         try{
             data.put(key, tasks);
-            redisTemplate.opsForHash().put(redisKey(key), key.getSpiderId(), tasks);
+            redisTemplate.opsForHash().put(REDIS_SPIDER_TASK_KEY, key.getSpiderId(), tasks);
         }
         finally {
             lock.writeLock().unlock();
@@ -53,7 +74,7 @@ public class SpiderTaskStore
             SpiderTaskData src = taskMap.get(task.getCnfId());
             src.setStatus(task.getStatus());
 
-            redisTemplate.opsForHash().put(redisKey(key), key.getSpiderId(), taskMap);
+            redisTemplate.opsForHash().put(REDIS_SPIDER_TASK_KEY, key.getSpiderId(), taskMap);
         }finally {
             lock.writeLock().unlock();;
         }
@@ -68,7 +89,7 @@ public class SpiderTaskStore
 
             taskMap.remove(task.getCnfId());
 
-            redisTemplate.opsForHash().put(redisKey(key), key.getSpiderId(), taskMap);
+            redisTemplate.opsForHash().put(REDIS_SPIDER_TASK_KEY, key.getSpiderId(), taskMap);
         }finally {
             lock.writeLock().unlock();
         }

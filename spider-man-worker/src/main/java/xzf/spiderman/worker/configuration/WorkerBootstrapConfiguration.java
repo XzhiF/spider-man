@@ -11,7 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xzf.spiderman.starter.curator.leader.LeaderManager;
 import xzf.spiderman.starter.curator.leader.LeaderManagerListener;
+import xzf.spiderman.worker.entity.SpiderStore;
 import xzf.spiderman.worker.service.MasterLeaderManager;
+import xzf.spiderman.worker.service.SpiderMasterService;
+import xzf.spiderman.worker.service.SpiderTaskStore;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -27,6 +30,13 @@ public class WorkerBootstrapConfiguration
 
     @Autowired
     private CuratorFramework curator;
+
+    @Autowired
+    private SpiderMasterService spiderMasterService;
+
+    @Autowired
+    private SpiderTaskStore spiderTaskStore;
+
 
     @Bean
     public MasterLeaderManager bossLeaderManager()
@@ -45,6 +55,9 @@ public class WorkerBootstrapConfiguration
             @Override
             public void takeLeadership(LeaderManager manager) throws Exception {
                 System.out.println("boss" + manager.getId()+", takeLeadership");
+
+                spiderMasterService.initSpiderWorkspace();
+                spiderTaskStore.sync();
             }
         });
 

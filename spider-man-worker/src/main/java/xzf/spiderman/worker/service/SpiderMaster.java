@@ -1,8 +1,11 @@
 package xzf.spiderman.worker.service;
 
 import org.apache.curator.framework.CuratorFramework;
+import xzf.spiderman.common.event.Event;
+import xzf.spiderman.common.event.EventListener;
 import xzf.spiderman.worker.data.SpiderTaskData;
 import xzf.spiderman.worker.entity.SpiderCnf;
+import xzf.spiderman.worker.service.event.SpiderSubmittedEvent;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +23,7 @@ import java.util.Map;
  * 5. 假如监听到zk工作目录的所有worker completed = true ，遍历发布stop消息给爬虫(http)
  *
  */
-public class SpiderMaster
+public class SpiderMaster implements EventListener
 {
     private SpiderTaskStore store ;
     private CuratorFramework curator;
@@ -69,4 +72,17 @@ public class SpiderMaster
         return taskData;
     }
 
+
+    //
+    @Override
+    public boolean supportEventType(Class<? extends Event> clazz) {
+        return SpiderSubmittedEvent.class.equals(clazz);
+    }
+
+    @Override
+    public void onEvent(Event event)
+    {
+        SpiderSubmittedEvent e = (SpiderSubmittedEvent) event;
+        this.submit(e.getKey(), e.getAvailableCnfs());
+    }
 }

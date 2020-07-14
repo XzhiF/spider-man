@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -16,6 +17,9 @@ import xzf.spiderman.common.exception.BizException;
 import xzf.spiderman.worker.data.SubmitSpiderReq;
 import xzf.spiderman.worker.feign.SpiderMasterFeignService;
 import xzf.spiderman.worker.service.MasterLeaderManager;
+import xzf.spiderman.worker.service.SpiderMasterService;
+
+import javax.validation.Valid;
 
 @RequestMapping("/worker/spider-master")
 @RestController
@@ -25,15 +29,19 @@ public class SpiderMasterController implements SpiderMasterFeignService
     @Autowired
     private MasterLeaderManager masterLeaderManager;
 
+    @Autowired
+    private SpiderMasterService spiderMasterService;
+
 
     @Override
     @PostMapping("/submit-spider")
-    public Ret<String> submitSpider(SubmitSpiderReq req)
+    public Ret<String> submitSpider(@Valid @RequestBody SubmitSpiderReq req)
     {
         if (masterLeaderManager.hasLeadership()) {
             // 直接处理
             log.info(".... startTask handle");
-            return Ret.success();
+            String spiderId  = spiderMasterService.submitSpider(req);
+            return Ret.success(spiderId);
 
         }
         return forwardToMasterServer(req);
@@ -42,7 +50,7 @@ public class SpiderMasterController implements SpiderMasterFeignService
 
     //---
     @PostMapping("/submit-spider-by-master")
-    public Ret<String> submitSpiderByMaster(SubmitSpiderReq req)
+    public Ret<String> submitSpiderByMaster(@Valid @RequestBody  SubmitSpiderReq req)
     {
         log.info(".... submitSpiderByMaster handle");
 
@@ -50,7 +58,8 @@ public class SpiderMasterController implements SpiderMasterFeignService
             throw new BizException("错误的转发。不是Leader节点。 ");
         }
 
-        return Ret.success();
+        String spiderId  = spiderMasterService.submitSpider(req);
+        return Ret.success(spiderId);
     }
 
 

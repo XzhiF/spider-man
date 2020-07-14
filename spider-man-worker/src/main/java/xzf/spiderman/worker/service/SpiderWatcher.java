@@ -80,7 +80,7 @@ public class SpiderWatcher
     public void createWatchingPath()
     {
         try {
-            curator.create().withMode(CreateMode.PERSISTENT).forPath(watchingPath);
+            curator.create().withMode(CreateMode.PERSISTENT).forPath(watchingPath, new byte[0]);
         }
         catch (Exception e) {
             throw new BizException("curator carete "+ watchingPath + " 失败。" + e.getMessage(), e);
@@ -117,23 +117,29 @@ public class SpiderWatcher
 
     private void onNodeCreated(ChildData data)
     {
+
+        if(data.getPath().equals(watchingPath)){
+            System.out.println("on create");
+            return;
+        }
+
         SpiderTaskData task = JSON.parseObject(data.getData(),SpiderTaskData.class);
-        store.update(key.getSpiderId(), task);
+        store.update(key, task);
     }
 
     private void onNodeChanged(ChildData data)
     {
         // 1. update 是不是stop
         SpiderTaskData task = JSON.parseObject(data.getData(),SpiderTaskData.class);
-        store.update(key.getSpiderId(), task);
+        store.update(key, task);
 
         // 2. 检查是否都达到close条件
-        if(isAllStatusCanClose(store.getTasks(key.getSpiderId()))) {
+        if(isAllStatusCanClose(store.getTasks(key))) {
             if(preCloseCallback != null){ preCloseCallback.call();}
         }
 
         // 3. 检查爬虫是否都关闭了
-        if(isAllStatusClosed(store.getTasks(key.getSpiderId()))){
+        if(isAllStatusClosed(store.getTasks(key))){
             close();
             if(closeCallback!=null){ closeCallback.call(); }
         }
@@ -142,7 +148,7 @@ public class SpiderWatcher
     private void onNodeDelete(ChildData data)
     {
         SpiderTaskData task = JSON.parseObject(data.getData(),SpiderTaskData.class);
-        store.remove(key.getSpiderId(), task);
+        store.remove(key, task);
     }
 
     private boolean isAllStatusCanClose(List<SpiderTaskData> tasks)
