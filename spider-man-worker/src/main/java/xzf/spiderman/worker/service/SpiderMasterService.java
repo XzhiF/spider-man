@@ -8,14 +8,13 @@ import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import xzf.spiderman.common.exception.BizException;
 import xzf.spiderman.worker.data.SubmitSpiderReq;
 import xzf.spiderman.worker.entity.SpiderCnf;
 import xzf.spiderman.worker.entity.SpiderGroup;
 import xzf.spiderman.worker.repository.SpiderCnfRepository;
 import xzf.spiderman.worker.repository.SpiderGroupRepository;
-import xzf.spiderman.worker.service.event.SpiderSubmittedEvent;
+import xzf.spiderman.worker.service.event.SubmitSpiderEvent;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -89,7 +88,6 @@ public class SpiderMasterService
     }
 
     //
-    @Transactional
     public String submitSpider(SubmitSpiderReq req)
     {
         // 1. 准备spiderTaskId
@@ -107,14 +105,14 @@ public class SpiderMasterService
 
 
         // 4. 发布事件
-        SpiderSubmittedEvent spiderSubmittedEvent = SpiderSubmittedEvent.builder()
-                .key(new SpiderKey(spiderId, req.getGroupId()))
+        SubmitSpiderEvent submitSpiderEvent = SubmitSpiderEvent.builder()
+                .key(new GroupSpiderKey(spiderId, req.getGroupId()))
                 .allCnfs(cnfs)
                 .availableCnfs(availableCnfs)
                 .build();
 
         eventPublisherRegistry.spiderMasterEventPublisher()
-                .publish(spiderSubmittedEvent);
+                .publish(submitSpiderEvent);
 
         return spiderId;
     }

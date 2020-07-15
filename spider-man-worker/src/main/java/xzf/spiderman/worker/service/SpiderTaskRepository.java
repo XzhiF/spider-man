@@ -2,7 +2,6 @@ package xzf.spiderman.worker.service;
 
 import xzf.spiderman.worker.configuration.HessianRedisTemplate;
 import static xzf.spiderman.worker.configuration.WorkerConst.*;
-import xzf.spiderman.worker.data.SpiderTaskData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,17 +10,17 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class SpiderTaskStore
+public class SpiderTaskRepository
 {
     private HessianRedisTemplate redisTemplate;
 
-    public SpiderTaskStore(HessianRedisTemplate redisTemplate)
+    public SpiderTaskRepository(HessianRedisTemplate redisTemplate)
     {
         this.redisTemplate = redisTemplate;
     }
 
     // Map{ spiderKey : Map{ cnfId : spiderData }  }
-    private final Map<SpiderKey, Map<String,SpiderTaskData>> data = new HashMap<>();
+    private final Map<GroupSpiderKey, Map<String, SpiderTask>> data = new HashMap<>();
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -35,23 +34,23 @@ public class SpiderTaskStore
             Map<Object, Object> entries = redisTemplate.opsForHash().entries(REDIS_SPIDER_TASK_KEY);
             for (Map.Entry<Object, Object> entry : entries.entrySet()) {
                 String spiderId = entry.getKey().toString();
-                Map<String, SpiderTaskData> tasks = (Map<String, SpiderTaskData>) entry.getValue();
+                Map<String, SpiderTask> tasks = (Map<String, SpiderTask>) entry.getValue();
                 if(tasks.isEmpty()){continue;}
 
                 String groupId = groupId(tasks);
-                data.put(new SpiderKey(spiderId, groupId), tasks);
+                data.put(new GroupSpiderKey(spiderId, groupId), tasks);
             }
         }finally {
             lock.writeLock().unlock();
         }
     }
 
-    private String groupId(Map<String, SpiderTaskData> map){
+    private String groupId(Map<String, SpiderTask> map){
         return map.values().iterator().next().getGroupId();
     }
 
 
-    public void put(SpiderKey key, Map<String,SpiderTaskData> tasks)
+    public void put(GroupSpiderKey key, Map<String, SpiderTask> tasks)
     {
         lock.writeLock().lock();
         try{
@@ -64,14 +63,14 @@ public class SpiderTaskStore
     }
 
 
-    public void update(SpiderKey key, SpiderTaskData task)
+    public void update(GroupSpiderKey key, SpiderTask task)
     {
         lock.writeLock().lock();
 
         try {
-            Map<String, SpiderTaskData> taskMap = data.get(key);
+            Map<String, SpiderTask> taskMap = data.get(key);
 
-            SpiderTaskData src = taskMap.get(task.getCnfId());
+            SpiderTask src = taskMap.get(task.getCnfId());
             src.setStatus(task.getStatus());
 
             redisTemplate.opsForHash().put(REDIS_SPIDER_TASK_KEY, key.getSpiderId(), taskMap);
@@ -80,7 +79,7 @@ public class SpiderTaskStore
         }
     }
 
-    public void remove(SpiderKey key)
+    public void remove(GroupSpiderKey key)
     {
         lock.writeLock().lock();
 
@@ -94,12 +93,12 @@ public class SpiderTaskStore
         }
     }
 
-    public void remove(SpiderKey key, SpiderTaskData task)
+    public void remove(GroupSpiderKey key, SpiderTask task)
     {
         lock.writeLock().lock();
 
         try {
-            Map<String, SpiderTaskData> taskMap = data.get(key);
+            Map<String, SpiderTask> taskMap = data.get(key);
 
             taskMap.remove(task.getCnfId());
 
@@ -110,7 +109,7 @@ public class SpiderTaskStore
     }
 
 
-    public List<SpiderTaskData> getTasks(SpiderKey key)
+    public List<SpiderTask> getTasks(GroupSpiderKey key)
     {
         lock.readLock().lock();
         try {

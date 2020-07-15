@@ -3,9 +3,8 @@ package xzf.spiderman.worker.service;
 import org.apache.curator.framework.CuratorFramework;
 import xzf.spiderman.common.event.Event;
 import xzf.spiderman.common.event.EventListener;
-import xzf.spiderman.worker.data.SpiderTaskData;
 import xzf.spiderman.worker.entity.SpiderCnf;
-import xzf.spiderman.worker.service.event.SpiderSubmittedEvent;
+import xzf.spiderman.worker.service.event.SubmitSpiderEvent;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,19 +24,19 @@ import java.util.Map;
  */
 public class SpiderMaster implements EventListener
 {
-    private SpiderTaskStore store ;
+    private SpiderTaskRepository taskRepository;
     private CuratorFramework curator;
 
-    public SpiderMaster(SpiderTaskStore store, CuratorFramework curator)
+    public SpiderMaster(SpiderTaskRepository taskRepository, CuratorFramework curator)
     {
-        this.store = store;
+        this.taskRepository = taskRepository;
         this.curator = curator;
     }
 
-    public void submit(SpiderKey key, List<SpiderCnf> cnfs)
+    public void submit(GroupSpiderKey key, List<SpiderCnf> cnfs)
     {
         // 1. 保存Task数据信息到store中
-        store.put(key, buildInitSpiderTaskRuntimeData(key, cnfs)); //init
+        taskRepository.put(key, buildInitSpiderTaskRuntimeData(key, cnfs)); //init
 
         // 2.创建dispatcher
         SpiderDispatcher dispatcher = new SpiderDispatcher(key, cnfs);
@@ -47,10 +46,10 @@ public class SpiderMaster implements EventListener
             dispatcher.dispatchClose();
         };
         SpiderWatcher.CloseCallback closeCallback = ()->{
-            store.remove(key);
+            taskRepository.remove(key);
         };
         SpiderWatcher watcher = SpiderWatcher.builder(curator)
-                .withStore(store)
+                .withStore(taskRepository)
                 .withKey(key)
                 .preCloseCallback(preCloseCallback)
                 .closeCallback(closeCallback)
@@ -63,31 +62,31 @@ public class SpiderMaster implements EventListener
         dispatcher.dispatchStart();
     }
 
-    private Map<String,SpiderTaskData> buildInitSpiderTaskRuntimeData(SpiderKey key, List<SpiderCnf> cnfs)
+    private Map<String, SpiderTask> buildInitSpiderTaskRuntimeData(GroupSpiderKey key, List<SpiderCnf> cnfs)
     {
-        Map<String,SpiderTaskData> taskData = new HashMap<>();
+        Map<String, SpiderTask> task = new HashMap<>();
         for (SpiderCnf cnf : cnfs) {
-            SpiderTaskData data = new SpiderTaskData();
+            SpiderTask data = new SpiderTask();
             data.setSpiderId(key.getSpiderId());
             data.setGroupId(key.getGroupId());
             data.setCnfId(cnf.getId());
-            data.setStatus(SpiderTaskData.STATUS_INIT);
-            taskData.put(cnf.getId(), data);
+            data.setStatus(SpiderTask.STATUS_INIT);
+            task.put(cnf.getId(), data);
         }
-        return taskData;
+        return task;
     }
 
 
     //
     @Override
     public boolean supportEventType(Class<? extends Event> clazz) {
-        return SpiderSubmittedEvent.class.equals(clazz);
+        return SubmitSpiderEvent.class.equals(clazz);
     }
 
     @Override
     public void onEvent(Event event)
     {
-        SpiderSubmittedEvent e = (SpiderSubmittedEvent) event;
+        SubmitSpiderEvent e = (SubmitSpiderEvent) event;
         this.submit(e.getKey(), e.getAvailableCnfs());
     }
 }

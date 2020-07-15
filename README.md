@@ -35,6 +35,7 @@
 > [记录自己写一个小Java爬虫项目-0030-简单集成webmagic-1](https://www.bilibili.com/video/BV1Mk4y1B7pR/) <br/>
 > [记录自己写一个小Java爬虫项目-0031-简单集成webmagic-2](https://www.bilibili.com/video/BV17z4y1D7Do/) <br/>
 > [记录自己写一个小Java爬虫项目-0032-分布式爬虫思路](https://www.bilibili.com/video/BV18D4y1S7za/) <br/>
->
+> [记录自己写一个小Java爬虫项目-0033-Webmagic增强-1](https://www.bilibili.com/video/BV1ap4y1S7eA/) <br/>
+> [记录自己写一个小Java爬虫项目-0034-Webmagic增强-2](https://www.bilibili.com/video/BV11A411e7xh/) <br/>
 >
 

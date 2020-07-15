@@ -9,16 +9,15 @@ import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.zookeeper.CreateMode;
 import xzf.spiderman.common.exception.BizException;
 import xzf.spiderman.worker.configuration.WorkerConst;
-import xzf.spiderman.worker.data.SpiderTaskData;
 
 import java.util.List;
 
 @Slf4j
 public class SpiderWatcher
 {
-    private final SpiderTaskStore store;
+    private final SpiderTaskRepository taskRepository;
     private final CuratorFramework curator;
-    private final SpiderKey key;
+    private final GroupSpiderKey key;
 
     private final String basePath;
     private final String watchingPath;
@@ -38,8 +37,8 @@ public class SpiderWatcher
         void call();
     }
 
-    public SpiderWatcher(CuratorFramework curator, SpiderTaskStore store, SpiderKey key, PreCloseCallback preCloseCallback,CloseCallback closeCallback) {
-        this.store = store;
+    public SpiderWatcher(CuratorFramework curator, SpiderTaskRepository taskRepository, GroupSpiderKey key, PreCloseCallback preCloseCallback, CloseCallback closeCallback) {
+        this.taskRepository = taskRepository;
         this.curator = curator;
         this.key = key;
         this.preCloseCallback = preCloseCallback;
@@ -129,23 +128,23 @@ public class SpiderWatcher
             return;
         }
 
-        SpiderTaskData task = JSON.parseObject(data.getData(),SpiderTaskData.class);
-        store.update(key, task);
+        SpiderTask task = JSON.parseObject(data.getData(), SpiderTask.class);
+        taskRepository.update(key, task);
     }
 
     private void onNodeChanged(ChildData data)
     {
         // 1. update 是不是stop
-        SpiderTaskData task = JSON.parseObject(data.getData(),SpiderTaskData.class);
-        store.update(key, task);
+        SpiderTask task = JSON.parseObject(data.getData(), SpiderTask.class);
+        taskRepository.update(key, task);
 
         // 2. 检查是否都达到close条件
-        if(isAllStatusCanClose(store.getTasks(key))) {
+        if(isAllStatusCanClose(taskRepository.getTasks(key))) {
             if(preCloseCallback != null){ preCloseCallback.call();}
         }
 
         // 3. 检查爬虫是否都关闭了
-        if(isAllStatusClosed(store.getTasks(key))){
+        if(isAllStatusClosed(taskRepository.getTasks(key))){
             close();
             if(closeCallback!=null){ closeCallback.call(); }
         }
@@ -153,18 +152,18 @@ public class SpiderWatcher
 
     private void onNodeDelete(ChildData data)
     {
-        SpiderTaskData task = JSON.parseObject(data.getData(),SpiderTaskData.class);
-        store.remove(key, task);
+        SpiderTask task = JSON.parseObject(data.getData(), SpiderTask.class);
+        taskRepository.remove(key, task);
     }
 
-    private boolean isAllStatusCanClose(List<SpiderTaskData> tasks)
+    private boolean isAllStatusCanClose(List<SpiderTask> tasks)
     {
-        return ! (tasks.stream().filter(t->t.getStatus() != SpiderTaskData.STATUS_CAN_CLOSE).findAny().isPresent());
+        return ! (tasks.stream().filter(t->t.getStatus() != SpiderTask.STATUS_CAN_CLOSE).findAny().isPresent());
     }
 
-    private boolean isAllStatusClosed(List<SpiderTaskData> tasks)
+    private boolean isAllStatusClosed(List<SpiderTask> tasks)
     {
-        return ! (tasks.stream().filter(t->t.getStatus() != SpiderTaskData.STATUS_CLOSED).findAny().isPresent());
+        return ! (tasks.stream().filter(t->t.getStatus() != SpiderTask.STATUS_CLOSED).findAny().isPresent());
     }
 
 
@@ -176,8 +175,8 @@ public class SpiderWatcher
     public static class Builder
     {
         private CuratorFramework curator;
-        private SpiderTaskStore store;
-        private SpiderKey key;
+        private SpiderTaskRepository store;
+        private GroupSpiderKey key;
         private PreCloseCallback preCloseCallback;
         private CloseCallback closeCallback;
 
@@ -186,14 +185,14 @@ public class SpiderWatcher
             this.curator = curator;
         }
 
-        public Builder withStore(SpiderTaskStore store)
+        public Builder withStore(SpiderTaskRepository store)
         {
             this.store = store;
             return this;
         }
 
 
-        public Builder withKey(SpiderKey key)
+        public Builder withKey(GroupSpiderKey key)
         {
             this.key = key;
             return this;

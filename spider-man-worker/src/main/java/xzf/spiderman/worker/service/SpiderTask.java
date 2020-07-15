@@ -1,4 +1,4 @@
-package xzf.spiderman.worker.data;
+package xzf.spiderman.worker.service;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @ToString
-public class SpiderTaskData implements Serializable
+public class SpiderTask implements Serializable
 {
     public static final int STATUS_INIT = 0;
     public static final int STATUS_RUNNING = 1;

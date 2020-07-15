@@ -22,11 +22,11 @@ public class SpiderDispatcher
     private final RestTemplate restTemplate = new RestTemplate();
 
     private final List<SpiderCnf> cnfs;
-    private final SpiderKey key;
+    private final GroupSpiderKey key;
 
 
     public SpiderDispatcher(
-            SpiderKey key,
+            GroupSpiderKey key,
             List<SpiderCnf> cnfs)
     {
         this.key = key;

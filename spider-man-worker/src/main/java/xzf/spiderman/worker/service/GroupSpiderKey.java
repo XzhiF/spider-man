@@ -2,14 +2,12 @@ package xzf.spiderman.worker.service;
 
 import lombok.*;
 
-@Data
-@AllArgsConstructor
 @Getter
+@AllArgsConstructor
+@ToString
 @EqualsAndHashCode
-@Builder
-public class SpiderKey
+public class GroupSpiderKey
 {
     private final String spiderId;
     private final String groupId;
-    private final String cnfId;
 }

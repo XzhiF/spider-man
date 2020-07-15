@@ -11,10 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xzf.spiderman.starter.curator.leader.LeaderManager;
 import xzf.spiderman.starter.curator.leader.LeaderManagerListener;
-import xzf.spiderman.worker.entity.SpiderStore;
 import xzf.spiderman.worker.service.MasterLeaderManager;
 import xzf.spiderman.worker.service.SpiderMasterService;
-import xzf.spiderman.worker.service.SpiderTaskStore;
+import xzf.spiderman.worker.service.SpiderTaskRepository;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -35,7 +34,7 @@ public class WorkerBootstrapConfiguration
     private SpiderMasterService spiderMasterService;
 
     @Autowired
-    private SpiderTaskStore spiderTaskStore;
+    private SpiderTaskRepository spiderTaskStore;
 
 
     @Bean
