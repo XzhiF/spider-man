@@ -7,6 +7,7 @@ import lombok.*;
 @Getter
 @EqualsAndHashCode
 @Builder
+@ToString
 public class SpiderKey
 {
     private final String spiderId;

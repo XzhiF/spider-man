@@ -60,6 +60,8 @@ public class WorkerSpider implements Runnable, Task
 
     protected final static int STAT_RUNNING = 1;
 
+    protected final static int STAT_STOPPING = 3;  // xzf
+
     protected final static int STAT_STOPPED = 2;
 
     protected boolean spawnUrl = true;
@@ -326,6 +328,9 @@ public class WorkerSpider implements Runnable, Task
         if (destroyWhenExit) {
             close();
         }
+
+        lifeCycleListener.onAfterRun(this);
+
         logger.info("Spider {} closed! {} pages downloaded.", getUUID(), pageCount.get());
     }
 
@@ -654,7 +659,7 @@ public class WorkerSpider implements Runnable, Task
 
 
     public enum Status {
-        Init(0), Running(1), Stopped(2);
+        Init(0), Running(1), Stopped(2), Sopping(3);//xzf
 
         private Status(int value) {
             this.value = value;
@@ -791,4 +796,11 @@ public class WorkerSpider implements Runnable, Task
     {
         return lifeCycleListener;
     }
+
+    public void updateStatusStopping()
+    {
+        stat.set(STAT_STOPPED);
+    }
+
+
 }

@@ -15,12 +15,9 @@ public class WorkerSpiderFactory
 
     private PageProcessorFactory processorFactory = new PageProcessorFactory();
 
-    public WorkerSpider create(SpiderCnf cnf)
-    {
-        return null;
-    }
 
-    public WorkerSpider create(SpiderCnf cnf, WorkerSpiderLifeCycleListener listener)
+
+    public WorkerSpider create(SpiderKey key, SpiderCnf cnf, WorkerSpiderLifeCycleListener listener)
     {
         return null;
     }

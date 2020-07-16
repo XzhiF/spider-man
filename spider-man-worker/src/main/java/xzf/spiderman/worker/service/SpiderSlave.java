@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -12,6 +14,7 @@ import xzf.spiderman.common.event.Event;
 import xzf.spiderman.common.event.EventListener;
 import xzf.spiderman.common.exception.BizException;
 import xzf.spiderman.worker.configuration.HessianRedisTemplate;
+import xzf.spiderman.worker.configuration.WorkerProperties;
 import xzf.spiderman.worker.entity.SpiderCnf;
 import xzf.spiderman.worker.service.event.CloseSpiderEvent;
 import xzf.spiderman.worker.service.event.StartSpiderEvent;
@@ -19,7 +22,8 @@ import xzf.spiderman.worker.webmagic.BlockingPollRedisScheduler;
 import xzf.spiderman.worker.webmagic.WorkerSpider;
 import xzf.spiderman.worker.webmagic.WorkerSpiderLifeCycleListener;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static xzf.spiderman.worker.configuration.WorkerConst.ZK_SPIDER_TASK_BASE_PATH;
 
@@ -34,19 +38,25 @@ import static xzf.spiderman.worker.configuration.WorkerConst.ZK_SPIDER_TASK_BASE
  */
 @Service
 @Slf4j
-public class SpiderSlave implements EventListener
+public class SpiderSlave implements EventListener, ApplicationListener<ContextClosedEvent>
 {
     private final CuratorFramework curator;
     private final WorkerSpiderFactory factory;
-
+    private final WorkerSpiderRepository repository;
+    private final ExecutorService executor;
 
     @Autowired
-    public SpiderSlave(CuratorFramework curator,WorkerSpiderFactory factory)
+    public SpiderSlave(
+            CuratorFramework curator,
+            WorkerSpiderFactory factory,
+            WorkerSpiderRepository repository,
+            WorkerProperties properties)
     {
         this.curator = curator;
         this.factory = factory;
+        this.repository = repository;
+        this.executor = newExecutor(properties);
     }
-
 
     public class StartSpiderHandler
     {
@@ -60,45 +70,49 @@ public class SpiderSlave implements EventListener
 
         public void handle()
         {
-            // 1. Build WorkerSpider
-            WorkerSpiderLifeCycleListener listener = new WorkerSpiderLifeCycleListener(){
+            // 1. Build WorkerSpider listener
+            WorkerSpiderLifeCycleListener listener = workerSpiderLifeCycleListener();
+
+            // 2. Build WorkerSpider
+            WorkerSpider spider = factory.create(key, cnf, listener);
+
+            // 3. Run WorkerSpider
+            executor.execute(()->spider.run());
+
+            // 保存到本地缓存中
+            repository.put(key, spider);
+        }
+
+        private WorkerSpiderLifeCycleListener workerSpiderLifeCycleListener()
+        {
+            return new WorkerSpiderLifeCycleListener(){
+
+                // 1. 通知zk，spider开始进行run方法。 这时候spider running
                 @Override
                 public void onBeforeStart(WorkerSpider spider) {
-                    //  write the task data into zk
-                    updateRunningTaskToZk();
+                    updateRunningTaskToZk(key);
                 }
 
+                // 2. 通知zk, spider已经达到了退出的条件，这时候spider canClose
                 @Override
                 public void onCanCloseCondition(WorkerSpider spider) {
-                    //  write the task data into zk
                     updateCanCloseTaskToZk(key);
                 }
+
+                // 3. 在CloseSpiderHandler里面调用spider.close方法， 让Spider可以退出run方法
+                @Override
+                public void onBeforeClose(WorkerSpider spider) {
+                    spider.updateStatusStopping();
+                }
+
+                // 4. Spider跑完了run方法。爬虫已经执行完毕.
+                @Override
+                public void onAfterRun(WorkerSpider spider) {
+                    updateClosedTaskToZk(key);
+                }
             };
-            WorkerSpider spider = factory.create(cnf, listener);
-
-
-            // 异步执行 start spider.
-
-
-        }
-
-
-        private void updateRunningTaskToZk()
-        {
-            String path = taskPath(key);
-            byte[] data = JSON.toJSONBytes(SpiderTask.newRunningTask(key));
-
-            try {
-                curator.create().withMode(CreateMode.EPHEMERAL).forPath(path, data);
-                log.info("Slave: task created. path="+path);
-            } catch (Exception e) {
-                throw new BizException("fail to updateRunningTaskToZk. " +e.getMessage(), e);
-            }
-
         }
     }
-
-
 
     public class CloseSpiderHandler
     {
@@ -112,25 +126,28 @@ public class SpiderSlave implements EventListener
 
         public void handle()
         {
-            // 1. Build WorkerSpider
-
-            // 2. WorkerSpider start.
-
-            // 3. write the task data into zk
-            String path = taskPath(key);
-            byte[] data = JSON.toJSONBytes(SpiderTask.newClosedTask(key));
-
-            try {
-                curator.setData().forPath(path, data);
-            } catch (Exception exception) {
-                // TODO ..
-                exception.printStackTrace();
+            WorkerSpider spider = repository.remove(key);
+            if(spider != null) {
+                spider.close();
             }
-
-            log.info("Slave: closed. path="+path);
+            log.info(key+" closed.");
         }
     }
 
+
+    private void updateRunningTaskToZk(SpiderKey key)
+    {
+        String path = taskPath(key);
+        byte[] data = JSON.toJSONBytes(SpiderTask.newRunningTask(key));
+
+        try {
+            curator.create().withMode(CreateMode.EPHEMERAL).forPath(path, data);
+            log.info("Slave: task created. path="+path);
+        } catch (Exception e) {
+            throw new BizException("fail to updateRunningTaskToZk. " +e.getMessage(), e);
+        }
+
+    }
 
     private void updateCanCloseTaskToZk(SpiderKey key)
     {
@@ -144,7 +161,19 @@ public class SpiderSlave implements EventListener
         }
     }
 
+    private void updateClosedTaskToZk(SpiderKey key)
+    {
+        String path = taskPath(key);
+        byte[] data = JSON.toJSONBytes(SpiderTask.newClosedTask(key));
 
+        try {
+            curator.create().withMode(CreateMode.EPHEMERAL).forPath(path, data);
+            log.info("Slave: task created. path="+path);
+        } catch (Exception e) {
+            throw new BizException("fail to updateRunningTaskToZk. " +e.getMessage(), e);
+        }
+
+    }
 
     private String taskPath(SpiderKey key)
     {
@@ -152,16 +181,11 @@ public class SpiderSlave implements EventListener
         return path;
     }
 
-
-
-
-
     @Override
     public boolean supportEventType(Class<? extends Event> clazz)
     {
         return StartSpiderEvent.class.equals(clazz) || CloseSpiderEvent.class.equals(clazz);
     }
-
 
     @Override
     public void onEvent(Event event)
@@ -185,5 +209,46 @@ public class SpiderSlave implements EventListener
     {
         StartSpiderHandler h = new StartSpiderHandler(event.getKey(), event.getCnf());
         h.handle();
+    }
+
+
+    private ExecutorService newExecutor(WorkerProperties props)
+    {
+        WorkerProperties.SpiderSlavePool cfg = props.getSpiderSlavePool();
+
+        ThreadGroup threadGroup = new ThreadGroup("SpiderSlave");
+
+        ThreadFactory factory = new ThreadFactory() {
+            AtomicInteger workerNo = new AtomicInteger(0);
+            @Override
+            public Thread newThread(Runnable r)
+            {
+                String name = threadGroup.getName()+"-WorkSpiderPool-"+workerNo.incrementAndGet();
+                Thread t = new Thread(threadGroup, r, name );
+                return t;
+            }
+        };
+
+        RejectedExecutionHandler rejectedExecutionHandler = new RejectedExecutionHandler(){
+            @Override
+            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                throw new BizException("SpiderSalve的WorkerSpider线程池已满["+cfg.getPoolThreads()+"]，请稍后重试");
+            }
+        };
+
+        return  new ThreadPoolExecutor(
+                cfg.getCoreThreads(),
+                cfg.getPoolThreads(),
+                cfg.getKeepAliveTimeSeconds(),
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(cfg.getPoolThreads()),
+                factory,
+                rejectedExecutionHandler);
+    }
+
+    @Override
+    public void onApplicationEvent(ContextClosedEvent event)
+    {
+        executor.shutdown();
     }
 }

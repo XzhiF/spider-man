@@ -6,6 +6,9 @@ public interface WorkerSpiderLifeCycleListener
 {
     default void onBeforeStart(WorkerSpider spider) {}
 
+    // 这里代表程序已经真正的可以退出了
+    default void onAfterRun(WorkerSpider spider) {}
+
     default void onRequestPolled(WorkerSpider spider, Request request){}
     //
     default void onCanCloseCondition(WorkerSpider spider) {};
