@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xzf.spiderman.starter.curator.CuratorAutoConfiguration;
+import xzf.spiderman.starter.curator.CuratorFacade;
 import xzf.spiderman.worker.service.SpiderMaster;
 import xzf.spiderman.worker.service.SpiderTaskRepository;
 
@@ -17,7 +18,7 @@ public class SpiderMasterConfiguration
     private HessianRedisTemplate hessianRedisTemplate;
 
     @Autowired
-    private CuratorFramework curator;
+    private CuratorFacade curatorFacade;
 
     @Bean
     public SpiderTaskRepository spiderTaskStore()
@@ -28,7 +29,7 @@ public class SpiderMasterConfiguration
     @Bean
     public SpiderMaster spiderMaster(SpiderTaskRepository store)
     {
-        return new SpiderMaster(store, curator);
+        return new SpiderMaster(store, curatorFacade);
     }
 
 }

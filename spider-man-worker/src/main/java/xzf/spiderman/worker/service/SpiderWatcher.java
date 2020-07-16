@@ -2,12 +2,11 @@ package xzf.spiderman.worker.service;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.CuratorCache;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.zookeeper.CreateMode;
-import xzf.spiderman.common.exception.BizException;
+import xzf.spiderman.starter.curator.CuratorFacade;
 import xzf.spiderman.worker.configuration.WorkerConst;
 
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.List;
 public class SpiderWatcher
 {
     private final SpiderTaskRepository taskRepository;
-    private final CuratorFramework curator;
+    private final CuratorFacade curatorFacade;
     private final GroupSpiderKey key;
 
     private final String basePath;
@@ -37,9 +36,9 @@ public class SpiderWatcher
         void call();
     }
 
-    public SpiderWatcher(CuratorFramework curator, SpiderTaskRepository taskRepository, GroupSpiderKey key, PreCloseCallback preCloseCallback, CloseCallback closeCallback) {
+    public SpiderWatcher(CuratorFacade curatorFacade, SpiderTaskRepository taskRepository, GroupSpiderKey key, PreCloseCallback preCloseCallback, CloseCallback closeCallback) {
         this.taskRepository = taskRepository;
-        this.curator = curator;
+        this.curatorFacade = curatorFacade;
         this.key = key;
         this.preCloseCallback = preCloseCallback;
         this.closeCallback = closeCallback;
@@ -54,7 +53,7 @@ public class SpiderWatcher
         createWatchingPath();
 
         // 2. create curator cache and start
-        curatorCache = CuratorCache.build(curator, watchingPath);
+        curatorCache = CuratorCache.build(curatorFacade.getCurator(), watchingPath);
         curatorCache.listenable().addListener(new CuratorCacheListenerImpl());
         curatorCache.start();
     }
@@ -72,24 +71,18 @@ public class SpiderWatcher
 
     private void deleteWatchingPath()
     {
-        try  {
+        curatorFacade.execute(curator -> {
             curator.delete().deletingChildrenIfNeeded().forPath(watchingPath);
             log.info("SpiderWatcher delete path : " + watchingPath);
-        }
-        catch (Exception e)  {
-            throw new BizException("curator carete "+ watchingPath + " 失败。" + e.getMessage(), e);
-        }
+        });
     }
 
     public void createWatchingPath()
     {
-        try {
+        curatorFacade.execute(curator -> {
             curator.create().withMode(CreateMode.PERSISTENT).forPath(watchingPath, new byte[0]);
             log.info("SpiderWatcher create path : " + watchingPath);
-        }
-        catch (Exception e) {
-            throw new BizException("curator create "+ watchingPath + " 失败。" + e.getMessage(), e);
-        }
+        });
     }
 
     public class CuratorCacheListenerImpl implements CuratorCacheListener
@@ -167,22 +160,22 @@ public class SpiderWatcher
     }
 
 
-    public static Builder builder(CuratorFramework curator)
+    public static Builder builder(CuratorFacade curatorFacade)
     {
-        return new Builder(curator);
+        return new Builder(curatorFacade);
     }
 
     public static class Builder
     {
-        private CuratorFramework curator;
+        private CuratorFacade curatorFacade;
         private SpiderTaskRepository store;
         private GroupSpiderKey key;
         private PreCloseCallback preCloseCallback;
         private CloseCallback closeCallback;
 
-        public Builder(CuratorFramework curator)
+        public Builder(CuratorFacade curatorFacade)
         {
-            this.curator = curator;
+            this.curatorFacade = curatorFacade;
         }
 
         public Builder withStore(SpiderTaskRepository store)
@@ -213,7 +206,7 @@ public class SpiderWatcher
 
         public SpiderWatcher build()
         {
-            return new SpiderWatcher(curator,store,key,preCloseCallback,closeCallback);
+            return new SpiderWatcher(curatorFacade,store,key,preCloseCallback,closeCallback);
         }
 
     }

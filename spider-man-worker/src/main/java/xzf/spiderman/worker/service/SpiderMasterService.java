@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.stereotype.Service;
 import xzf.spiderman.common.exception.BizException;
+import xzf.spiderman.starter.curator.CuratorAction;
+import xzf.spiderman.starter.curator.CuratorFacade;
 import xzf.spiderman.worker.data.SubmitSpiderReq;
 import xzf.spiderman.worker.entity.SpiderCnf;
 import xzf.spiderman.worker.entity.SpiderGroup;
@@ -40,7 +42,7 @@ public class SpiderMasterService
     private SpiderGroupRepository spiderGroupRepository;
 
     @Autowired
-    private CuratorFramework curator;
+    private CuratorFacade curatorFacade;
 
     @Autowired
     private SpiderTaskRepository spiderTaskRepository;
@@ -68,35 +70,40 @@ public class SpiderMasterService
 
     private void initSpiderTaskBasePath()
     {
-        try{
+        curatorFacade.execute(curator -> {
             if(curator.checkExists().forPath(ZK_SPIDER_TASK_BASE_PATH) == null) {
                 curator.create().creatingParentContainersIfNeeded()
                         .withMode(CreateMode.PERSISTENT).forPath(ZK_SPIDER_TASK_BASE_PATH);
             }
-        }catch (Exception e){
-            log.warn("curator create " + ZK_SPIDER_TASK_BASE_PATH + "失败。" + e.getMessage());
-        }
+        });
+
+
     }
 
     private void initSpiderTaskPath4Group(SpiderGroup group)
     {
         String path = ZK_SPIDER_TASK_BASE_PATH + "/" + group.getId();
-        try
-        {
+
+        curatorFacade.execute(curator -> {
             if (curator.checkExists().forPath(path) == null)
             {
                 curator.create()
                         .withMode(CreateMode.PERSISTENT)
                         .forPath(path);
             }
-        }catch (Exception e) {
-            log.warn("curator create " + path + "失败。" + e.getMessage());
-        }
+        });
+
+
     }
 
     //
     public String submitSpider(SubmitSpiderReq req)
     {
+        if (spiderTaskRepository.hasRunningGroup(req.getGroupId())) {
+            throw new BizException("爬虫任务组["+req.getGroupId()+"]已经运行。请稍后再试。");
+        }
+
+
         // 1. 准备spiderTaskId
         String spiderId = newSpiderId();
 

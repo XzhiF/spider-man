@@ -1,14 +1,13 @@
 package xzf.spiderman.worker.service;
 
-import org.apache.curator.framework.CuratorFramework;
 import xzf.spiderman.common.event.Event;
 import xzf.spiderman.common.event.EventListener;
+import xzf.spiderman.starter.curator.CuratorFacade;
 import xzf.spiderman.worker.entity.SpiderCnf;
 import xzf.spiderman.worker.service.event.SubmitSpiderEvent;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 1. 选举出boss
@@ -25,23 +24,23 @@ import java.util.Map;
 public class SpiderMaster implements EventListener
 {
     private SpiderTaskRepository taskRepository;
-    private CuratorFramework curator;
+    private CuratorFacade curatorFacade;
 
-    public SpiderMaster(SpiderTaskRepository taskRepository, CuratorFramework curator)
+    public SpiderMaster(SpiderTaskRepository taskRepository, CuratorFacade curatorFacade)
     {
         this.taskRepository = taskRepository;
-        this.curator = curator;
+        this.curatorFacade = curatorFacade;
     }
 
-    private Map<String, SpiderTask> buildInitSpiderTaskRuntimeData(GroupSpiderKey key, List<SpiderCnf> cnfs)
+    private List<SpiderTask> buildInitSpiderTaskRuntimeData(GroupSpiderKey key, List<SpiderCnf> cnfs)
     {
-        Map<String, SpiderTask> task = new HashMap<>();
+        List<SpiderTask> tasks = new ArrayList<>();
         for (SpiderCnf cnf : cnfs) {
             SpiderKey spiderKey = key.toSpiderKey(cnf.getId());
             SpiderTask data = SpiderTask.newInitTask(spiderKey);
-            task.put(cnf.getId(), data);
+            tasks.add(data);
         }
-        return task;
+        return tasks;
     }
 
     public class SubmitSpiderHandler
@@ -57,7 +56,7 @@ public class SpiderMaster implements EventListener
         public void handle()
         {
             // 1. 保存Task数据信息到store中
-            taskRepository.put(key, buildInitSpiderTaskRuntimeData(key, cnfs)); //init
+            taskRepository.putAll(key, buildInitSpiderTaskRuntimeData(key, cnfs)); //init
 
             // 2.创建dispatcher
             SpiderDispatcher dispatcher = new SpiderDispatcher(key, cnfs);
@@ -67,9 +66,9 @@ public class SpiderMaster implements EventListener
                 dispatcher.dispatchClose();
             };
             SpiderWatcher.CloseCallback closeCallback = ()->{
-                taskRepository.remove(key);
+                taskRepository.removeAll(key);
             };
-            SpiderWatcher watcher = SpiderWatcher.builder(curator)
+            SpiderWatcher watcher = SpiderWatcher.builder(curatorFacade)
                     .withStore(taskRepository)
                     .withKey(key)
                     .preCloseCallback(preCloseCallback)

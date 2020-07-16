@@ -29,4 +29,11 @@ public class CuratorAutoConfiguration
         return new CuratorFrameworkFactoryBean(properties, curatorRetryPolicyProvider);
     }
 
+    @Bean
+    @ConditionalOnMissingBean(CuratorFacade.class)
+    public CuratorFacade curatorFacade(CuratorFramework curator)
+    {
+        return new CuratorFacade(curator);
+    }
+
 }
