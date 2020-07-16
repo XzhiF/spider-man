@@ -43,20 +43,27 @@ public class SpiderMasterService
     private CuratorFramework curator;
 
     @Autowired
+    private SpiderTaskRepository spiderTaskRepository;
+
+    @Autowired
     private EventPublisherRegistry eventPublisherRegistry;
 
 
     // 1. init
     public void initSpiderWorkspace()
     {
+        // 1. init redis cache
+        spiderTaskRepository.sync();
+
+        // 2. init zk paths
         initSpiderTaskBasePath();
-
         List<SpiderGroup> groups = spiderGroupRepository.findAll();
-
         for (SpiderGroup group : groups)
         {
             initSpiderTaskPath4Group(group);
         }
+
+        //
     }
 
     private void initSpiderTaskBasePath()

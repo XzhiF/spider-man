@@ -91,8 +91,8 @@ public class WorkerSpider implements Runnable, Task
      * @return new spider
      * @see PageProcessor
      */
-    public static Spider create(PageProcessor pageProcessor) {
-        return new Spider(pageProcessor);
+    public static WorkerSpider create(PageProcessor pageProcessor) {
+        return new WorkerSpider(pageProcessor);
     }
 
     /**

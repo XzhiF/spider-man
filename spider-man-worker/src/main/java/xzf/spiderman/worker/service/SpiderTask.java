@@ -20,4 +20,36 @@ public class SpiderTask implements Serializable
     private String groupId;
     private String cnfId;
     private int status;
+
+    public static SpiderTask newTask(SpiderKey key, Integer status)
+    {
+        SpiderTask task = new SpiderTask();
+        task.setSpiderId(key.getSpiderId());
+        task.setGroupId(key.getGroupId());
+        task.setCnfId(key.getCnfId());
+        task.setStatus(status);
+        return task;
+    }
+
+    public static SpiderTask newRunningTask(SpiderKey key)
+    {
+        return newTask(key, SpiderTask.STATUS_RUNNING);
+    }
+
+    public static SpiderTask newCanCloseTask(SpiderKey key)
+    {
+        return newTask(key, SpiderTask.STATUS_CAN_CLOSE);
+    }
+
+
+    public static SpiderTask newClosedTask(SpiderKey key)
+    {
+        return newTask(key, SpiderTask.STATUS_CLOSED);
+    }
+
+
+    public static SpiderTask newInitTask(SpiderKey key)
+    {
+        return newTask(key, SpiderTask.STATUS_INIT);
+    }
 }

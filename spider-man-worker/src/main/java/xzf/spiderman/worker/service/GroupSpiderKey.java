@@ -10,4 +10,9 @@ public class GroupSpiderKey
 {
     private final String spiderId;
     private final String groupId;
+
+    public SpiderKey toSpiderKey(String cnfId)
+    {
+        return new SpiderKey(spiderId, groupId, cnfId);
+    }
 }

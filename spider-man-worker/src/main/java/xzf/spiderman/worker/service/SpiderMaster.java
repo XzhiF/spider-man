@@ -33,49 +33,55 @@ public class SpiderMaster implements EventListener
         this.curator = curator;
     }
 
-    public void submit(GroupSpiderKey key, List<SpiderCnf> cnfs)
-    {
-        // 1. 保存Task数据信息到store中
-        taskRepository.put(key, buildInitSpiderTaskRuntimeData(key, cnfs)); //init
-
-        // 2.创建dispatcher
-        SpiderDispatcher dispatcher = new SpiderDispatcher(key, cnfs);
-
-        // 3. zk中创建目录，并监控
-        SpiderWatcher.PreCloseCallback preCloseCallback = () -> {
-            dispatcher.dispatchClose();
-        };
-        SpiderWatcher.CloseCallback closeCallback = ()->{
-            taskRepository.remove(key);
-        };
-        SpiderWatcher watcher = SpiderWatcher.builder(curator)
-                .withStore(taskRepository)
-                .withKey(key)
-                .preCloseCallback(preCloseCallback)
-                .closeCallback(closeCallback)
-                .build();
-
-        watcher.watchAutoClose();
-
-
-        // 4. 发送给slave，开始爬虫任务 ->  slave , zkCli -> create_path -> /worker/spider-task/{groupId}/{spiderId}/spider1-(data:ip,port, conf.  running)
-        dispatcher.dispatchStart();
-    }
-
     private Map<String, SpiderTask> buildInitSpiderTaskRuntimeData(GroupSpiderKey key, List<SpiderCnf> cnfs)
     {
         Map<String, SpiderTask> task = new HashMap<>();
         for (SpiderCnf cnf : cnfs) {
-            SpiderTask data = new SpiderTask();
-            data.setSpiderId(key.getSpiderId());
-            data.setGroupId(key.getGroupId());
-            data.setCnfId(cnf.getId());
-            data.setStatus(SpiderTask.STATUS_INIT);
+            SpiderKey spiderKey = key.toSpiderKey(cnf.getId());
+            SpiderTask data = SpiderTask.newInitTask(spiderKey);
             task.put(cnf.getId(), data);
         }
         return task;
     }
 
+    public class SubmitSpiderHandler
+    {
+        private final GroupSpiderKey key;
+        private final List<SpiderCnf> cnfs;
+
+        public SubmitSpiderHandler(GroupSpiderKey key, List<SpiderCnf> cnfs) {
+            this.key = key;
+            this.cnfs = cnfs;
+        }
+
+        public void handle()
+        {
+            // 1. 保存Task数据信息到store中
+            taskRepository.put(key, buildInitSpiderTaskRuntimeData(key, cnfs)); //init
+
+            // 2.创建dispatcher
+            SpiderDispatcher dispatcher = new SpiderDispatcher(key, cnfs);
+
+            // 3. zk中创建目录，并监控
+            SpiderWatcher.PreCloseCallback preCloseCallback = () -> {
+                dispatcher.dispatchClose();
+            };
+            SpiderWatcher.CloseCallback closeCallback = ()->{
+                taskRepository.remove(key);
+            };
+            SpiderWatcher watcher = SpiderWatcher.builder(curator)
+                    .withStore(taskRepository)
+                    .withKey(key)
+                    .preCloseCallback(preCloseCallback)
+                    .closeCallback(closeCallback)
+                    .build();
+
+            watcher.watchAutoClose();
+
+            // 4. 发送给slave，开始爬虫任务 ->  slave , zkCli -> create_path -> /worker/spider-task/{groupId}/{spiderId}/spider1-(data:ip,port, conf.  running)
+            dispatcher.dispatchStart();
+        }
+    }
 
     //
     @Override
@@ -86,7 +92,15 @@ public class SpiderMaster implements EventListener
     @Override
     public void onEvent(Event event)
     {
-        SubmitSpiderEvent e = (SubmitSpiderEvent) event;
-        this.submit(e.getKey(), e.getAvailableCnfs());
+        if(event instanceof SubmitSpiderEvent)
+        {
+            onSubmitSpiderEvent( (SubmitSpiderEvent) event );
+        }
+    }
+
+    private void onSubmitSpiderEvent(SubmitSpiderEvent event)
+    {
+        SubmitSpiderHandler handler = new SubmitSpiderHandler(event.getKey(), event.getAvailableCnfs());
+        handler.handle();
     }
 }

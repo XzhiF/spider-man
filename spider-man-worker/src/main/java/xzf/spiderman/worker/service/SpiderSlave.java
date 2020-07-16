@@ -6,11 +6,18 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.processor.PageProcessor;
 import xzf.spiderman.common.event.Event;
 import xzf.spiderman.common.event.EventListener;
+import xzf.spiderman.common.exception.BizException;
+import xzf.spiderman.worker.configuration.HessianRedisTemplate;
 import xzf.spiderman.worker.entity.SpiderCnf;
 import xzf.spiderman.worker.service.event.CloseSpiderEvent;
 import xzf.spiderman.worker.service.event.StartSpiderEvent;
+import xzf.spiderman.worker.webmagic.BlockingPollRedisScheduler;
+import xzf.spiderman.worker.webmagic.WorkerSpider;
+import xzf.spiderman.worker.webmagic.WorkerSpiderLifeCycleListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,12 +36,15 @@ import static xzf.spiderman.worker.configuration.WorkerConst.ZK_SPIDER_TASK_BASE
 @Slf4j
 public class SpiderSlave implements EventListener
 {
-    private CuratorFramework curator;
+    private final CuratorFramework curator;
+    private final WorkerSpiderFactory factory;
+
 
     @Autowired
-    public SpiderSlave(CuratorFramework curator)
+    public SpiderSlave(CuratorFramework curator,WorkerSpiderFactory factory)
     {
         this.curator = curator;
+        this.factory = factory;
     }
 
 
@@ -51,40 +61,43 @@ public class SpiderSlave implements EventListener
         public void handle()
         {
             // 1. Build WorkerSpider
+            WorkerSpiderLifeCycleListener listener = new WorkerSpiderLifeCycleListener(){
+                @Override
+                public void onBeforeStart(WorkerSpider spider) {
+                    //  write the task data into zk
+                    updateRunningTaskToZk();
+                }
 
-            // 2. WorkerSpider start.
-
-            // 3. write the task data into zk
-            String path = taskPath(key);
-            byte[] data = JSON.toJSONBytes(newRunningTask(key));
-
-            try {
-                curator.create().withMode(CreateMode.EPHEMERAL).forPath(path, data);
-            } catch (Exception exception) {
-                // TODO ..
-                exception.printStackTrace();
-            }
-            log.info("Slave: task created. path="+path);
+                @Override
+                public void onCanCloseCondition(WorkerSpider spider) {
+                    //  write the task data into zk
+                    updateCanCloseTaskToZk(key);
+                }
+            };
+            WorkerSpider spider = factory.create(cnf, listener);
 
 
-
-            // 模拟30秒后关闭
-
-            try {
-                TimeUnit.SECONDS.sleep(30L);
-
-                byte[] closedData = JSON.toJSONBytes(newCanCloseTask(key));
-                curator.setData().forPath(path, closedData);
-            } catch (Exception exception) {
-                // TODO ..
-                exception.printStackTrace();
-            }
-
-            log.info("Slave: task can close. path="+path);
+            // 异步执行 start spider.
 
 
         }
+
+
+        private void updateRunningTaskToZk()
+        {
+            String path = taskPath(key);
+            byte[] data = JSON.toJSONBytes(SpiderTask.newRunningTask(key));
+
+            try {
+                curator.create().withMode(CreateMode.EPHEMERAL).forPath(path, data);
+                log.info("Slave: task created. path="+path);
+            } catch (Exception e) {
+                throw new BizException("fail to updateRunningTaskToZk. " +e.getMessage(), e);
+            }
+
+        }
     }
+
 
 
     public class CloseSpiderHandler
@@ -105,7 +118,7 @@ public class SpiderSlave implements EventListener
 
             // 3. write the task data into zk
             String path = taskPath(key);
-            byte[] data = JSON.toJSONBytes(newClosedTask(key));
+            byte[] data = JSON.toJSONBytes(SpiderTask.newClosedTask(key));
 
             try {
                 curator.setData().forPath(path, data);
@@ -119,7 +132,17 @@ public class SpiderSlave implements EventListener
     }
 
 
-
+    private void updateCanCloseTaskToZk(SpiderKey key)
+    {
+        try {
+            String path = taskPath(key);
+            byte[] closedData = JSON.toJSONBytes(SpiderTask.newCanCloseTask(key));
+            curator.setData().forPath(path, closedData);
+            log.info("Slave: task can close. path="+path);
+        } catch (Exception e) {
+            throw new BizException("fail to updateCanCloseTaskToZk. " +e.getMessage(), e);
+        }
+    }
 
 
 
@@ -129,31 +152,7 @@ public class SpiderSlave implements EventListener
         return path;
     }
 
-    private SpiderTask newTask(SpiderKey key, Integer status)
-    {
-        SpiderTask task = new SpiderTask();
-        task.setSpiderId(key.getSpiderId());
-        task.setGroupId(key.getGroupId());
-        task.setCnfId(key.getCnfId());
-        task.setStatus(SpiderTask.STATUS_RUNNING);
-        return task;
-    }
 
-    private SpiderTask newRunningTask(SpiderKey key)
-    {
-        return newTask(key, SpiderTask.STATUS_RUNNING);
-    }
-
-    private SpiderTask newCanCloseTask(SpiderKey key)
-    {
-        return newTask(key, SpiderTask.STATUS_CAN_CLOSE);
-    }
-
-
-    private SpiderTask newClosedTask(SpiderKey key)
-    {
-        return newTask(key, SpiderTask.STATUS_CLOSED);
-    }
 
 
 

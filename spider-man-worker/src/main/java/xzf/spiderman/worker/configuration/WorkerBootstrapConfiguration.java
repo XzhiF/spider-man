@@ -53,11 +53,11 @@ public class WorkerBootstrapConfiguration
         manager.addListener(new LeaderManagerListener() {
             @Override
             public void takeLeadership(LeaderManager manager) throws Exception {
-                System.out.println("boss" + manager.getId()+", takeLeadership");
-
-                // TODO ...
+                System.out.println("spider master " + manager.getId()+", takeLeadership");
+                System.out.println("spider master " + manager.getId()+", begin initSpiderWorkspace ");
                 spiderMasterService.initSpiderWorkspace();
-                spiderTaskStore.sync();
+                System.out.println("spider master " + manager.getId()+", end initSpiderWorkspace ");
+
             }
         });
 
