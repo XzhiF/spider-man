@@ -37,5 +37,16 @@
 > [记录自己写一个小Java爬虫项目-0032-分布式爬虫思路](https://www.bilibili.com/video/BV18D4y1S7za/) <br/>
 > [记录自己写一个小Java爬虫项目-0033-Webmagic增强-1](https://www.bilibili.com/video/BV1ap4y1S7eA/) <br/>
 > [记录自己写一个小Java爬虫项目-0034-Webmagic增强-2](https://www.bilibili.com/video/BV11A411e7xh/) <br/>
+> [记录自己写一个小Java爬虫项目-0035-Spider配置实现-1](https://www.bilibili.com/video/BV1Wz411v7ZE/) <br/>
+> [记录自己写一个小Java爬虫项目-0036-Spider配置实现-2](https://www.bilibili.com/video/BV1C5411Y7qt/) <br/>
+> [记录自己写一个小Java爬虫项目-0037-Boss选举实现](https://www.bilibili.com/video/BV1CA411e7Dn/) <br/>
+> [记录自己写一个小Java爬虫项目-0038-SpiderMaster实现-1](https://www.bilibili.com/video/BV1ni4y1376L/) <br/>
+> [记录自己写一个小Java爬虫项目-0039-SpiderMaster实现-2](https://www.bilibili.com/video/BV1d54y1q7nm/) <br/>
+> [记录自己写一个小Java爬虫项目-0040-SpiderMaster实现-3](https://www.bilibili.com/video/BV1SZ4y1u7hb/) <br/>
+> [记录自己写一个小Java爬虫项目-0041-SpiderMaster实现-4](https://www.bilibili.com/video/BV16K4y1e7E4/) <br/>
+>
+>
+>
+>
 >
 
