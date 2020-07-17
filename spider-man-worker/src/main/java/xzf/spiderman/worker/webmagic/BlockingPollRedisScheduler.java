@@ -69,8 +69,12 @@ public class BlockingPollRedisScheduler extends DuplicateRemovedScheduler implem
     @Override
     public Request poll(Task task)
     {
-        Object urlObj = blockingPoll(task);
+        Object urlObj = this.redisTemplate.opsForList().leftPop(getQueueKey(task));
+        return getRequest(task, urlObj);
+    }
 
+    private Request getRequest(Task task, Object urlObj)
+    {
         if (urlObj == null) {
             return null;
         }
@@ -88,21 +92,31 @@ public class BlockingPollRedisScheduler extends DuplicateRemovedScheduler implem
         return request;
     }
 
+    public Request blockingPoll(Task task, long timeout, TimeUnit timeUnit) throws InterruptedException
+    {
+        Object urlObj = popUrlObj(task, timeout, timeUnit);
 
-    private Object blockingPoll(Task task)
+        return getRequest(task,urlObj);
+    }
+
+    private Object popUrlObj(Task task, long timeout, TimeUnit timeUnit) throws InterruptedException
     {
         Object popUrl = null;
-
+//
         try {
-            popUrl = this.redisTemplate.opsForList().leftPop(getQueueKey(task), pollTimeout, pollTimeunit);
+            popUrl = this.redisTemplate.opsForList().leftPop(getQueueKey(task), timeout, timeUnit);
         }catch (RedisCommandInterruptedException e){
-            if(Thread.interrupted()){
-                log.info("redisTemplate.leftPop 被正常中断。");
-            }else {
-                log.error("redisTemplate.leftPop 被意外中断， 请检查程序", e);
-            }
+            log.info("redisTemplate.leftPop 被中断。");
+//            Thread.currentThread().interrupt(); 不来了，让捕获异常的地方来处理
+            throw new InterruptedException(e.getMessage());
         }
         return popUrl;
+    }
+
+
+    public Request blockingPoll(Task task) throws InterruptedException
+    {
+        return blockingPoll(task,pollTimeout, pollTimeunit);
     }
 
 

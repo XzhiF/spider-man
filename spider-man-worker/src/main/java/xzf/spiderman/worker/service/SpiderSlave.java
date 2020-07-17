@@ -101,13 +101,7 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
                     updateCanCloseTaskToZk(key);
                 }
 
-                // 3. 在CloseSpiderHandler里面调用spider.close方法， 让Spider可以退出run方法
-                @Override
-                public void onBeforeClose(WorkerSpider spider) {
-                    spider.updateStatusStopping();
-                }
-
-                // 4. Spider跑完了run方法。爬虫已经执行完毕.
+                // 3. Spider跑完了run方法。爬虫已经执行完毕.
                 @Override
                 public void onAfterRun(WorkerSpider spider) {
                     updateClosedTaskToZk(key);

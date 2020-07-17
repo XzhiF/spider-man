@@ -42,7 +42,7 @@ public class WorkerSpider implements Runnable, Task
 
     protected String uuid;
 
-    protected Scheduler scheduler = new QueueScheduler();
+    protected BlockingPollRedisScheduler scheduler;
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -84,6 +84,8 @@ public class WorkerSpider implements Runnable, Task
     private AtomicInteger pollTimeoutCount = new AtomicInteger(0); //记录连续poll结果为空的次数
     private int maxPollTimeoutCount = 3; // 记录最大连续poll结果都为空的次数
     private WorkerSpiderLifeCycleListener lifeCycleListener = WorkerSpiderLifeCycleListener.DEFAULT;
+    private Integer pollTimeoutSeconds; //假如有设置，使用这个，如果没有。使用properties配置的
+    private Thread currentThread;   //记录当前执行的线程。
 
 
     /**
@@ -150,10 +152,10 @@ public class WorkerSpider implements Runnable, Task
      *
      * @param scheduler scheduler
      * @return this
-     * @see #setScheduler(us.codecraft.webmagic.scheduler.Scheduler)
+     * @see #setScheduler
      */
     @Deprecated
-    public WorkerSpider scheduler(Scheduler scheduler) {
+    public WorkerSpider scheduler(BlockingPollRedisScheduler scheduler) {
         return setScheduler(scheduler);
     }
 
@@ -165,7 +167,7 @@ public class WorkerSpider implements Runnable, Task
      * @see Scheduler
      * @since 0.2.1
      */
-    public WorkerSpider setScheduler(Scheduler scheduler) {
+    public WorkerSpider setScheduler(BlockingPollRedisScheduler scheduler) {
         checkIfRunning();
         Scheduler oldScheduler = this.scheduler;
         this.scheduler = scheduler;
@@ -278,9 +280,29 @@ public class WorkerSpider implements Runnable, Task
     }
 
 
+    private Request blockingPoll(Task task)
+    {
+        Request request=null;
+        try {
+            if(pollTimeoutSeconds!=null){
+                request = scheduler.blockingPoll(task, pollTimeoutSeconds, TimeUnit.SECONDS);
+            }
+            else{
+                request = scheduler.blockingPoll(task);
+            }
+
+        } catch (InterruptedException e) {
+            // TODO 如果一直被中断是不是要异常处理
+            logger.info("scheduler.blockingPoll 被中断。");
+            Thread.currentThread().interrupt();// 设置成Interrupted
+        }
+        return request;
+    }
+
     @Override
     public void run() {
 
+        currentThread = Thread.currentThread();
         lifeCycleListener.onBeforeStart(this);
 
         checkRunningStat();
@@ -288,7 +310,8 @@ public class WorkerSpider implements Runnable, Task
         logger.info("Spider {} started!",getUUID());
         while (!Thread.currentThread().isInterrupted() && stat.get() == STAT_RUNNING) {
 
-            final Request request = scheduler.poll(this);
+            final Request request = blockingPoll(this);
+
             lifeCycleListener.onRequestPolled(this,request);
 
             if (request == null) {
@@ -362,7 +385,19 @@ public class WorkerSpider implements Runnable, Task
         }
     }
 
-    public void close() {
+    public void close()
+    {
+        if(stat.get()==STAT_INIT){
+            return ;
+        }
+
+        // 使用线程中断
+        if( currentThread != null ){
+            currentThread.interrupt();
+        }
+        //设置他的status=stopping
+        this.updateStatusStopping();
+
         lifeCycleListener.onBeforeClose(this);
         destroyEach(downloader);
         destroyEach(pageProcessor);
@@ -802,5 +837,7 @@ public class WorkerSpider implements Runnable, Task
         stat.set(STAT_STOPPED);
     }
 
-
+    public void setPollTimeoutSeconds(Integer pollTimeoutSeconds) {
+        this.pollTimeoutSeconds = pollTimeoutSeconds;
+    }
 }

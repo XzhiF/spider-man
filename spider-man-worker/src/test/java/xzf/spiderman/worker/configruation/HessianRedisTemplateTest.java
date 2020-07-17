@@ -54,6 +54,7 @@ public class HessianRedisTemplateTest
             try {
                 TimeUnit.SECONDS.sleep(8);
                 mainThread.interrupt();
+                System.out.println("other thread.. mianThread interrputed="+mainThread.isInterrupted());
             } catch (InterruptedException e) {
             }
         }).start();
@@ -63,6 +64,8 @@ public class HessianRedisTemplateTest
             System.out.println("un-interrupted");
         }catch (Exception e )
         {
+            System.out.println("mainThreadInterrput="+Thread.currentThread().isInterrupted());
+            e.printStackTrace();
             // RedisCommandInterruptedException
             System.out.println(e.getMessage());
         }

@@ -10,12 +10,14 @@ import java.util.concurrent.TimeUnit;
 @Data
 public class WorkerProperties
 {
-    private Long pollTimeout = 100L;
-    private TimeUnit pollTimeunit = TimeUnit.SECONDS;
-
-
-
+    private SpiderBlockingScheduler spiderBlockingScheduler = new SpiderBlockingScheduler();
     private SpiderSlavePool spiderSlavePool = new SpiderSlavePool();
+
+    @Data
+    public class SpiderBlockingScheduler
+    {
+        private Integer defaultTimeoutSeconds = 60;
+    }
 
     @Data
     public static class SpiderSlavePool

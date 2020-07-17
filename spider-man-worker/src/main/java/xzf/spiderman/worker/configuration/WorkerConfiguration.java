@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xzf.spiderman.worker.webmagic.BlockingPollRedisScheduler;
 
+import java.util.concurrent.TimeUnit;
+
 @Configuration
 @EnableConfigurationProperties(WorkerProperties.class)
 public class WorkerConfiguration
@@ -18,7 +20,9 @@ public class WorkerConfiguration
     @Bean
     public BlockingPollRedisScheduler blockingPollRedisScheduler()
     {
-        return new BlockingPollRedisScheduler(redisTemplate, properties.getPollTimeout(), properties.getPollTimeunit());
+        return new BlockingPollRedisScheduler(redisTemplate,
+                properties.getSpiderBlockingScheduler().getDefaultTimeoutSeconds(),
+                TimeUnit.SECONDS);
     }
 
 }

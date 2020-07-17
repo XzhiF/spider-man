@@ -16,8 +16,12 @@ spring:
 xzf:
   spiderman:
     worker:
-      poll-timeout: 100
-      poll-timeunit: SECONDS
+      spider-blocking-scheduler:
+        default-timeout-seconds: 30
+      spider-slave-pool:
+        core-threads: 2
+        pool-threads: 10
+        keep-alive-time-seconds: 60
     curator:
       connectionString: zk.spiderman.xzf:2181
 
