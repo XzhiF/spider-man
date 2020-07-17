@@ -3,6 +3,8 @@ package xzf.spiderman.worker.service;
 import org.springframework.stereotype.Repository;
 import xzf.spiderman.worker.webmagic.WorkerSpider;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,5 +22,10 @@ public class WorkerSpiderRepository
     public WorkerSpider remove(SpiderKey key)
     {
         return data.remove(key);
+    }
+
+    public Collection<WorkerSpider> all()
+    {
+        return data.values();
     }
 }

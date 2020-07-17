@@ -13,7 +13,10 @@ CREATE TABLE IF NOT EXISTS `worker`.`spider_cnf` (
   `active_flag` INT NOT NULL DEFAULT 1,
   `create_time` DATETIME NULL,
   `processor` VARCHAR(255) NULL,
-  `stop_condition_count` INT NULL,
+  `can_close_count` INT NULL,
+  `worker_threads` INT NULL,
+  `poll_timeout_seconds` INT NULL,
+  `max_poll_timeout_count` INT NULL,
   PRIMARY KEY (`spider_cnf_id`))
 ENGINE = InnoDB;
 

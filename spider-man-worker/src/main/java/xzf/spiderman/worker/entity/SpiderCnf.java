@@ -52,17 +52,8 @@ public class SpiderCnf
     @Column(name = "spider_type")
     private Integer type;
 
-    @Column(name = "spider_params")
-    private String params;
-    
     @Column(name = "spider_desc")
     private String desc;
-
-    @Column(name = "processor")
-    private String processor;
-
-    @Column(name = "stop_condition_count")
-    private Integer stopConditionCount;
 
     @Column(name = "status")
     private Integer status;
@@ -72,6 +63,23 @@ public class SpiderCnf
 
     @Column(name = "create_time")
     private Date createTime;
+
+    @Column(name = "spider_params")
+    private String params;
+
+    @Column(name = "processor")
+    private String processor;
+
+    @Column(name = "worker_threads")
+    private Integer workerThreads;
+
+    @Column(name = "max_poll_timeout_count")
+    private Integer maxPollTimeoutCount;
+
+    @Column(name = "poll_timeout_seconds")
+    private Integer pollTimeoutSeconds;
+
+
 
 
     public static SpiderCnf create(AddSpiderCnfReq req,
@@ -87,7 +95,9 @@ public class SpiderCnf
         ret.setParams(req.getParams());
         ret.setDesc(req.getDesc());
         ret.setProcessor(req.getProcessor());
-        ret.setStopConditionCount(req.getStopConditionCount());
+        ret.setMaxPollTimeoutCount(req.getMaxPollTimeoutCount());
+        ret.setPollTimeoutSeconds(req.getPollTimeoutSeconds());
+        ret.setWorkerThreads(req.getWorkerThreads());
 
         ret.setServer(server);
         ret.setGroup(group);

@@ -238,5 +238,19 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
     public void onApplicationEvent(ContextClosedEvent event)
     {
         executor.shutdown();
+
+        for (WorkerSpider workerSpider : repository.all()) {
+            workerSpider.close();
+        }
+
+        try {
+            boolean isTerminated = executor.awaitTermination(10, TimeUnit.SECONDS);
+            if(!isTerminated) {
+                log.warn("尝试停止所有线程失败。 尝试调用立刻停止");
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

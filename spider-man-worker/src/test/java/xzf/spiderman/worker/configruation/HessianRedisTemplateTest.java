@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import xzf.spiderman.worker.configuration.HessianRedisTemplate;
 import xzf.spiderman.worker.entity.SpiderGroup;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -70,6 +70,57 @@ public class HessianRedisTemplateTest
             System.out.println(e.getMessage());
         }
         System.out.println("interrupted");
+    }
+
+
+    @Test
+    public void testRBPollInThreadPool_1() throws Exception
+    {
+        System.out.println("before...");
+
+        CopyOnWriteArrayList<Thread> list = new CopyOnWriteArrayList<>();
+
+        Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Object o = hessianRedisTemplate.opsForList().leftPop("test:spiderman.blockinglist", 1, TimeUnit.MINUTES);
+                    System.out.println("un-interrupted");
+                }catch (Exception e){
+                    System.out.println("interruped, exception="+e);
+                    System.out.println(Thread.currentThread()+ "="+Thread.currentThread().isInterrupted());
+                }
+            }
+        };
+
+        ExecutorService executor = Executors.newFixedThreadPool(1, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread t = new Thread(r);
+                list.add(t);
+                return t;
+            }
+        });
+        executor.execute(task);
+
+        TimeUnit.SECONDS.sleep(5L);
+
+//        executor.shutdown();
+//        System.out.println("invoke shutdown");
+
+        executor.shutdownNow();
+        System.out.println("invoke shutdownNow");
+
+
+        TimeUnit.SECONDS.sleep(5L);
+
+//        System.out.println("invoke list interrupted = "+list.size());
+//
+//        list.forEach(t->t.interrupt());
+//
+//        TimeUnit.SECONDS.sleep(10L);
+
+
     }
 
 }

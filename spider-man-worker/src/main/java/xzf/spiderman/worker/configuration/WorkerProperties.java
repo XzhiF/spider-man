@@ -12,9 +12,19 @@ public class WorkerProperties
 {
     private SpiderBlockingScheduler spiderBlockingScheduler = new SpiderBlockingScheduler();
     private SpiderSlavePool spiderSlavePool = new SpiderSlavePool();
+    private WorkerSpiderCnf workerSpiderCnf = new WorkerSpiderCnf();
 
     @Data
-    public class SpiderBlockingScheduler
+    public static class WorkerSpiderCnf
+    {
+        private Integer defaultPollTimeoutSeconds = 10;
+        private Integer defaultMaxPollTimeoutCount = 3;
+        private Integer defaultWorkerThreads = 2;
+    }
+
+
+    @Data
+    public static class SpiderBlockingScheduler
     {
         private Integer defaultTimeoutSeconds = 60;
     }
@@ -27,12 +37,6 @@ public class WorkerProperties
         private Integer keepAliveTimeSeconds = 60;
 
     }
-
-
-
-
-
-
 
 
 

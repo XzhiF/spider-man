@@ -38,7 +38,11 @@ public class AddSpiderCnfReq
     @NotBlank(message = "爬虫处理程序不能为空")
     private String processor;
 
-    @NotBlank(message = "停止条件计数器不能为空")
-    private Integer stopConditionCount;
+    private Integer maxPollTimeoutCount;
+
+    private Integer pollTimeoutSeconds;
+
+    private Integer workerThreads;
+
 
 }

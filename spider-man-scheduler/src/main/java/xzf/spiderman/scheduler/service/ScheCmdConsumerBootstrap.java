@@ -45,7 +45,10 @@ public class ScheCmdConsumerBootstrap
     public void stop()
     {
         if( started.compareAndSet(true, false) ) {
-            executorService.shutdown();
+
+            //因为里面使用redis blocking pop 阻塞线程, worker.tryLock会等于false, 为了能中断阻塞，要使用shutdownNow
+            executorService.shutdownNow();
+
             try {
                 boolean terminated = executorService.awaitTermination(5L, TimeUnit.SECONDS);
                 if (!terminated) {
