@@ -28,6 +28,9 @@ public class SpiderCnf
     public static final int TYPE_DB = 2;
     public static final int TYPE_FILE = 3;
 
+    public static final int MODE_SHARED = 1;
+    public static final int MODE_EXCLUSIVE = 2;
+
 
 
     @Id
@@ -79,6 +82,9 @@ public class SpiderCnf
     @Column(name = "poll_timeout_seconds")
     private Integer pollTimeoutSeconds;
 
+    @Column(name = "mode")      // 1.shared , 2.exclusive
+    private Integer mode;
+
 
 
 
@@ -98,6 +104,7 @@ public class SpiderCnf
         ret.setMaxPollTimeoutCount(req.getMaxPollTimeoutCount());
         ret.setPollTimeoutSeconds(req.getPollTimeoutSeconds());
         ret.setWorkerThreads(req.getWorkerThreads());
+        ret.setMode(req.getMode());
 
         ret.setServer(server);
         ret.setGroup(group);
@@ -110,6 +117,16 @@ public class SpiderCnf
         return ret;
     }
 
+
+    public boolean isSharedMode()
+    {
+        return MODE_SHARED == mode.intValue();
+    }
+
+    public boolean isExclusiveMode()
+    {
+        return MODE_EXCLUSIVE == mode.intValue();
+    }
 
 
 }

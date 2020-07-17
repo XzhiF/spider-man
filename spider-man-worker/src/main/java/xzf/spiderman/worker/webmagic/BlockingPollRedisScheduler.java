@@ -3,11 +3,13 @@ package xzf.spiderman.worker.webmagic;
 import io.lettuce.core.RedisCommandInterruptedException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.data.redis.RedisSystemException;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.scheduler.DuplicateRemovedScheduler;
 import us.codecraft.webmagic.scheduler.MonitorableScheduler;
 import us.codecraft.webmagic.scheduler.component.DuplicateRemover;
+import xzf.spiderman.common.exception.UnknownException;
 import xzf.spiderman.worker.configuration.HessianRedisTemplate;
 
 import java.io.Closeable;
@@ -105,12 +107,20 @@ public class BlockingPollRedisScheduler extends DuplicateRemovedScheduler implem
 //
         try {
             popUrl = this.redisTemplate.opsForList().leftPop(getQueueKey(task), timeout, timeUnit);
-        }catch (RedisCommandInterruptedException e){
+            return popUrl;
+        }
+        catch (RedisCommandInterruptedException e){
+            //            Thread.currentThread().interrupt(); 不来了，让捕获异常的地方来处理
             log.info("redisTemplate.leftPop 被中断。");
-//            Thread.currentThread().interrupt(); 不来了，让捕获异常的地方来处理
             throw new InterruptedException(e.getMessage());
         }
-        return popUrl;
+        catch (RedisSystemException e){
+            if(e.getCause() instanceof RedisCommandInterruptedException){
+                log.info("redisTemplate.leftPop 被中断。");
+                throw new InterruptedException(e.getMessage());
+            }
+            throw new UnknownException("Schudler任务队列发生未知异常"+e.getMessage(), e);
+        }
     }
 
 
@@ -143,5 +153,14 @@ public class BlockingPollRedisScheduler extends DuplicateRemovedScheduler implem
     public int getTotalRequestsCount(Task task)
     {
         return this.redisTemplate.opsForSet().size(getSetKey(task)).intValue();
+    }
+
+
+    public static String getSetPrefix() {
+        return SET_PREFIX;
+    }
+
+    public HessianRedisTemplate getRedisTemplate() {
+        return redisTemplate;
     }
 }

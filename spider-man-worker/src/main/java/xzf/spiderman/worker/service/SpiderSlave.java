@@ -79,7 +79,8 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
             WorkerSpider spider = factory.create(key, cnf, listener);
 
             // 3. Run WorkerSpider
-            executor.execute(()->spider.run());
+            CompletableFuture.runAsync( ()->spider.run(), executor )
+                    .thenRunAsync( ()->updateClosedTaskToZk(key), executor);
 
             // 保存到本地缓存中
             repository.put(key, spider);
@@ -99,12 +100,6 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
                 @Override
                 public void onCanCloseCondition(WorkerSpider spider) {
                     updateCanCloseTaskToZk(key);
-                }
-
-                // 3. Spider跑完了run方法。爬虫已经执行完毕.
-                @Override
-                public void onAfterRun(WorkerSpider spider) {
-                    updateClosedTaskToZk(key);
                 }
             };
         }
@@ -146,6 +141,7 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
         String path = taskPath(key);
         byte[] closedData = JSON.toJSONBytes(SpiderTask.newCanCloseTask(key));
         curatorFacade.execute(curator -> {
+            log.info("Slave: before task can close. path="+path);
             curator.setData().forPath(path, closedData);
             log.info("Slave: task can close. path="+path);
         });
@@ -158,7 +154,7 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
 
         curatorFacade.execute(curator -> {
             curator.setData().forPath(path, data);
-            log.info("Slave: task created. path="+path);
+            log.info("Slave: task closed. path="+path);
         });
 
     }

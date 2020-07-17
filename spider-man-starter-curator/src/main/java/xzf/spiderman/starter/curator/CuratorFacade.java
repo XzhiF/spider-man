@@ -24,7 +24,7 @@ public class CuratorFacade
         try {
             action.execute(curator);
         } catch (Exception e) {
-            log.error("调用Curator方法失败。"+ e.getMessage());
+            log.error("调用Curator方法失败。"+ e.getMessage(),e);
             throw new ThirdPartyServiceInvokeException("调用Curator方法失败。"+ e.getMessage(), e);
         }
     }

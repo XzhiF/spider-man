@@ -25,11 +25,13 @@ public class SpiderMaster implements EventListener
 {
     private SpiderTaskRepository taskRepository;
     private CuratorFacade curatorFacade;
+    private SpiderQueueManager queueManager;
 
-    public SpiderMaster(SpiderTaskRepository taskRepository, CuratorFacade curatorFacade)
+    public SpiderMaster(SpiderTaskRepository taskRepository, CuratorFacade curatorFacade, SpiderQueueManager queueManager)
     {
         this.taskRepository = taskRepository;
         this.curatorFacade = curatorFacade;
+        this.queueManager = queueManager;
     }
 
     private List<SpiderTask> buildInitSpiderTaskRuntimeData(GroupSpiderKey key, List<SpiderCnf> cnfs)
@@ -67,17 +69,21 @@ public class SpiderMaster implements EventListener
             };
             SpiderWatcher.CloseCallback closeCallback = ()->{
                 taskRepository.removeAll(key);
+                queueManager.clear(key);
             };
+
             SpiderWatcher watcher = SpiderWatcher.builder(curatorFacade)
                     .withStore(taskRepository)
                     .withKey(key)
                     .preCloseCallback(preCloseCallback)
                     .closeCallback(closeCallback)
                     .build();
-
             watcher.watchAutoClose();
 
-            // 4. 发送给slave，开始爬虫任务 ->  slave , zkCli -> create_path -> /worker/spider-task/{groupId}/{spiderId}/spider1-(data:ip,port, conf.  running)
+            // 4. 发送任务到Spider Scheduler Queue中
+            queueManager.sendTasks(key, cnfs);
+
+            // 5. 发送给slave，开始爬虫任务 ->  slave , zkCli -> create_path -> /worker/spider-task/{groupId}/{spiderId}/spider1-(data:ip,port, conf.  running)
             dispatcher.dispatchStart();
         }
     }

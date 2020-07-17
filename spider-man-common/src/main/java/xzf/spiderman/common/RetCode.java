@@ -11,6 +11,7 @@ public interface RetCode
     String REQUEST_TIMEOUT_ERROR = "request_timeout_error";
     String THIRD_PARTY_SERVICE_INVOKE_ERROR = "third_party_service_invoke_error";
     String JSON_PARSER_ERROR = "json_parser_error";
+    String CONFIG_NOT_VALID_ERROR = "config_not_valid_error";
 
 
 

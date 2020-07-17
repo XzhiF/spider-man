@@ -44,5 +44,8 @@ public class AddSpiderCnfReq
 
     private Integer workerThreads;
 
+    @NotNull(message = "爬虫任务模式不能为空")
+    private Integer mode;
+
 
 }

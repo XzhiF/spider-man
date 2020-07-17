@@ -86,6 +86,7 @@ public class WorkerSpider implements Runnable, Task
     private WorkerSpiderLifeCycleListener lifeCycleListener = WorkerSpiderLifeCycleListener.DEFAULT;
     private Integer pollTimeoutSeconds; //假如有设置，使用这个，如果没有。使用properties配置的
     private Thread currentThread;   //记录当前执行的线程。
+    private boolean doneCanClose = false;
 
 
     /**
@@ -312,13 +313,19 @@ public class WorkerSpider implements Runnable, Task
 
             final Request request = blockingPoll(this);
 
+            if(stat.get()==STAT_STOPPING){
+                break;
+            }
+
             lifeCycleListener.onRequestPolled(this,request);
 
             if (request == null) {
 
                 pollTimeoutCount.incrementAndGet();
-                if(canClose()){
+                if(canClose() && !doneCanClose){
+                    logger.info("invoke can close...");
                     lifeCycleListener.onCanCloseCondition(this);
+                    doneCanClose = true;
                 }
 
                 if (threadPool.getThreadAlive() == 0 && exitWhenComplete) {
@@ -351,8 +358,6 @@ public class WorkerSpider implements Runnable, Task
         if (destroyWhenExit) {
             close();
         }
-
-        lifeCycleListener.onAfterRun(this);
 
         logger.info("Spider {} closed! {} pages downloaded.", getUUID(), pageCount.get());
     }
@@ -391,10 +396,7 @@ public class WorkerSpider implements Runnable, Task
             return ;
         }
 
-        // 使用线程中断
-        if( currentThread != null ){
-            currentThread.interrupt();
-        }
+
         //设置他的status=stopping
         this.updateStatusStopping();
 
@@ -407,6 +409,11 @@ public class WorkerSpider implements Runnable, Task
         }
         threadPool.shutdown();
         lifeCycleListener.onAfterClose(this);
+
+        // 使用线程中断
+        if( currentThread != null ){
+            currentThread.interrupt();
+        }
     }
 
     private void destroyEach(Object object) {

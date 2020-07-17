@@ -1,5 +1,6 @@
 package xzf.spiderman.worker;
 
+import com.alibaba.fastjson.JSON;
 import org.jsoup.select.Elements;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
@@ -11,7 +12,9 @@ import us.codecraft.webmagic.selector.Html;
 import us.codecraft.webmagic.selector.Selectable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OschinaBlogIndexPageProcessor implements PageProcessor
 {
@@ -20,19 +23,32 @@ public class OschinaBlogIndexPageProcessor implements PageProcessor
     @Override
     public void process(Page page)
     {
-        Html html = page.getHtml();
+        page.addTargetRequests(page.getHtml().links().regex("(https://my.oschina.net/\\w+/blog/\\w+)").all());
 
-        Selectable blogItemDivs = html.$(".blog-item");
-//        Elements elts = html.getDocument().select(".blog-item");
+//        String id =  page.getHtml().xpath("//*[@id=\"mainScreen\"]/div/val[2]")
+        String id = page.getHtml().$("#mainScreen > div > val:nth-child(3)", "data-value").toString();
+        String title = page.getHtml().xpath("//*[@id=\"mainScreen\"]/div/div[1]/div/div[2]/div[1]/div[2]/h2/text()").toString();
 
-        List<Selectable> blogItemNodes = blogItemDivs.nodes();
-//        List<Map<String,Object>> results = new ArrayList<>();
-        List<String> heads = new ArrayList<>();
+        page.putField("id", id);
+        page.putField("title", title);
 
-        for (Selectable itemNode : blogItemNodes) {
-            heads.add(itemNode.$(".header").get());
+        if(id == null){
+//            page.setSkip(true);
         }
-        page.putField("heads", heads);
+
+//        Html html = page.getHtml();
+//
+//        Selectable blogItemDivs = html.$(".blog-item");
+////        Elements elts = html.getDocument().select(".blog-item");
+//
+//        List<Selectable> blogItemNodes = blogItemDivs.nodes();
+////        List<Map<String,Object>> results = new ArrayList<>();
+//        List<String> heads = new ArrayList<>();
+//
+//        for (Selectable itemNode : blogItemNodes) {
+//            heads.add(itemNode.$(".header").get());
+//        }
+//        page.putField("heads", heads);
     }
 
     @Override

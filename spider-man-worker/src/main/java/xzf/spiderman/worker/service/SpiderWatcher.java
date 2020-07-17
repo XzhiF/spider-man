@@ -60,11 +60,15 @@ public class SpiderWatcher
 
     public void close()
     {
+
         // 1. close掉 cache
         curatorCache.close();
+        log.info("curatorCache closed.");
 
         // 2.清理zk节点
         deleteWatchingPath();
+
+        if(closeCallback!=null){ closeCallback.call(); }
 
         log.info("SpiderWatcher closed.");
     }
@@ -138,8 +142,8 @@ public class SpiderWatcher
 
         // 3. 检查爬虫是否都关闭了
         if(isAllStatusClosed(taskRepository.getTasks(key))){
+            log.info("onNodeChanged. It's all closed . ");
             close();
-            if(closeCallback!=null){ closeCallback.call(); }
         }
     }
 

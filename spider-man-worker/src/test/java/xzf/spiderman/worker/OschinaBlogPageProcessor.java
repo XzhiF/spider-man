@@ -10,6 +10,8 @@ import java.util.List;
 
 public class OschinaBlogPageProcessor implements PageProcessor {
 
+
+
     private Site site = Site.me().setDomain("my.oschina.net");
 
     @Override

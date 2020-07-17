@@ -100,7 +100,7 @@ public class SpiderMasterService
     public String submitSpider(SubmitSpiderReq req)
     {
         if (spiderTaskRepository.hasRunningGroup(req.getGroupId())) {
-            throw new BizException("爬虫任务组["+req.getGroupId()+"]已经运行。请稍后再试。");
+//            throw new BizException("爬虫任务组["+req.getGroupId()+"]已经运行。请稍后再试。");
         }
 
 

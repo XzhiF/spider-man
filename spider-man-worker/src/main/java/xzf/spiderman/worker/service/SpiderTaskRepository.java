@@ -108,8 +108,9 @@ public class SpiderTaskRepository
         try {
             Map<String, SpiderTask> taskMap = tasks.get(key);
 
-            SpiderTask src = taskMap.get(task.getCnfId());
-            src.setStatus(task.getStatus());
+//            SpiderTask src = taskMap.get(task.getCnfId());
+//            src.setStatus(task.getStatus());
+            taskMap.put(task.getCnfId(), task);
 
             redisTemplate.opsForHash().put(REDIS_RUNNING_SPIDER_TASK_KEY, key.getSpiderId(), taskMap);
         }finally {
