@@ -1,4 +1,4 @@
-package xzf.spiderman.worker.service;
+package xzf.spiderman.worker.service.master;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +10,7 @@ import xzf.spiderman.worker.data.CloseSpiderReq;
 import xzf.spiderman.worker.data.StartSpiderReq;
 import xzf.spiderman.worker.entity.SpiderCnf;
 import xzf.spiderman.worker.entity.SpiderServer;
+import xzf.spiderman.worker.service.GroupSpiderKey;
 
 import java.util.List;
 import java.util.concurrent.*;

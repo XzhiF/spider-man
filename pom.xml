@@ -13,6 +13,7 @@
         <module>spider-man-parent</module>
 
         <module>spider-man-common</module>
+        <module>spider-man-common-configuration</module>
 
         <module>spider-man-admin</module>
         <module>spider-man-admin-client</module>

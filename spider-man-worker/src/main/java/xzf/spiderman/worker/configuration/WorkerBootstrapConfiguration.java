@@ -11,9 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xzf.spiderman.starter.curator.leader.LeaderManager;
 import xzf.spiderman.starter.curator.leader.LeaderManagerListener;
-import xzf.spiderman.worker.service.MasterLeaderManager;
+import xzf.spiderman.worker.service.master.MasterLeaderManager;
 import xzf.spiderman.worker.service.SpiderMasterService;
-import xzf.spiderman.worker.service.SpiderTaskRepository;
+import xzf.spiderman.worker.service.master.SpiderTaskRepository;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

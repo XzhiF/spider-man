@@ -1,11 +1,10 @@
-package xzf.spiderman.worker.service;
+package xzf.spiderman.worker.service.slave;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
 import xzf.spiderman.worker.configuration.WorkerProperties;
 import xzf.spiderman.worker.entity.SpiderCnf;
+import xzf.spiderman.worker.service.SpiderKey;
 import xzf.spiderman.worker.webmagic.BlockingPollRedisScheduler;
 import xzf.spiderman.worker.webmagic.SpiderParams;
 import xzf.spiderman.worker.webmagic.WorkerSpider;
@@ -14,17 +13,18 @@ import xzf.spiderman.worker.webmagic.WorkerSpiderLifeCycleListener;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Repository
 public class WorkerSpiderFactory
 {
     private final ThreadGroup threadGroup = new ThreadGroup("WorkerSpider");
     private final ProcessorFactory processorFactory = new ProcessorFactory();
 
-    @Autowired
-    private BlockingPollRedisScheduler scheduler;
+    private final BlockingPollRedisScheduler scheduler;
+    private final WorkerProperties properties;
 
-    @Autowired
-    private WorkerProperties properties;
+    public WorkerSpiderFactory(BlockingPollRedisScheduler scheduler, WorkerProperties properties) {
+        this.scheduler = scheduler;
+        this.properties = properties;
+    }
 
     public WorkerSpider create(SpiderKey key, SpiderCnf cnf, WorkerSpiderLifeCycleListener listener)
     {

@@ -1,6 +1,9 @@
-package xzf.spiderman.worker.service;
+package xzf.spiderman.worker.service.master;
 
 import xzf.spiderman.worker.configuration.HessianRedisTemplate;
+import xzf.spiderman.worker.service.GroupSpiderKey;
+import xzf.spiderman.worker.service.SpiderTask;
+
 import static xzf.spiderman.worker.configuration.WorkerConst.*;
 
 import java.util.ArrayList;

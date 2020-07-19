@@ -1,4 +1,4 @@
-package xzf.spiderman.worker.service;
+package xzf.spiderman.worker.service.master;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +8,8 @@ import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.zookeeper.CreateMode;
 import xzf.spiderman.starter.curator.CuratorFacade;
 import xzf.spiderman.worker.configuration.WorkerConst;
+import xzf.spiderman.worker.service.GroupSpiderKey;
+import xzf.spiderman.worker.service.SpiderTask;
 
 import java.util.List;
 

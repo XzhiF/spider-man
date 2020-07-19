@@ -16,7 +16,7 @@ import xzf.spiderman.common.Ret;
 import xzf.spiderman.common.exception.BizException;
 import xzf.spiderman.worker.data.SubmitSpiderReq;
 import xzf.spiderman.worker.feign.SpiderMasterFeignService;
-import xzf.spiderman.worker.service.MasterLeaderManager;
+import xzf.spiderman.worker.service.master.MasterLeaderManager;
 import xzf.spiderman.worker.service.SpiderMasterService;
 
 import javax.validation.Valid;

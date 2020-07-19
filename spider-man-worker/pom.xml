@@ -24,6 +24,11 @@
         </dependency>
         <dependency>
             <groupId>xzf</groupId>
+            <artifactId>spider-common-configuration</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>xzf</groupId>
             <artifactId>spider-man-starter-curator</artifactId>
             <version>${revision}</version>
         </dependency>
@@ -92,6 +97,12 @@
         <dependency>
             <groupId>com.caucho</groupId>
             <artifactId>hessian</artifactId>
+        </dependency>
+
+        <!-- groovy -->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
         </dependency>
 
     </dependencies>

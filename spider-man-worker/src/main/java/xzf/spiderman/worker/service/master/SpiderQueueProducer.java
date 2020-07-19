@@ -1,11 +1,11 @@
-package xzf.spiderman.worker.service;
+package xzf.spiderman.worker.service.master;
 
 import lombok.extern.slf4j.Slf4j;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Task;
-import xzf.spiderman.worker.configuration.HessianRedisTemplate;
 import xzf.spiderman.worker.entity.SpiderCnf;
+import xzf.spiderman.worker.service.GroupSpiderKey;
 import xzf.spiderman.worker.webmagic.BlockingPollRedisScheduler;
 import xzf.spiderman.worker.webmagic.SpiderParams;
 
@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 
 
 @Slf4j
-public class SpiderQueueManager
+public class SpiderQueueProducer
 {
     private BlockingPollRedisScheduler scheduler;
 
-    public SpiderQueueManager(BlockingPollRedisScheduler scheduler)
+    public SpiderQueueProducer(BlockingPollRedisScheduler scheduler)
     {
         this.scheduler = scheduler;
     }
@@ -79,8 +79,7 @@ public class SpiderQueueManager
 
     public void clear(GroupSpiderKey key)
     {
-        String setPrefix = BlockingPollRedisScheduler.getSetPrefix();
-        scheduler.getRedisTemplate().delete(setPrefix+key.getSpiderId());
+        scheduler.clearDuplicateSet(new DefaultTask(key.getSpiderId()));
     }
 
 
@@ -93,6 +92,11 @@ public class SpiderQueueManager
             this.uuid = uuid;
             this.site = site;
         }
+
+        public DefaultTask(String uuid){
+            this(uuid, new Site());
+        }
+
 
         @Override
         public String getUUID() {

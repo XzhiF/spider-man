@@ -1,4 +1,4 @@
-package xzf.spiderman.worker.service;
+package xzf.spiderman.worker.service.master;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.springframework.context.ApplicationListener;

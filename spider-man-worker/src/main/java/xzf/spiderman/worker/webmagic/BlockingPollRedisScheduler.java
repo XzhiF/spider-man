@@ -156,11 +156,9 @@ public class BlockingPollRedisScheduler extends DuplicateRemovedScheduler implem
     }
 
 
-    public static String getSetPrefix() {
-        return SET_PREFIX;
+    public void clearDuplicateSet(Task task)
+    {
+         this.redisTemplate.delete(getSetKey(task));
     }
 
-    public HessianRedisTemplate getRedisTemplate() {
-        return redisTemplate;
-    }
 }

@@ -1,26 +1,22 @@
-package xzf.spiderman.worker.service;
+package xzf.spiderman.worker.service.slave;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Service;
-import us.codecraft.webmagic.Spider;
-import us.codecraft.webmagic.processor.PageProcessor;
 import xzf.spiderman.common.event.Event;
 import xzf.spiderman.common.event.EventListener;
 import xzf.spiderman.common.exception.BizException;
-import xzf.spiderman.starter.curator.CuratorAction;
 import xzf.spiderman.starter.curator.CuratorFacade;
-import xzf.spiderman.worker.configuration.HessianRedisTemplate;
 import xzf.spiderman.worker.configuration.WorkerProperties;
 import xzf.spiderman.worker.entity.SpiderCnf;
+import xzf.spiderman.worker.service.SpiderKey;
+import xzf.spiderman.worker.service.SpiderTask;
 import xzf.spiderman.worker.service.event.CloseSpiderEvent;
 import xzf.spiderman.worker.service.event.StartSpiderEvent;
-import xzf.spiderman.worker.webmagic.BlockingPollRedisScheduler;
 import xzf.spiderman.worker.webmagic.WorkerSpider;
 import xzf.spiderman.worker.webmagic.WorkerSpiderLifeCycleListener;
 
@@ -38,7 +34,6 @@ import static xzf.spiderman.worker.configuration.WorkerConst.ZK_SPIDER_TASK_BASE
  *   当 canClose为真的时候。 更新zk节点，设置为completed
  *
  */
-@Service
 @Slf4j
 public class SpiderSlave implements EventListener, ApplicationListener<ContextClosedEvent>
 {
@@ -47,7 +42,6 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
     private final WorkerSpiderRepository repository;
     private final ExecutorService executor;
 
-    @Autowired
     public SpiderSlave(
             CuratorFacade curatorFacade,
             WorkerSpiderFactory factory,
@@ -80,7 +74,7 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
 
             // 3. Run WorkerSpider
             CompletableFuture.runAsync( ()->spider.run(), executor )
-                    .thenRunAsync( ()->updateClosedTaskToZk(key), executor);
+                    .thenRunAsync( ()->updateClosedTaskToZk(key)  );
 
             // 保存到本地缓存中
             repository.put(key, spider);

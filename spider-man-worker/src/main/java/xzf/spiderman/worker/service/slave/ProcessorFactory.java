@@ -1,4 +1,4 @@
-package xzf.spiderman.worker.service;
+package xzf.spiderman.worker.service.slave;
 
 import us.codecraft.webmagic.processor.PageProcessor;
 import xzf.spiderman.common.exception.ConfigNotValidException;

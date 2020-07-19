@@ -1,18 +1,15 @@
-package xzf.spiderman.worker.service;
+package xzf.spiderman.worker.service.slave;
 
-import org.springframework.stereotype.Repository;
+import xzf.spiderman.worker.service.SpiderKey;
 import xzf.spiderman.worker.webmagic.WorkerSpider;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Repository
 public class WorkerSpiderRepository
 {
     private Map<SpiderKey, WorkerSpider> data = new ConcurrentHashMap<>();
-
 
     public void put(SpiderKey key, WorkerSpider value)
     {

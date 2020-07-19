@@ -6,6 +6,8 @@ import xzf.spiderman.common.event.EventPublisher;
 import xzf.spiderman.worker.service.event.CloseSpiderEvent;
 import xzf.spiderman.worker.service.event.StartSpiderEvent;
 import xzf.spiderman.worker.service.event.SubmitSpiderEvent;
+import xzf.spiderman.worker.service.master.SpiderMaster;
+import xzf.spiderman.worker.service.slave.SpiderSlave;
 
 @Repository
 public class EventPublisherRegistry

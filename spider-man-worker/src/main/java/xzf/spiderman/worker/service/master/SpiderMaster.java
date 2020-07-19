@@ -1,9 +1,10 @@
-package xzf.spiderman.worker.service;
+package xzf.spiderman.worker.service.master;
 
 import xzf.spiderman.common.event.Event;
 import xzf.spiderman.common.event.EventListener;
 import xzf.spiderman.starter.curator.CuratorFacade;
 import xzf.spiderman.worker.entity.SpiderCnf;
+import xzf.spiderman.worker.service.*;
 import xzf.spiderman.worker.service.event.SubmitSpiderEvent;
 
 import java.util.ArrayList;
@@ -25,13 +26,13 @@ public class SpiderMaster implements EventListener
 {
     private SpiderTaskRepository taskRepository;
     private CuratorFacade curatorFacade;
-    private SpiderQueueManager queueManager;
+    private SpiderQueueProducer queueProducer;
 
-    public SpiderMaster(SpiderTaskRepository taskRepository, CuratorFacade curatorFacade, SpiderQueueManager queueManager)
+    public SpiderMaster(SpiderTaskRepository taskRepository, CuratorFacade curatorFacade, SpiderQueueProducer queueProducer)
     {
         this.taskRepository = taskRepository;
         this.curatorFacade = curatorFacade;
-        this.queueManager = queueManager;
+        this.queueProducer = queueProducer;
     }
 
     private List<SpiderTask> buildInitSpiderTaskRuntimeData(GroupSpiderKey key, List<SpiderCnf> cnfs)
@@ -69,7 +70,7 @@ public class SpiderMaster implements EventListener
             };
             SpiderWatcher.CloseCallback closeCallback = ()->{
                 taskRepository.removeAll(key);
-                queueManager.clear(key);
+                queueProducer.clear(key);
             };
 
             SpiderWatcher watcher = SpiderWatcher.builder(curatorFacade)
@@ -81,7 +82,7 @@ public class SpiderMaster implements EventListener
             watcher.watchAutoClose();
 
             // 4. 发送任务到Spider Scheduler Queue中
-            queueManager.sendTasks(key, cnfs);
+            queueProducer.sendTasks(key, cnfs);
 
             // 5. 发送给slave，开始爬虫任务 ->  slave , zkCli -> create_path -> /worker/spider-task/{groupId}/{spiderId}/spider1-(data:ip,port, conf.  running)
             dispatcher.dispatchStart();

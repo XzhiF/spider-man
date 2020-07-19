@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xzf.spiderman.starter.curator.CuratorAutoConfiguration;
 import xzf.spiderman.starter.curator.CuratorFacade;
-import xzf.spiderman.worker.service.SpiderMaster;
-import xzf.spiderman.worker.service.SpiderQueueManager;
-import xzf.spiderman.worker.service.SpiderTaskRepository;
+import xzf.spiderman.worker.service.master.SpiderMaster;
+import xzf.spiderman.worker.service.master.SpiderQueueProducer;
+import xzf.spiderman.worker.service.master.SpiderTaskRepository;
 import xzf.spiderman.worker.webmagic.BlockingPollRedisScheduler;
 
 @Configuration
@@ -28,15 +28,15 @@ public class SpiderMasterConfiguration
     }
 
     @Bean
-    public SpiderQueueManager spiderQueueSender(BlockingPollRedisScheduler scheduler)
+    public SpiderQueueProducer spiderQueueProducer(BlockingPollRedisScheduler scheduler)
     {
-        return new SpiderQueueManager(scheduler);
+        return new SpiderQueueProducer(scheduler);
     }
 
     @Bean
-    public SpiderMaster spiderMaster(SpiderTaskRepository store, SpiderQueueManager sender)
+    public SpiderMaster spiderMaster(SpiderTaskRepository store, SpiderQueueProducer producer)
     {
-        return new SpiderMaster(store, curatorFacade,sender);
+        return new SpiderMaster(store, curatorFacade,producer);
     }
 
 }
