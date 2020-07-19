@@ -94,6 +94,7 @@
             <artifactId>webmagic-extension</artifactId>
         </dependency>
 
+        <!-- hessian -->
         <dependency>
             <groupId>com.caucho</groupId>
             <artifactId>hessian</artifactId>
@@ -104,6 +105,7 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
         </dependency>
+
 
     </dependencies>
 

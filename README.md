@@ -44,7 +44,11 @@
 > [记录自己写一个小Java爬虫项目-0039-SpiderMaster实现-2](https://www.bilibili.com/video/BV1d54y1q7nm/) <br/>
 > [记录自己写一个小Java爬虫项目-0040-SpiderMaster实现-3](https://www.bilibili.com/video/BV1SZ4y1u7hb/) <br/>
 > [记录自己写一个小Java爬虫项目-0041-SpiderMaster实现-4](https://www.bilibili.com/video/BV16K4y1e7E4/) <br/>
->
+> [记录自己写一个小Java爬虫项目-0042-SpiderMaster实现-5](https://www.bilibili.com/video/BV1va4y1a7zX/) <br/>
+> [记录自己写一个小Java爬虫项目-0043-SpiderMaster实现-6](https://www.bilibili.com/video/BV1fh411o7FS/) <br/>
+> [记录自己写一个小Java爬虫项目-0044-SpiderMaster实现-7](https://www.bilibili.com/video/BV17C4y1b7eG/) <br/>
+> [记录自己写一个小Java爬虫项目-0045-SpiderMaster实现-8](https://www.bilibili.com/video/BV1Jv411q7Hk/) <br/>
+> [记录自己写一个小Java爬虫项目-0046-SpiderMaster测试](https://www.bilibili.com/video/BV1M54y1S7dS/) <br/>
 >
 >
 >

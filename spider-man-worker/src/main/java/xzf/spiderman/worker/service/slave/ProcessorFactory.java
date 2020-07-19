@@ -15,6 +15,10 @@ public class ProcessorFactory
         try
         {
             String processorClassName  = cnf.getProcessor();
+            if("groovy".equals(processorClassName)){
+                processorClassName = "xzf.spiderman.worker.webmagic.GroovyProcessor";
+            }
+
             Class<? extends ParamProcessor> clazz = (Class<? extends ParamProcessor>) Class.forName(processorClassName);
             Constructor<? extends ParamProcessor> constructor = clazz.getConstructor(SpiderParams.class);
             SpiderParams params = SpiderParams.parse(cnf.getParams());
