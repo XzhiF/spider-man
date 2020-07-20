@@ -123,4 +123,18 @@ public class HessianRedisTemplateTest
 
     }
 
+    @Test
+    public void testSetIf() throws Exception
+    {
+        String key = "test:hello";
+
+        boolean absent = hessianRedisTemplate.opsForValue().setIfAbsent(key,"0",3,TimeUnit.MINUTES);
+        System.out.println("absent = " + absent);
+        TimeUnit.MINUTES.sleep(1L);
+        boolean fk = hessianRedisTemplate.opsForValue().setIfPresent(key,"fk", 1, TimeUnit.MINUTES);
+        System.out.println(fk);
+        System.out.println("present = " + fk);
+    }
+
+
 }

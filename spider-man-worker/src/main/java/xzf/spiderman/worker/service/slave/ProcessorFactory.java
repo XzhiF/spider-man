@@ -3,6 +3,7 @@ package xzf.spiderman.worker.service.slave;
 import us.codecraft.webmagic.processor.PageProcessor;
 import xzf.spiderman.common.exception.ConfigNotValidException;
 import xzf.spiderman.worker.entity.SpiderCnf;
+import xzf.spiderman.worker.webmagic.GroovyProcessor;
 import xzf.spiderman.worker.webmagic.ParamProcessor;
 import xzf.spiderman.worker.webmagic.SpiderParams;
 
@@ -16,7 +17,7 @@ public class ProcessorFactory
         {
             String processorClassName  = cnf.getProcessor();
             if("groovy".equals(processorClassName)){
-                processorClassName = "xzf.spiderman.worker.webmagic.GroovyProcessor";
+                processorClassName = GroovyProcessor.class.getName();
             }
 
             Class<? extends ParamProcessor> clazz = (Class<? extends ParamProcessor>) Class.forName(processorClassName);

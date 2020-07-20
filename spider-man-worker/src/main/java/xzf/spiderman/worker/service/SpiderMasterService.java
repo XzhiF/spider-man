@@ -98,8 +98,21 @@ public class SpiderMasterService
     //
     public String submitSpider(SubmitSpiderReq req)
     {
+
+        // TODO 以后优化的点
+        // 支持spider server, cnf.host为*
+        // 找到集群中一台空闲的机器运行 （nacos跟本地配置）。
+        // 如果没有空闲的机器（一种必须执行，让一台机器支持跑多个爬虫）
+        // 另一种就直接拒绝，也就是说一台机器只能跑组里的一个爬虫
+
+
+        // redisson ,
+        // 上锁.  tryLock ttl  (time to live) ->
+        // 解锁   unLock  -> spdier close
+        // ->续租 ->  listener pollRequested()
+
         if (spiderTaskRepository.hasRunningGroup(req.getGroupId())) {
-//            throw new BizException("爬虫任务组["+req.getGroupId()+"]已经运行。请稍后再试。");
+            throw new BizException("爬虫任务组["+req.getGroupId()+"]已经运行。请稍后再试。");
         }
 
 
