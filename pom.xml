@@ -23,6 +23,7 @@
         <module>spider-man-worker</module>
         <module>spider-man-worker-client</module>
         <module>spider-man-starter-curator</module>
+        <module>spider-man-storage</module>
     </modules>
 
 

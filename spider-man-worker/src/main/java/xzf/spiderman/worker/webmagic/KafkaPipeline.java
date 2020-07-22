@@ -31,13 +31,10 @@ public class KafkaPipeline implements Pipeline
         HashMap<String, Object> data = new HashMap<>();
         data.putAll(resultItems.getAll());
 
-        HashMap<String, Object> cfg = new HashMap<>();
-        cfg.put("storeId", cnf.getStore());
-
         //
         HashMap<String, Object> ret = new HashMap<>();
         ret.put("data", data);
-        ret.put("cfg", cfg);
+        ret.put("cfg", getStoreData());
 
         String msg = JSON.toJSONString(ret);
 
@@ -45,5 +42,22 @@ public class KafkaPipeline implements Pipeline
     }
 
 
+
+    private StoreData getStoreData()
+    {
+        StoreData ret = new StoreData();
+
+        ret.setCnfId(cnf.getId());
+        ret.setStoreId(cnf.getStore().getId());
+        ret.setUrl(cnf.getStore().getUrl());
+        ret.setHost(cnf.getStore().getHost());
+        ret.setPort(cnf.getStore().getPort());
+        ret.setType(cnf.getStore().getType());
+        ret.setTableName(cnf.getStore().getTableName());
+        ret.setUsername(cnf.getStore().getUsername());
+        ret.setPassword(cnf.getStore().getPassword());
+
+        return ret;
+    }
 
 }

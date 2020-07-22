@@ -25,11 +25,17 @@ public class SpiderStore
     @Column(name = "port")
     private Integer port;
 
+    @Column(name = "database")
+    private String database;
+
     @Column(name = "table_name")
     private String tableName;
 
     @Column(name = "type")
     private Integer type;
+
+    @Column(name = "url")
+    private String url;
 
     @Column(name = "username")
     private String username ;

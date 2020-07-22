@@ -17,8 +17,12 @@ public class StoreData
 
     private Integer type;
 
+    private String url;
+
     private String username ;
 
     private String password;
+
+    private String database;
 
 }

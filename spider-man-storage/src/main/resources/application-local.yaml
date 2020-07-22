@@ -1,0 +1,18 @@
+server:
+  port: 8085
+
+spring:
+  kafka:
+    bootstrap-servers: kafka.spiderman.xzf:9092
+    producer:
+      acks: 1
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      auto-commit-interval: 2000ms
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringSerializer
+      value-deserializer: org.apache.kafka.common.serialization.StringSerializer
+
+
+

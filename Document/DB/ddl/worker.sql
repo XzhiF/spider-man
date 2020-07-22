@@ -47,5 +47,6 @@ CREATE TABLE IF NOT EXISTS `worker`.`spider_store` (
   `url` VARCHAR(255) NULL,
   `username` VARCHAR(45) NULL,
   `password` VARCHAR(45) NULL,
+  `database` varchar(128)  NULL,
   PRIMARY KEY (`spider_store_id`))
 ENGINE = InnoDB;
