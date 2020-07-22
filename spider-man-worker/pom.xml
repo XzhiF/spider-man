@@ -62,6 +62,11 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
         <!-- alibaba -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>

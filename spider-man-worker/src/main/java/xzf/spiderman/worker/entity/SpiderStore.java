@@ -31,5 +31,10 @@ public class SpiderStore
     @Column(name = "type")
     private Integer type;
 
+    @Column(name = "username")
+    private String username ;
+
+    @Column(name = "password")
+    private String password;
 
 }

@@ -12,6 +12,12 @@ spring:
     port: 6379
     database: 0
     timeout: 120s
+  kafka:
+    bootstrap-servers: kafka.spiderman.xzf:9092
+    producer:
+      acks: 1
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 xzf:
   spiderman:
