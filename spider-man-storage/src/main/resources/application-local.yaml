@@ -2,6 +2,11 @@ server:
   port: 8085
 
 spring:
+  redis:
+    host: redis.spiderman.xzf
+    port: 6379
+    database: 0
+    timeout: 210s
   kafka:
     bootstrap-servers: kafka.spiderman.xzf:9092
     producer:

@@ -53,7 +53,7 @@ public class KafkaTemplateTest
         msg.put("data",data);
         msg.put("cfg", store);
 
-        kafkaTemplate.send(WorkerConst.KAFKA_SPIDER_MAN_STORAGE, JSON.toJSONString(msg)).get();
+        kafkaTemplate.send(WorkerConst.KAFKA_SPIDER_MAN_STORAGE_QUEUE, JSON.toJSONString(msg)).get();
 
         System.out.println("sended------");
     }

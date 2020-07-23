@@ -23,9 +23,9 @@ public class StoreCnfData
 
     private String tableName;
 
-    private Integer type;
+    private Integer type;       // 1.mongo... 2.es
 
-    private String url;
+    private String url;         // mongon:,
 
     private String username ;
 

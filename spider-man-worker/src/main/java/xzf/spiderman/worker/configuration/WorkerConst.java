@@ -11,6 +11,6 @@ public class WorkerConst
     public static final String ZK_SPIDER_TASK_BASE_PATH = "/worker/spider-task";
 
     //
-    public static final String KAFKA_SPIDER_MAN_STORAGE = "spider-man-storage";
+    public static final String KAFKA_SPIDER_MAN_STORAGE_QUEUE = "spider-man-storage";
 
 }

@@ -11,7 +11,7 @@ import xzf.spiderman.worker.data.StoreDataReq;
 import xzf.spiderman.worker.entity.SpiderCnf;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Date;
 
 public class KafkaPipeline implements Pipeline
 {
@@ -27,14 +27,17 @@ public class KafkaPipeline implements Pipeline
     @Override
     public void process(ResultItems resultItems, Task task)
     {
+        resultItems.put("_timestamp", new Date());
+
         StoreDataReq req = StoreDataReq.builder()
                 .data(resultItems.getAll())
                 .storeCnfs(Arrays.asList(getStoreData()))
+                .timestamp(new Date())
                 .build();
 
         String msg = JSON.toJSONString(req);
 
-        kafkaTemplate.send(WorkerConst.KAFKA_SPIDER_MAN_STORAGE, msg);
+        kafkaTemplate.send(WorkerConst.KAFKA_SPIDER_MAN_STORAGE_QUEUE, msg);
     }
 
 
