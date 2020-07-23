@@ -52,6 +52,7 @@ public class MongoConsumer implements Closeable
     @KafkaListener(topics = KAFKA_SPIDER_MAN_STORAGE_QUEUE, groupId = "mongo",concurrency = "${xzf.spiderman.storage.consumerThreadPool:1}")
     public void handle(ConsumerRecord rec , Consumer consumer)
     {
+        log.info("begin consume rec....." + KAFKA_SPIDER_MAN_STORAGE_QUEUE + ":mongo" + ":"  + rec.partition() + ":"  + rec.offset());
 //        topic,mongo,partition,offset
 
         // 1. 保存到redis 临时保存
@@ -84,6 +85,8 @@ public class MongoConsumer implements Closeable
                 template.opsForSet().add(REDIS_SPIDER_MAN_STORAGE_ERROR_SET_KEY, hashKey);
             }
         });
+
+        log.info("end consume rec....." + KAFKA_SPIDER_MAN_STORAGE_QUEUE + ":mongo" + ":"  + rec.partition() + ":"  + rec.offset());
     }
 
     private MongoTemplate getMongoTemplate(StoreCnfData store)

@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import us.codecraft.webmagic.Page
 import us.codecraft.webmagic.Site
 import xzf.spiderman.worker.webmagic.ContextProcessor
-import xzf.spiderman.worker.webmagic.SpiderParams
+import xzf.spiderman.worker.webmagic.ProcessorContext
 
 class BlogProcessor extends ContextProcessor
 {
@@ -13,8 +13,8 @@ class BlogProcessor extends ContextProcessor
 
     private final Site site = Site.me().setDomain("www.oschina.net");
 
-    BlogProcessor(SpiderParams params) {
-        super(params);
+    BlogProcessor(ProcessorContext context) {
+        super(context);
     }
 
     @Override
@@ -39,8 +39,8 @@ class BlogProcessor extends ContextProcessor
         }
         else {
             String id = page.getHtml().$("#mainScreen > div > val:nth-child(3)", "data-value").toString();
-            String author = page.getHtml().xpath("//*[@id=\"mainScreen\"]/div/div[1]/div/div[2]/div[1]/div[2]/div[1]/div[1]/a/span/text()").toString();
-            String title = page.getHtml().xpath("//*[@id=\"mainScreen\"]/div/div[1]/div/div[2]/div[1]/div[2]/h2/text()").toString();
+            String author = page.getHtml().xpath("//*[@id=\"mainScreen\"]/div/div[1]/div/div[2]/div[1]/div[3]/div[1]/div[1]/a/span/text()").toString();
+            String title = page.getHtml().xpath("//*[@id=\"mainScreen\"]/div/div[1]/div/div[2]/div[1]/div[3]/h2/text()").toString();
 
             page.putField("id", id);
             page.putField("author", author);

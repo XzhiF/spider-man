@@ -39,8 +39,11 @@ public class SpiderCnfService
 
         SpiderServer server = spiderServerRepository.getOne(req.getServerId());
         SpiderGroup group = spiderGroupRepository.getOne(req.getGroupId());
+
+        // TODO
         SpiderStore store = spiderStoreRepository.getOne(req.getStoreId());
-        SpiderCnf cnf = SpiderCnf.create(req, group, server,store);
+
+        SpiderCnf cnf = SpiderCnf.create(req, group, server);
         spiderCnfRepository.save(cnf);
     }
 

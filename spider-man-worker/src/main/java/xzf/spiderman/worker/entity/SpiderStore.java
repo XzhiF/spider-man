@@ -14,6 +14,13 @@ import javax.persistence.*;
 public class SpiderStore
 {
     public static final int TYPE_MONGO = 1;
+    public static final int TYPE_ES = 2;
+
+
+    public static final int URL_TYPE_DB_CONNECT = 1;
+    public static final int URL_TYPE_NACOS_URI = 2;
+
+
 
     @Id
     @Column(name = "spider_store_id")
@@ -42,5 +49,8 @@ public class SpiderStore
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "url_type")
+    private Integer urlType;
 
 }

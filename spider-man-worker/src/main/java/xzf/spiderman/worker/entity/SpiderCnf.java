@@ -45,10 +45,6 @@ public class SpiderCnf
     @JoinColumn(name = "spider_server_id")
     private SpiderServer server;
 
-    @ManyToOne
-    @JoinColumn(name = "spider_store_id")
-    private SpiderStore store;
-
     @Column(name = "spider_name")
     private String name;
 
@@ -90,8 +86,7 @@ public class SpiderCnf
 
     public static SpiderCnf create(AddSpiderCnfReq req,
                                    SpiderGroup group,
-                                   SpiderServer server,
-                                   SpiderStore store)
+                                   SpiderServer server)
     {
         SpiderCnf ret = new SpiderCnf();
 
@@ -108,7 +103,6 @@ public class SpiderCnf
 
         ret.setServer(server);
         ret.setGroup(group);
-        ret.setStore(store);
 
         ret.setStatus(STATUS_STOPED);
         ret.setActiveFlag(ACTIVE_FLAG_ENABLE);

@@ -43,7 +43,7 @@ public class MongoTemplateFactory
         MongoProperties properties = createProperties(cnf);
         MongoClientFactory factory = new MongoClientFactory(properties, null);
         MongoClient client = factory.createMongoClient(null);
-        MongoTemplate template = new MongoTemplate(client, cnf.getDatabase());
+        MongoTemplate template = new MongoTemplate(client, properties.getDatabase());
         return template;
     }
 

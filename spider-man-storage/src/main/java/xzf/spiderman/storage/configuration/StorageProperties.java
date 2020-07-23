@@ -14,20 +14,14 @@ public class StorageProperties
     private Integer consumerConcurrency = 2;
 
 
-
-
     @Data
     public class ConsumerThreadPool
     {
         private int corePoolSize = 2;
         private int maximumPoolSize = 10;
         private long keepAliveTimeSeconds;
-        private int workQueue = 0;
-
-
+        private int workQueue = 10;
     }
-
-
 
 
 }

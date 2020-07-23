@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS `worker`.`spider_cnf` (
   `spider_cnf_id` VARCHAR(30) NOT NULL,
   `spider_group_id` VARCHAR(30) NOT NULL,
   `spider_server_id` VARCHAR(30) NOT NULL,
-  `spider_store_id` VARCHAR(30) NOT NULL,
   `spider_name` VARCHAR(45) NOT NULL,
   `spider_type` INT NOT NULL DEFAULT 1 COMMENT '1 web; 2 db; 3 file;',
   `spider_params` VARCHAR(2000) NULL COMMENT 'Json',
@@ -17,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `worker`.`spider_cnf` (
   `worker_threads` INT NULL,
   `poll_timeout_seconds` INT NULL,
   `max_poll_timeout_count` INT NULL,
+  `mode` int(11) DEFAULT '1' COMMENT '1 shared, 2 exclusive',
   PRIMARY KEY (`spider_cnf_id`))
 ENGINE = InnoDB;
 
@@ -48,5 +48,14 @@ CREATE TABLE IF NOT EXISTS `worker`.`spider_store` (
   `username` VARCHAR(45) NULL,
   `password` VARCHAR(45) NULL,
   `database` varchar(128)  NULL,
+  `url_type` INT NULL COMMENT '1 连接db串;2 nacos路径',
   PRIMARY KEY (`spider_store_id`))
+ENGINE = InnoDB;
+
+
+CREATE TABLE IF NOT EXISTS `worker`.`spider_cnf_store` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `spider_cnf_id` VARCHAR(30) NOT NULL,
+  `spider_store_id` VARCHAR(30) NOT NULL,
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB;

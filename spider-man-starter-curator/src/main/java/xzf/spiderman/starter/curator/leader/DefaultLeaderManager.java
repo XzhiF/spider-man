@@ -123,8 +123,10 @@ public class DefaultLeaderManager implements LeaderSelectorListener, LeaderManag
     public void close() throws IOException
     {
         try {
+            log.error(this.getClass().getSimpleName()+" shutdown initiated.");
             listeners.forEach(l->l.onClose(this));
             leaderSelector.close();
+            log.error(this.getClass().getSimpleName()+" shutdown completed.");
         }finally {
             semaphore.release();
         }

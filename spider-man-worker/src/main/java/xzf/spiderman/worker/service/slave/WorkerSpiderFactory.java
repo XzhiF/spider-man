@@ -5,9 +5,11 @@ import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
 import xzf.spiderman.worker.configuration.WorkerProperties;
 import xzf.spiderman.worker.entity.SpiderCnf;
+import xzf.spiderman.worker.entity.SpiderStore;
 import xzf.spiderman.worker.service.SpiderKey;
 import xzf.spiderman.worker.webmagic.*;
 
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,7 +20,6 @@ public class WorkerSpiderFactory
 
     private final BlockingPollRedisScheduler scheduler;
     private final KafkaTemplate kafkaTemplate;
-
     private final WorkerProperties properties;
 
     public WorkerSpiderFactory(BlockingPollRedisScheduler scheduler,KafkaTemplate kafkaTemplate, WorkerProperties properties) {
@@ -27,9 +28,12 @@ public class WorkerSpiderFactory
         this.properties = properties;
     }
 
-    public WorkerSpider create(SpiderKey key, SpiderCnf cnf, WorkerSpiderLifeCycleListener listener)
+    public WorkerSpider create(WorkerSpiderSettings settings, WorkerSpiderLifeCycleListener listener)
     {
-        SpiderParams params = new SpiderParams();
+        SpiderKey key = settings.getKey();
+        SpiderCnf cnf = settings.getCnf();
+        List<SpiderStore> stores = settings.getStores();
+
         PageProcessor pageProcessor = processorFactory.create(cnf);
         WorkerSpider spider = WorkerSpider.create(pageProcessor);
 
@@ -37,7 +41,7 @@ public class WorkerSpiderFactory
         // httpclient, selenium, jsoup.
 
         spider.addPipeline(new ConsolePipeline());
-        spider.addPipeline(new KafkaPipeline(kafkaTemplate, cnf));
+        spider.addPipeline(new KafkaPipeline(kafkaTemplate, cnf,stores));
 
         // 不需要设置request或url，由master端设置
         spider.setScheduler(scheduler); //设置任务队列

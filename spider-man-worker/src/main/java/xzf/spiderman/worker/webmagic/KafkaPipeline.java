@@ -9,19 +9,25 @@ import xzf.spiderman.worker.configuration.WorkerConst;
 import xzf.spiderman.worker.data.StoreCnfData;
 import xzf.spiderman.worker.data.StoreDataReq;
 import xzf.spiderman.worker.entity.SpiderCnf;
+import xzf.spiderman.worker.entity.SpiderStore;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class KafkaPipeline implements Pipeline
 {
     private final KafkaTemplate kafkaTemplate;
     private final SpiderCnf cnf;
+    private final List<SpiderStore> stores;
+    
 
-    public KafkaPipeline(KafkaTemplate kafkaTemplate, SpiderCnf cnf)
+    public KafkaPipeline(KafkaTemplate kafkaTemplate,SpiderCnf cnf, List<SpiderStore> stores)
     {
         this.kafkaTemplate = kafkaTemplate;
         this.cnf = cnf;
+        this.stores = stores;
     }
 
     @Override
@@ -31,7 +37,7 @@ public class KafkaPipeline implements Pipeline
 
         StoreDataReq req = StoreDataReq.builder()
                 .data(resultItems.getAll())
-                .storeCnfs(Arrays.asList(getStoreData()))
+                .storeCnfs(getStoreCnfs())
                 .timestamp(new Date())
                 .build();
 
@@ -42,21 +48,28 @@ public class KafkaPipeline implements Pipeline
 
 
 
-    private StoreCnfData getStoreData()
+    private List<StoreCnfData> getStoreCnfs()
     {
-        StoreCnfData ret = new StoreCnfData();
+        List<StoreCnfData> rets = new ArrayList<>();
+        
+        for (SpiderStore store : stores) {
 
-        ret.setCnfId(cnf.getId());
-        ret.setStoreId(cnf.getStore().getId());
-        ret.setUrl(cnf.getStore().getUrl());
-        ret.setHost(cnf.getStore().getHost());
-        ret.setPort(cnf.getStore().getPort());
-        ret.setType(cnf.getStore().getType());
-        ret.setTableName(cnf.getStore().getTableName());
-        ret.setUsername(cnf.getStore().getUsername());
-        ret.setPassword(cnf.getStore().getPassword());
+            StoreCnfData ret = new StoreCnfData();
+            ret.setCnfId(store.getId());
+            ret.setStoreId(store.getId());
+            ret.setUrl(store.getUrl());
+            ret.setHost(store.getHost());
+            ret.setPort(store.getPort());
+            ret.setType(store.getType());
+            ret.setDatabase(store.getDatabase());
+            ret.setTableName(store.getTableName());
+            ret.setUsername(store.getUsername());
+            ret.setPassword(store.getPassword());
 
-        return ret;
+            rets.add(ret);
+        }
+        
+        return rets;
     }
 
 }

@@ -3,16 +3,15 @@ package xzf.spiderman.worker.service.slave;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.stereotype.Service;
 import xzf.spiderman.common.event.Event;
 import xzf.spiderman.common.event.EventListener;
 import xzf.spiderman.common.exception.BizException;
 import xzf.spiderman.starter.curator.CuratorFacade;
 import xzf.spiderman.worker.configuration.WorkerProperties;
 import xzf.spiderman.worker.entity.SpiderCnf;
+import xzf.spiderman.worker.entity.SpiderStore;
 import xzf.spiderman.worker.service.SpiderKey;
 import xzf.spiderman.worker.service.SpiderTask;
 import xzf.spiderman.worker.service.event.CloseSpiderEvent;
@@ -20,6 +19,7 @@ import xzf.spiderman.worker.service.event.StartSpiderEvent;
 import xzf.spiderman.worker.webmagic.WorkerSpider;
 import xzf.spiderman.worker.webmagic.WorkerSpiderLifeCycleListener;
 
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -58,10 +58,12 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
     {
         private final SpiderKey key;
         private final SpiderCnf cnf;
+        private final List<SpiderStore> stores;
 
-        public StartSpiderHandler(SpiderKey key, SpiderCnf cnf) {
+        public StartSpiderHandler(SpiderKey key, SpiderCnf cnf,List<SpiderStore> stores) {
             this.key = key;
             this.cnf = cnf;
+            this.stores = stores;
         }
 
         public void handle()
@@ -70,7 +72,7 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
             WorkerSpiderLifeCycleListener listener = workerSpiderLifeCycleListener();
 
             // 2. Build WorkerSpider
-            WorkerSpider spider = factory.create(key, cnf, listener);
+            WorkerSpider spider = factory.create(new WorkerSpiderSettings(key,cnf,stores), listener);
 
             // 3. Run WorkerSpider
             CompletableFuture.runAsync( ()->spider.run(), executor )
@@ -185,7 +187,7 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
 
     private void onStartSpiderEvent(StartSpiderEvent event)
     {
-        StartSpiderHandler h = new StartSpiderHandler(event.getKey(), event.getCnf());
+        StartSpiderHandler h = new StartSpiderHandler(event.getKey(), event.getCnf(), event.getStores());
         h.handle();
     }
 

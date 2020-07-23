@@ -1,14 +1,14 @@
 package xzf.spiderman.worker.data;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.*;
 
 @Data
 @ToString
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class StoreDataReq
 {
     public static final int TYPE_MONGO = 1;

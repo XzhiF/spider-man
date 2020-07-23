@@ -39,7 +39,7 @@ public class GroovyProcessor extends ContextProcessor
             String url = context.getParams().getString("groovyUrl");
 
             Class clazz = getGroovyClass(url);
-            GroovyObject groovyObject = (GroovyObject) clazz.getConstructor(SpiderParams.class).newInstance(context);
+            GroovyObject groovyObject = (GroovyObject) clazz.getConstructor(ProcessorContext.class).newInstance(context);
             groovyObject.invokeMethod("process", page);
             log.info("GroovyProcessor执行脚本成功");
 

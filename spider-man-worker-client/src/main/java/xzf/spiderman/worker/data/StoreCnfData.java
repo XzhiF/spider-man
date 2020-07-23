@@ -40,7 +40,7 @@ public class StoreCnfData
         if(other==null){
             throw new BizException("非法调用hasChanges, other is null ");
         }
-        if(Objects.equals(this, other)){
+        if(!Objects.equals(this, other)){
             throw new BizException("非法调用hasChanges,不同的storeId["+this.storeId+","+other.storeId+"]");
         }
 

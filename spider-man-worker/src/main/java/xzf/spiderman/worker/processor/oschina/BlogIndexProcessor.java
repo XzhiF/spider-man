@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import xzf.spiderman.worker.webmagic.ContextProcessor;
+import xzf.spiderman.worker.webmagic.ProcessorContext;
 import xzf.spiderman.worker.webmagic.SpiderParams;
 
 import java.util.List;
@@ -13,8 +14,8 @@ public class BlogIndexProcessor extends ContextProcessor
 {
     private final Site site = Site.me().setDomain("www.oschina.net");
 
-    public BlogIndexProcessor(SpiderParams params) {
-        super(params);
+    public BlogIndexProcessor(ProcessorContext context) {
+        super(context);
     }
 
     @Override
