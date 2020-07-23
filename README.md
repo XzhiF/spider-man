@@ -49,7 +49,15 @@
 > [记录自己写一个小Java爬虫项目-0044-SpiderMaster实现-7](https://www.bilibili.com/video/BV17C4y1b7eG/) <br/>
 > [记录自己写一个小Java爬虫项目-0045-SpiderMaster实现-8](https://www.bilibili.com/video/BV1Jv411q7Hk/) <br/>
 > [记录自己写一个小Java爬虫项目-0046-SpiderMaster测试](https://www.bilibili.com/video/BV1M54y1S7dS/) <br/>
->
+> [记录自己写一个小Java爬虫项目-0047-SpiderSlave实现-1](https://www.bilibili.com/video/BV1AD4y1D7kM/) <br/>
+> [记录自己写一个小Java爬虫项目-0048-SpiderSlave实现-2](https://www.bilibili.com/video/BV16f4y1R7X9/) <br/>
+> [记录自己写一个小Java爬虫项目-0049-SpiderSlave实现-3](https://www.bilibili.com/video/BV15v411q7q2/) <br/>
+> [记录自己写一个小Java爬虫项目-0050-SpiderSlave实现-4](https://www.bilibili.com/video/BV1C54y1q7Mz/) <br/>
+> [记录自己写一个小Java爬虫项目-0051-SpiderSlave实现-5](https://www.bilibili.com/video/BV1ki4y137XY/) <br/>
+> [记录自己写一个小Java爬虫项目-0052-WorkerSpider创建-1](https://www.bilibili.com/video/BV1j54y1S7RX/) <br/>
+> [记录自己写一个小Java爬虫项目-0053-WorkerSpider创建-2](https://www.bilibili.com/video/BV1qZ4y1T7Cy/) <br/>
+> [记录自己写一个小Java爬虫项目-0053-WorkerSpider创建-3](https://www.bilibili.com/video/BV15i4y137AN/) <br/>
+> [记录自己写一个小Java爬虫项目-0054-联调爬取博客测试](https://www.bilibili.com/video/BV1kZ4y1u7bg/) <br/>
 >
 >
 >
