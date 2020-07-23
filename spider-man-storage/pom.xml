@@ -18,7 +18,11 @@
             <artifactId>spider-man-common</artifactId>
             <version>${revision}</version>
         </dependency>
-
+        <dependency>
+            <groupId>xzf</groupId>
+            <artifactId>spider-man-worker-client</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
         <!-- spring bott -->
         <dependency>
@@ -40,7 +44,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
 
 
         <!-- alibaba -->

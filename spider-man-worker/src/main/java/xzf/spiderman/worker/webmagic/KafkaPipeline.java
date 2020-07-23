@@ -1,15 +1,16 @@
 package xzf.spiderman.worker.webmagic;
 
 import com.alibaba.fastjson.JSON;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.pipeline.Pipeline;
 import xzf.spiderman.worker.configuration.WorkerConst;
-import xzf.spiderman.worker.data.StoreData;
+import xzf.spiderman.worker.data.StoreCnfData;
+import xzf.spiderman.worker.data.StoreDataReq;
 import xzf.spiderman.worker.entity.SpiderCnf;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class KafkaPipeline implements Pipeline
@@ -26,26 +27,21 @@ public class KafkaPipeline implements Pipeline
     @Override
     public void process(ResultItems resultItems, Task task)
     {
-        // 组织数据 ->
-        // store ->  storage 可见的数据 。
-        HashMap<String, Object> data = new HashMap<>();
-        data.putAll(resultItems.getAll());
+        StoreDataReq req = StoreDataReq.builder()
+                .data(resultItems.getAll())
+                .storeCnfs(Arrays.asList(getStoreData()))
+                .build();
 
-        //
-        HashMap<String, Object> ret = new HashMap<>();
-        ret.put("data", data);
-        ret.put("cfg", getStoreData());
-
-        String msg = JSON.toJSONString(ret);
+        String msg = JSON.toJSONString(req);
 
         kafkaTemplate.send(WorkerConst.KAFKA_SPIDER_MAN_STORAGE, msg);
     }
 
 
 
-    private StoreData getStoreData()
+    private StoreCnfData getStoreData()
     {
-        StoreData ret = new StoreData();
+        StoreCnfData ret = new StoreCnfData();
 
         ret.setCnfId(cnf.getId());
         ret.setStoreId(cnf.getStore().getId());

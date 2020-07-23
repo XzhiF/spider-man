@@ -4,7 +4,8 @@ import us.codecraft.webmagic.processor.PageProcessor;
 import xzf.spiderman.common.exception.ConfigNotValidException;
 import xzf.spiderman.worker.entity.SpiderCnf;
 import xzf.spiderman.worker.webmagic.GroovyProcessor;
-import xzf.spiderman.worker.webmagic.ParamProcessor;
+import xzf.spiderman.worker.webmagic.ContextProcessor;
+import xzf.spiderman.worker.webmagic.ProcessorContext;
 import xzf.spiderman.worker.webmagic.SpiderParams;
 
 import java.lang.reflect.Constructor;
@@ -20,10 +21,14 @@ public class ProcessorFactory
                 processorClassName = GroovyProcessor.class.getName();
             }
 
-            Class<? extends ParamProcessor> clazz = (Class<? extends ParamProcessor>) Class.forName(processorClassName);
-            Constructor<? extends ParamProcessor> constructor = clazz.getConstructor(SpiderParams.class);
+            Class<? extends ContextProcessor> clazz = (Class<? extends ContextProcessor>) Class.forName(processorClassName);
+            Constructor<? extends ContextProcessor> constructor = clazz.getConstructor(ProcessorContext.class);
+
             SpiderParams params = SpiderParams.parse(cnf.getParams());
-            ParamProcessor o = constructor.newInstance(params);
+            ProcessorContext context = new ProcessorContext(params);
+
+            ContextProcessor o = constructor.newInstance(context);
+
             return o;
         } catch (Exception e) {
             throw new ConfigNotValidException("无法创建"+cnf.getProcessor()+", "+e.getMessage(),e);

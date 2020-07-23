@@ -4,10 +4,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import us.codecraft.webmagic.Page
 import us.codecraft.webmagic.Site
-import xzf.spiderman.worker.webmagic.ParamProcessor
+import xzf.spiderman.worker.webmagic.ContextProcessor
 import xzf.spiderman.worker.webmagic.SpiderParams
 
-class BlogProcessor extends ParamProcessor
+class BlogProcessor extends ContextProcessor
 {
     Logger log = LoggerFactory.getLogger BlogProcessor.class
 

@@ -2,17 +2,14 @@ package xzf.spiderman.worker.processor.oschina;
 
 import lombok.extern.slf4j.Slf4j;
 import us.codecraft.webmagic.Page;
-import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
-import us.codecraft.webmagic.processor.PageProcessor;
-import us.codecraft.webmagic.selector.Selectable;
-import xzf.spiderman.worker.webmagic.ParamProcessor;
+import xzf.spiderman.worker.webmagic.ContextProcessor;
 import xzf.spiderman.worker.webmagic.SpiderParams;
 
 import java.util.List;
 
 @Slf4j
-public class BlogIndexProcessor extends ParamProcessor
+public class BlogIndexProcessor extends ContextProcessor
 {
     private final Site site = Site.me().setDomain("www.oschina.net");
 

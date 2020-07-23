@@ -6,6 +6,7 @@ import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.context.scope.ScopeCache;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import xzf.spiderman.common.exception.ConfigNotValidException;
@@ -15,30 +16,30 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-public class GroovyProcessor extends ParamProcessor
+public class GroovyProcessor extends ContextProcessor
 {
     public static final String KEY_GROOVY_URL = "groovyUrl";
 
     // URL key 除了?号之前的路径。
     private final static Map<String,GroovyCacheItem> CACHE = new ConcurrentHashMap<>(16);
 
-    public GroovyProcessor(SpiderParams params) {
-        super(params);
+    public GroovyProcessor(ProcessorContext context) {
+        super(context);
     }
 
     @Override
     public void process(Page page)
     {
-        if(!params.containsKey(KEY_GROOVY_URL)){
+        if(!context.getParams().containsKey(KEY_GROOVY_URL)){
             throw new ConfigNotValidException("类型为groovy的processor必须配置"+KEY_GROOVY_URL);
         }
 
         try {
             // 1.   ?version=?， 假如跟我本地lcoal 缓存 的,version变了，更新缓存
-            String url = params.getString("groovyUrl");
+            String url = context.getParams().getString("groovyUrl");
 
             Class clazz = getGroovyClass(url);
-            GroovyObject groovyObject = (GroovyObject) clazz.getConstructor(SpiderParams.class).newInstance(params);
+            GroovyObject groovyObject = (GroovyObject) clazz.getConstructor(SpiderParams.class).newInstance(context);
             groovyObject.invokeMethod("process", page);
             log.info("GroovyProcessor执行脚本成功");
 
@@ -122,8 +123,8 @@ public class GroovyProcessor extends ParamProcessor
     @Override
     public Site getSite()
     {
-        if(params.getString("siteDomain") != null){
-            return Site.me().setDomain(params.getString("siteDomain"));
+        if(context.getParams().getString("siteDomain") != null){
+            return Site.me().setDomain(context.getParams().getString("siteDomain"));
         }
 
         return Site.me();

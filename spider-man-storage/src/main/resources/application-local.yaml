@@ -11,8 +11,11 @@ spring:
     consumer:
       auto-commit-interval: 2000ms
       enable-auto-commit: false
-      key-deserializer: org.apache.kafka.common.serialization.StringSerializer
-      value-deserializer: org.apache.kafka.common.serialization.StringSerializer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
-
-
+xzf:
+  spiderman:
+    storage:
+      mongo:
+        enabled: true
