@@ -33,9 +33,6 @@ public class WorkerBootstrapConfiguration
     @Autowired
     private SpiderMasterService spiderMasterService;
 
-    @Autowired
-    private SpiderTaskRepository spiderTaskStore;
-
 
     @Bean
     public MasterLeaderManager bossLeaderManager()

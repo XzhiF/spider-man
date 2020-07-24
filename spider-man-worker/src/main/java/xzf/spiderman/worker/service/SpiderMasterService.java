@@ -15,6 +15,7 @@ import xzf.spiderman.worker.entity.SpiderGroup;
 import xzf.spiderman.worker.repository.SpiderCnfRepository;
 import xzf.spiderman.worker.repository.SpiderGroupRepository;
 import xzf.spiderman.worker.service.event.SubmitSpiderEvent;
+import xzf.spiderman.worker.service.master.RunningLockChecker;
 import xzf.spiderman.worker.service.master.SpiderTaskRepository;
 
 import java.net.InetAddress;
@@ -49,6 +50,9 @@ public class SpiderMasterService
     @Autowired
     private EventPublisherRegistry eventPublisherRegistry;
 
+    @Autowired
+    private RunningLockChecker runningLockChecker;
+
 
     // 1. init
     public void initSpiderWorkspace()
@@ -64,7 +68,8 @@ public class SpiderMasterService
             initSpiderTaskPath4Group(group);
         }
 
-        //
+        // 3. 启动task锁续租
+        runningLockChecker.start();
     }
 
     private void initSpiderTaskBasePath()

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xzf.spiderman.starter.curator.CuratorAutoConfiguration;
 import xzf.spiderman.starter.curator.CuratorFacade;
+import xzf.spiderman.worker.service.master.RunningLockChecker;
 import xzf.spiderman.worker.service.master.SpiderMaster;
 import xzf.spiderman.worker.service.master.SpiderQueueProducer;
 import xzf.spiderman.worker.service.master.SpiderTaskRepository;
@@ -20,6 +21,13 @@ public class SpiderMasterConfiguration
 
     @Autowired
     private CuratorFacade curatorFacade;
+
+    @Bean(destroyMethod = "close")
+    public RunningLockChecker runningLockChecker(SpiderTaskRepository repository)
+    {
+        return new RunningLockChecker(hessianRedisTemplate,repository);
+    }
+
 
     @Bean
     public SpiderTaskRepository spiderTaskStore()

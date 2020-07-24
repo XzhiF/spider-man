@@ -6,22 +6,28 @@ import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.context.scope.ScopeCache;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
+import xzf.spiderman.common.cache.DelayCache;
+import xzf.spiderman.common.cache.MemDelayCache;
 import xzf.spiderman.common.exception.ConfigNotValidException;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 @Slf4j
 public class GroovyProcessor extends ContextProcessor
 {
     public static final String KEY_GROOVY_URL = "groovyUrl";
 
-    // URL key 除了?号之前的路径。
-    private final static Map<String,GroovyCacheItem> CACHE = new ConcurrentHashMap<>(16);
+    private static final DelayCache<String, Supplier<GroovyCacheItem>, GroovyCacheItem> cache = new MemDelayCache<>();
 
     public GroovyProcessor(ProcessorContext context) {
         super(context);
@@ -49,39 +55,31 @@ public class GroovyProcessor extends ContextProcessor
     }
 
 
-    private synchronized Class getGroovyClass(String url)
+    private Class getGroovyClass(final String url)
     {
         String key = getUri(url);
-        String version = getVersion(url);
 
-        if( CACHE.containsKey(key) )
-        {
-            GroovyCacheItem groovyCacheItem = CACHE.get(key);
+        Optional<GroovyCacheItem> optional = cache.computeAndGet(key, (uri, old) -> {
 
-            if(groovyCacheItem.getVersion().equals(version))
-            {
-                return groovyCacheItem.getClazz();
+            GroovyCacheItem oldItem = old.get();
+
+            String oldVersion = oldItem.getVersion();
+            String newVersion = getVersion(url);
+
+            if (StringUtils.equals(newVersion, oldVersion)) {
+                return old;
             }
-            else {
-                // clear old version
-                groovyCacheItem.getGroovyClassLoader().clearCache();
 
-                // cache new version
-                GroovyClassLoader groovyClassLoader = new GroovyClassLoader();
-                Class clazz = parseGroovyClass(groovyClassLoader, url);
-                GroovyCacheItem newCacheItem = new GroovyCacheItem(version, groovyClassLoader, clazz);
-                CACHE.put(key, newCacheItem);
-                return clazz;
+            //close old的类加载信息
+            try {
+                oldItem.getGroovyClassLoader().close();
+            } catch (IOException e) {
             }
-        }
 
-        // cache new version
-        GroovyClassLoader groovyClassLoader = new GroovyClassLoader();
-        Class clazz = parseGroovyClass(groovyClassLoader, url);
-        GroovyCacheItem newCacheItem = new GroovyCacheItem(version,groovyClassLoader,clazz);
-        CACHE.put(key, newCacheItem);
-        return clazz;
+            return new GroovyCacheItemSupplier(url);
+        });
 
+        return optional.orElseThrow(()->new ConfigNotValidException(KEY_GROOVY_URL+"无法解析。调用失败。")).getClazz();
     }
 
     private Class parseGroovyClass(GroovyClassLoader groovyClassLoader,String url)
@@ -96,15 +94,31 @@ public class GroovyProcessor extends ContextProcessor
     }
 
 
+    private GroovyCacheItem createCacheItem(String url)
+    {
+        GroovyClassLoader groovyClassLoader = new GroovyClassLoader();
+        Class clazz = parseGroovyClass(groovyClassLoader, url);
+        GroovyCacheItem newCacheItem = new GroovyCacheItem(getVersion(url), groovyClassLoader, clazz);
+        return newCacheItem;
+    }
+
     private String getUri(  String url ){
+        if(url.indexOf("?")==-1){
+            return url;
+        }
+
         return url.substring(0, url.indexOf("?"));
     }
 
     private String getVersion( String url )
     {
-        String substring =  url.substring(url.indexOf("?")+1) ;
+        String version = "0";
 
-        String version = "";
+        if(url.indexOf("?")==-1){
+            return version;
+        }
+
+        String substring =  url.substring(url.indexOf("?")+1) ;
 
         String[] split = substring.split("&");
         for (String s : split) {
@@ -140,28 +154,30 @@ public class GroovyProcessor extends ContextProcessor
     }
 
 
-    public static void main(String[] args)
+    public class GroovyCacheItemSupplier implements Supplier<GroovyCacheItem>
     {
+        private volatile String url;
 
-        String url = "file:///Users/xzf/Projects/prj2020/spider-man/spider-man-worker/src/main/groovy/xzf/spiderman/worker/processor/oschina/BlogProcessor.groovy?version=1";
-
-        String substring = url.substring(url.indexOf("?")+1);
-        System.out.println(substring);
-
-
-        String version = "";
-
-        String[] split = substring.split("&");
-        for (String s : split) {
-            String[] keyValue = s.split("=");
-            if(keyValue[0].equals("version")){
-                version =  keyValue.length>1?keyValue[1]:"";
-                break;
-            }
+        public GroovyCacheItemSupplier(String url) {
+            this.url = url;
         }
 
-        System.out.println(version);
+        private GroovyCacheItem instance;
 
-//        org.springframework.web.util.UriComponentsBuilder
+
+        @Override
+        public GroovyCacheItem get()
+        {
+            if(instance == null){
+                synchronized (this){
+                    if(instance == null){
+                        instance =  createCacheItem(url);
+                    }
+                }
+            }
+            return instance;
+        }
     }
+
+
 }

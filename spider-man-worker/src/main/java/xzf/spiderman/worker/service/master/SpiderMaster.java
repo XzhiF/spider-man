@@ -59,7 +59,7 @@ public class SpiderMaster implements EventListener
         public void handle()
         {
             // 1. 保存Task数据信息到store中
-            taskRepository.putAll(key, buildInitSpiderTaskRuntimeData(key, cnfs)); //init
+            taskRepository.putAllAndLock(key, buildInitSpiderTaskRuntimeData(key, cnfs)); //init
 
             // 2.创建dispatcher
             SpiderDispatcher dispatcher = new SpiderDispatcher(key, cnfs);

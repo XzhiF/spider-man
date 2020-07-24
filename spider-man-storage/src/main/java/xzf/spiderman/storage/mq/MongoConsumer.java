@@ -56,7 +56,7 @@ public class MongoConsumer implements Closeable
 //        topic,mongo,partition,offset
 
         // 1. 保存到redis 临时保存
-        final String hashKey = KAFKA_SPIDER_MAN_STORAGE_QUEUE + ":mongo" + ":"  + rec.partition() + ":"  + rec.offset();
+        final String hashKey = getRedisMapKey(rec);
         template.opsForHash().put(REDIS_SPIDER_MAN_STORAGE_MAP_KEY, hashKey, rec.value());
 
         // 2. commit
@@ -65,7 +65,25 @@ public class MongoConsumer implements Closeable
         consumer.commitSync(Collections.singletonMap(topicPartition,offsetAndMetadata));
 
         // 3. 异步执行保存数据逻辑
+        runAsync(rec);
+
+        log.info("end consume rec....." + KAFKA_SPIDER_MAN_STORAGE_QUEUE + ":mongo" + ":"  + rec.partition() + ":"  + rec.offset());
+    }
+
+    private String getRedisMapKey(ConsumerRecord rec)
+    {
+        // 1. 保存到redis 临时保存
+        String hashKey = KAFKA_SPIDER_MAN_STORAGE_QUEUE + ":mongo" + ":"  + rec.partition() + ":"  + rec.offset();
+        return hashKey;
+    }
+
+
+    private void runAsync(ConsumerRecord rec)
+    {
+
         executor.execute(()->{
+            String hashKey = getRedisMapKey(rec);
+
             try {
                 StoreDataReq req = JSON.parseObject((String) rec.value(), StoreDataReq.class);
 
@@ -85,9 +103,8 @@ public class MongoConsumer implements Closeable
                 template.opsForSet().add(REDIS_SPIDER_MAN_STORAGE_ERROR_SET_KEY, hashKey);
             }
         });
-
-        log.info("end consume rec....." + KAFKA_SPIDER_MAN_STORAGE_QUEUE + ":mongo" + ":"  + rec.partition() + ":"  + rec.offset());
     }
+
 
     private MongoTemplate getMongoTemplate(StoreCnfData store)
     {
