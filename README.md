@@ -58,7 +58,11 @@
 > [记录自己写一个小Java爬虫项目-0053-WorkerSpider创建-2](https://www.bilibili.com/video/BV1qZ4y1T7Cy/) <br/>
 > [记录自己写一个小Java爬虫项目-0053-WorkerSpider创建-3](https://www.bilibili.com/video/BV15i4y137AN/) <br/>
 > [记录自己写一个小Java爬虫项目-0054-联调爬取博客测试](https://www.bilibili.com/video/BV1kZ4y1u7bg/) <br/>
->
+> [记录自己写一个小Java爬虫项目-0055-代码及爬虫架构小优化](https://www.bilibili.com/video/BV1sv411q7PC/) <br/>
+> [记录自己写一个小Java爬虫项目-0056-爬虫脚本动态化](https://www.bilibili.com/video/BV19k4y1271t/) <br/>
+> [记录自己写一个小Java爬虫项目-0057-简单缓存groovy的Class](https://www.bilibili.com/video/BV175411e731/) <br/>
+> [记录自己写一个小Java爬虫项目-0058-添加KafkaPipeline](https://www.bilibili.com/video/BV1cz4y1Q7pv/) <br/>
+> [记录自己写一个小Java爬虫项目-0059-Storage工程创建](https://www.bilibili.com/video/BV17i4y137bt/) <br/>
 >
 >
 
