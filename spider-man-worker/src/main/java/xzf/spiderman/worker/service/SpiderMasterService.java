@@ -111,6 +111,7 @@ public class SpiderMasterService
         // 另一种就直接拒绝，也就是说一台机器只能跑组里的一个爬虫
 
 
+        // 完成了
         // redisson ,
         // 上锁.  tryLock ttl  (time to live) ->
         // 解锁   unLock  -> spdier close

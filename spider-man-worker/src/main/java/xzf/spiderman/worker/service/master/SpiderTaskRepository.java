@@ -151,9 +151,9 @@ public class SpiderTaskRepository
                     "    return 0 " +
                     "end";
 
-            redisTemplate.execute(new DefaultRedisScript(script),
-                    Arrays.asList(REDIS_RUNNING_SPIDER_GROUP_LOCK_PREFIX+key.getGroupId(),
-                    key.getSpiderId()));
+            redisTemplate.execute(new DefaultRedisScript<Long>(script,Long.class),
+                    Arrays.asList(REDIS_RUNNING_SPIDER_GROUP_LOCK_PREFIX+key.getGroupId()),
+                    key.getSpiderId());
 
         }
         finally {

@@ -20,6 +20,10 @@ class BlogProcessor extends ContextProcessor
     @Override
     public void process(Page page)
     {
+        try {
+            Thread.sleep(1000 * 30);
+        }catch(Exception e){}
+
         log.info("BlogProcessor -- 3 -- " + Thread.currentThread());
 
         if(page.getUrl().toString().startsWith("https://www.oschina.net/blog")) {
@@ -27,24 +31,30 @@ class BlogProcessor extends ContextProcessor
             List<String> links2 = page.getHtml().links().regex("https://my.oschina.net/\\w+/\\d+/blog/\\d+").all();
 
             // debug
-            int size1 = Math.min(links1.size(),5);
+            int size1 = Math.min(links1.size(),10);
             for (int i = 0; i < size1; i++) {
                 page.addTargetRequest(links1.get(i));
             }
 
-            int size2 = Math.min(links2.size(),5);
+            int size2 = Math.min(links2.size(),10);
             for (int i = 0; i < size2; i++) {
                 page.addTargetRequest(links2.get(i));
             }
         }
         else {
             String id = page.getHtml().$("#mainScreen > div > val:nth-child(3)", "data-value").toString();
-            String author = page.getHtml().xpath("//*[@id=\"mainScreen\"]/div/div[1]/div/div[2]/div[1]/div[3]/div[1]/div[1]/a/span/text()").toString();
-            String title = page.getHtml().xpath("//*[@id=\"mainScreen\"]/div/div[1]/div/div[2]/div[1]/div[3]/h2/text()").toString();
+            String author = page.getHtml().$("#mainScreen > div > div.ui.internally.grid.blog-detail.bg-wrap > div > div.twelve.wide.computer.sixteen.wide.tablet.sixteen.wide.mobile.column.body-container > div.float-menu-content > div.article-detail > div.extra.ui.horizontal.list.meta-wrap > div:nth-child(1) > a > span").get();
+            String title = page.getHtml().$("#mainScreen > div > div.ui.internally.grid.blog-detail.bg-wrap > div > div.twelve.wide.computer.sixteen.wide.tablet.sixteen.wide.mobile.column.body-container > div.float-menu-content > div.article-detail > h2").get();
+
+//            String author = page.getHtml().xpath("//*[@id=\"mainScreen\"]/div/div[1]/div/div[2]/div[1]/div[3]/div[1]/div[1]/a/span/text()").toString();
+//            String title = page.getHtml().xpath("//*[@id=\"mainScreen\"]/div/div[1]/div/div[2]/div[1]/div[3]/h2/text()").toString();
+
+            String content = page.getHtml().$("#js_content > section:nth-child(1)").get();
 
             page.putField("id", id);
             page.putField("author", author);
             page.putField("title", title);
+            page.putField("content", content);
             if (id == null) {
                 page.setSkip(true);
             }

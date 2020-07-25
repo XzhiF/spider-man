@@ -61,6 +61,10 @@ public class GroovyProcessor extends ContextProcessor
 
         Optional<GroovyCacheItem> optional = cache.computeAndGet(key, (uri, old) -> {
 
+            if(old == null){
+                return new GroovyCacheItemSupplier(url);
+            }
+
             GroovyCacheItem oldItem = old.get();
 
             String oldVersion = oldItem.getVersion();

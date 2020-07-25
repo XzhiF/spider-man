@@ -42,10 +42,11 @@ public class RunningLockChecker
     {
         Runnable runnable = ()->{
 
-            while (exit.get() && !Thread.currentThread().isInterrupted() ){
+            while (!exit.get() && !Thread.currentThread().isInterrupted() ){
 
                 try {
-                    TimeUnit.MINUTES.sleep(2);
+                    TimeUnit.MINUTES.sleep(1);
+//                    TimeUnit.SECONDS.sleep(10);
                 } catch (InterruptedException e) {
                 }
 
@@ -64,9 +65,8 @@ public class RunningLockChecker
                             "    return 0 " +
                             "end";
 
-                    Long effect =  redisTemplate.execute(new DefaultRedisScript<Long>(script),
-                            Arrays.asList(REDIS_RUNNING_SPIDER_GROUP_LOCK_PREFIX+groupId,
-                                    spiderId));
+                    Long effect =  redisTemplate.execute(new DefaultRedisScript<Long>(script,Long.class),
+                            Arrays.asList(REDIS_RUNNING_SPIDER_GROUP_LOCK_PREFIX+groupId),spiderId);
 
                     if(effect==0){
                         repository.removeGroupKeys(groupId);
