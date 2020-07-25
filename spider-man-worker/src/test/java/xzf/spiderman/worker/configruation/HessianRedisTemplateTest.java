@@ -5,12 +5,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.test.context.junit4.SpringRunner;
 import xzf.spiderman.worker.configuration.HessianRedisTemplate;
 import xzf.spiderman.worker.entity.SpiderGroup;
 
+import java.util.Arrays;
 import java.util.concurrent.*;
+
+import static xzf.spiderman.worker.configuration.WorkerConst.REDIS_RUNNING_SPIDER_GROUP_LOCK_PREFIX;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -18,6 +23,9 @@ public class HessianRedisTemplateTest
 {
     @Autowired
     private HessianRedisTemplate hessianRedisTemplate;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
 
     @Test
@@ -134,6 +142,27 @@ public class HessianRedisTemplateTest
         boolean fk = hessianRedisTemplate.opsForValue().setIfPresent(key,"fk", 1, TimeUnit.MINUTES);
         System.out.println(fk);
         System.out.println("present = " + fk);
+    }
+
+    @Test
+    public void testLuaScript() throws Exception
+    {
+        hessianRedisTemplate.opsForValue().set(REDIS_RUNNING_SPIDER_GROUP_LOCK_PREFIX+"123","45678", 5,TimeUnit.MINUTES);
+
+
+        String script = "if redis.call(\"get\",KEYS[1]) == ARGV[1] " +
+                "then " +
+                "    return redis.call(\"del\",KEYS[1]) " +
+                "else " +
+                "    return 0 " +
+                "end";
+
+        Long ret = hessianRedisTemplate.execute(new DefaultRedisScript<Long>(script,Long.class),
+                Arrays.asList(REDIS_RUNNING_SPIDER_GROUP_LOCK_PREFIX + "123"), "45678");
+
+        System.out.println("ret="+ret);
+
+
     }
 
 
