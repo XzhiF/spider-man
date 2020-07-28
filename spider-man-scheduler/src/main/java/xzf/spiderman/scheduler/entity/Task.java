@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Table(name = "task")
 public class Task implements Serializable
 {
-    public static final int STATUS_STOPED = 0;
+    public static final int STATUS_STOPPED = 0;
     public static final int STATUS_RUNNING = 1;
     public static final int STATUS_WAITING = 2;
 
@@ -86,7 +86,7 @@ public class Task implements Serializable
         task.setScheduleClass(req.getScheduleClass());
         task.setGroupId(req.getGroupId());
 
-        task.setStatus(STATUS_STOPED);
+        task.setStatus(STATUS_STOPPED);
         task.setActiveFlag(ACTIVE_FLAG_ENABLE);
         task.setLastRunningTime(null);
         task.setLastRunningResult(null);
@@ -140,6 +140,20 @@ public class Task implements Serializable
     public TaskArgData asTaskArgData(TaskArg arg)
     {
         return new TaskArgData(arg.getKey(), arg.getValue());
+    }
+
+
+
+    public void completeTask(int lastRunningResult)
+    {
+        if(Task.ACTIVE_FLAG_ENABLE == this.getActiveFlag().intValue()) {
+            this.setStatus(Task.STATUS_WAITING);
+        } else {
+            this.setStatus(Task.STATUS_STOPPED);
+        }
+
+        this.setLastRunningTime(new Date());
+        this.setLastRunningResult(lastRunningResult);
     }
 
 

@@ -6,10 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xzf.spiderman.starter.curator.CuratorAutoConfiguration;
 import xzf.spiderman.starter.curator.CuratorFacade;
-import xzf.spiderman.worker.service.master.RunningLockChecker;
-import xzf.spiderman.worker.service.master.SpiderMaster;
-import xzf.spiderman.worker.service.master.SpiderQueueProducer;
-import xzf.spiderman.worker.service.master.SpiderTaskRepository;
+import xzf.spiderman.worker.service.master.*;
+import xzf.spiderman.worker.webmagic.ApplicationServiceRegistry;
 import xzf.spiderman.worker.webmagic.BlockingPollRedisScheduler;
 
 @Configuration
@@ -22,12 +20,21 @@ public class SpiderMasterConfiguration
     @Autowired
     private CuratorFacade curatorFacade;
 
+    @Autowired
+    private ApplicationServiceRegistry applicationServiceRegistry;
+
     @Bean(destroyMethod = "close")
     public RunningLockChecker runningLockChecker(SpiderTaskRepository repository)
     {
         return new RunningLockChecker(hessianRedisTemplate,repository);
     }
 
+
+    @Bean
+    public SpiderNotifier spiderNotifier()
+    {
+        return new SpiderNotifier(applicationServiceRegistry);
+    }
 
     @Bean
     public SpiderTaskRepository spiderTaskStore()
@@ -42,9 +49,9 @@ public class SpiderMasterConfiguration
     }
 
     @Bean
-    public SpiderMaster spiderMaster(SpiderTaskRepository store, SpiderQueueProducer producer)
+    public SpiderMaster spiderMaster(SpiderTaskRepository store, SpiderQueueProducer producer,SpiderNotifier spiderNotifier)
     {
-        return new SpiderMaster(store, curatorFacade,producer);
+        return new SpiderMaster(store, curatorFacade,producer,spiderNotifier);
     }
 
 }

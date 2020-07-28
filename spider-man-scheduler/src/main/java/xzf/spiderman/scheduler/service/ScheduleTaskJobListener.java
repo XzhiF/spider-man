@@ -55,10 +55,20 @@ public class ScheduleTaskJobListener implements JobListener
         Task task = findTask(context);
         if(task == null) {return ;}
 
-//        updateTask4JobWasExecuted(task, jobException);
+        updateTask4JobWasExecutedIfError(task, jobException);
         addTaskLog4JobWasExecuted(task,context, jobException);
     }
 
+    private void updateTask4JobWasExecutedIfError(Task task, JobExecutionException jobException) {
+
+        if(jobException == null){
+            return ;
+        }
+
+        // 重置task status.
+        task.completeTask(Task.TASK_RESULT_ERROR);
+        taskRepository.save(task);
+    }
 
 
     private Task findTask(JobExecutionContext context)
@@ -73,21 +83,6 @@ public class ScheduleTaskJobListener implements JobListener
         taskRepository.save(task);
     }
 
-//    private void updateTask4JobWasExecuted(Task task,JobExecutionException jobException)
-//    {
-//        if(Task.ACTIVE_FLAG_ENABLE == task.getActiveFlag().intValue()) {
-//            task.setStatus(Task.STATUS_WAITING);
-//        } else {
-//            task.setStatus(Task.STATUS_STOPED);
-//        }
-//        task.setLastRunningTime(new Date());
-//        if(jobException != null){
-//            task.setLastRunningResult(Task.TASK_RESULT_ERROR);
-//        }else{
-//            task.setLastRunningResult(Task.TASK_RESULT_SUCCESS);
-//        }
-//        taskRepository.save(task);
-//    }
 
     private void addTaskLog4JobToBeExecuted(Task task, JobExecutionContext context)
     {

@@ -59,8 +59,6 @@ public class SpiderJob implements Job
 
         jobTask.setTaskId(task.getId());
         jobTask.setTaskGroupId(task.getGroupId());
-        jobTask.setTaskName(task.getName());
-        jobTask.setTaskStatus(task.getStatus());
 
         //
         jobTask.setUuid(uuid);

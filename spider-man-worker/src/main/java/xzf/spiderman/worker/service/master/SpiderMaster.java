@@ -27,12 +27,18 @@ public class SpiderMaster implements EventListener
     private SpiderTaskRepository taskRepository;
     private CuratorFacade curatorFacade;
     private SpiderQueueProducer queueProducer;
+    private SpiderNotifier spiderNotifier;
 
-    public SpiderMaster(SpiderTaskRepository taskRepository, CuratorFacade curatorFacade, SpiderQueueProducer queueProducer)
+    public SpiderMaster(
+            SpiderTaskRepository taskRepository,
+            CuratorFacade curatorFacade,
+            SpiderQueueProducer queueProducer,
+            SpiderNotifier spiderNotifier)
     {
         this.taskRepository = taskRepository;
         this.curatorFacade = curatorFacade;
         this.queueProducer = queueProducer;
+        this.spiderNotifier = spiderNotifier;
     }
 
     private List<SpiderTask> buildInitSpiderTaskRuntimeData(GroupSpiderKey key, List<SpiderCnf> cnfs)
@@ -71,6 +77,7 @@ public class SpiderMaster implements EventListener
             SpiderWatcher.CloseCallback closeCallback = ()->{
                 taskRepository.removeAll(key);
                 queueProducer.clear(key);
+                spiderNotifier.notifyClosed(key);
             };
 
             SpiderWatcher watcher = SpiderWatcher.builder(curatorFacade)
