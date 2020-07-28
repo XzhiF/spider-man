@@ -55,7 +55,7 @@ public class ScheduleTaskJobListener implements JobListener
         Task task = findTask(context);
         if(task == null) {return ;}
 
-        updateTask4JobWasExecuted(task, jobException);
+//        updateTask4JobWasExecuted(task, jobException);
         addTaskLog4JobWasExecuted(task,context, jobException);
     }
 
@@ -73,21 +73,21 @@ public class ScheduleTaskJobListener implements JobListener
         taskRepository.save(task);
     }
 
-    private void updateTask4JobWasExecuted(Task task,JobExecutionException jobException)
-    {
-        if(Task.ACTIVE_FLAG_ENABLE == task.getActiveFlag().intValue()) {
-            task.setStatus(Task.STATUS_WAITING);
-        } else {
-            task.setStatus(Task.STATUS_STOPED);
-        }
-        task.setLastRunningTime(new Date());
-        if(jobException != null){
-            task.setLastRunningResult(Task.TASK_RESULT_ERROR);
-        }else{
-            task.setLastRunningResult(Task.TASK_RESULT_SUCCESS);
-        }
-        taskRepository.save(task);
-    }
+//    private void updateTask4JobWasExecuted(Task task,JobExecutionException jobException)
+//    {
+//        if(Task.ACTIVE_FLAG_ENABLE == task.getActiveFlag().intValue()) {
+//            task.setStatus(Task.STATUS_WAITING);
+//        } else {
+//            task.setStatus(Task.STATUS_STOPED);
+//        }
+//        task.setLastRunningTime(new Date());
+//        if(jobException != null){
+//            task.setLastRunningResult(Task.TASK_RESULT_ERROR);
+//        }else{
+//            task.setLastRunningResult(Task.TASK_RESULT_SUCCESS);
+//        }
+//        taskRepository.save(task);
+//    }
 
     private void addTaskLog4JobToBeExecuted(Task task, JobExecutionContext context)
     {

@@ -32,6 +32,9 @@ import static xzf.spiderman.worker.configuration.WorkerConst.ZK_SPIDER_TASK_BASE
 @Slf4j
 public class SpiderMasterService
 {
+    // 单例，变量
+    private volatile boolean ready = false;
+
     @Autowired
     private NacosServiceDiscovery nacosServiceDiscovery;
 
@@ -70,6 +73,9 @@ public class SpiderMasterService
 
         // 3. 启动task锁续租
         runningLockChecker.start();
+
+        // 4. 设置爬虫状态已经ok
+        ready = true;
     }
 
     private void initSpiderTaskBasePath()
@@ -112,10 +118,15 @@ public class SpiderMasterService
 
 
         // 完成了
-        // redisson ,
+        // redisson | zk
         // 上锁.  tryLock ttl  (time to live) ->
         // 解锁   unLock  -> spdier close
         // ->续租 ->  listener pollRequested()
+
+        // check 检查
+        if(!ready){
+            throw new BizException("爬虫管理节点未初始化完成");
+        }
 
         if (spiderTaskRepository.hasRunningGroup(req.getGroupId())) {
             throw new BizException("爬虫任务组["+req.getGroupId()+"]已经运行。请稍后再试。");
@@ -147,6 +158,12 @@ public class SpiderMasterService
                 .publish(submitSpiderEvent);
 
         return spiderId;
+    }
+
+
+    public void setUnready()
+    {
+        ready = false;
     }
 
 

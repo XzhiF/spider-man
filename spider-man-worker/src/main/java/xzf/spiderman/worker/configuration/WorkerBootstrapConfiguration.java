@@ -56,6 +56,11 @@ public class WorkerBootstrapConfiguration
                 System.out.println("spider master " + manager.getId()+", end initSpiderWorkspace ");
 
             }
+
+            @Override
+            public void onDisconnected(LeaderManager manager) {
+                spiderMasterService.setUnready();
+            }
         });
 
         return manager;

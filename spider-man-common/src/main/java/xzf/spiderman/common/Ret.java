@@ -55,6 +55,10 @@ public class Ret<T>
 
     //
 
+    public boolean isSuccess()
+    {
+        return RetCode.SUCCESS.equals(code);
+    }
 
     public String getCode() {
         return code;
