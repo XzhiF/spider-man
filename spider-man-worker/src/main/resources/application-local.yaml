@@ -18,6 +18,8 @@ spring:
       acks: 1
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  session:
+    store-type: redis
 
 xzf:
   spiderman:
@@ -30,4 +32,7 @@ xzf:
         keep-alive-time-seconds: 60
     curator:
       connectionString: zk.spiderman.xzf:2181
+    common:
+      cookie:
+        domain: spiderman.xzf
 

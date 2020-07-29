@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.Map;
@@ -11,12 +12,12 @@ import java.util.Map;
 @RestController
 public class HelloController {
 
-    @Autowired
-    private DataSource dataSource;
-
     @GetMapping("/admin/hello")
-    public Map<String,Object> hello()
+    public Map<String,Object> hello(HttpSession session)
     {
-        return Collections.singletonMap("msg",dataSource);
+        session.setAttribute("k","hahaha");
+        session.setAttribute("map", Collections.singletonMap("msg","hahakkk"));
+
+        return Collections.singletonMap("msg","admin hello");
     }
 }

@@ -2,14 +2,42 @@ server:
   port: 8080
 
 spring:
+  redis:
+    host: redis.spiderman.xzf
+    port: 6379
+    database: 0
+    timeout: 210s
+  session:
+    store-type: redis
   cloud:
     gateway:
-      routes:
-        - id: spider-man-admin
-          uri: lb://spider-man-admin
-          predicates:
-            - Path=/admin/**
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
+      routes:
+        - id: spider-man-admin
+          uri: lb://spider-man-admin
+          predicates:
+            - Path=/api/admin/**
+          filters:
+            - RewritePath=/api/(?<segment>/?.*),  /$\{segment}
+        - id: spider-man-scheduler
+          uri: lb://spider-man-scheduler
+          predicates:
+            - Path=/api/scheduler/**
+          filters:
+            - RewritePath=/api/(?<segment>/?.*),  /$\{segment}
+        - id: spider-man-worker
+          uri: lb://spider-man-worker
+          predicates:
+            - Path=/api/worker/**
+          filters:
+            - RewritePath=/api/(?<segment>/?.*),  /$\{segment}
+
+
+
+xzf:
+  common:
+    cookie:
+      domain: spiderman.xzf

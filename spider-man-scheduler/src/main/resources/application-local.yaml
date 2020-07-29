@@ -14,10 +14,18 @@ spring:
     port: 6379
     database: 0
     timeout: 210s
+  session:
+    store-type: redis
+
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 10000
 
 xzf:
   spiderman:
     curator:
       connectionString: zk.spiderman.xzf:2181
-
+    common:
+      cookie:
+        domain: spiderman.xzf
 

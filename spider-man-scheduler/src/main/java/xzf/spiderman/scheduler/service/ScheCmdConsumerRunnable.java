@@ -60,7 +60,7 @@ public class ScheCmdConsumerRunnable implements Runnable
                 if(cmd != null) {
                     execCmd(cmd);
                 } else {
-                    log.info("ScheCmdConsumer, 5秒钟未有任务消费。"+SchedulerConst.SCHEDULE_QUEUE_NAME);
+                    log.info("ScheCmdConsumer, 3分钟未有任务消费。"+SchedulerConst.SCHEDULE_QUEUE_NAME);
                 }
             }
             catch (InterruptedException e) {

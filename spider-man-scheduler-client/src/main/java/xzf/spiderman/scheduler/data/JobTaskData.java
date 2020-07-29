@@ -12,6 +12,7 @@ public class JobTaskData
 
     private String taskGroupId;
 
+    private String spiderGroupId;
 
     // Job
     private String uuid;

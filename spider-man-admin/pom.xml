@@ -19,6 +19,11 @@
             <artifactId>spider-man-admin-client</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>xzf</groupId>
+            <artifactId>spider-common-configuration</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
         <!-- boot -->
         <dependency>
@@ -29,7 +34,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
 
         <!-- alibaba -->
         <dependency>

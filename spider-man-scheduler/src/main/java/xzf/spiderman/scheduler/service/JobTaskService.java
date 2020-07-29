@@ -48,6 +48,9 @@ public class JobTaskService
 
         // 3. 写log
         addLog( task, jobTask );
+
+        // 4. 清理job task
+        remoteJobTask(req);
     }
 
 
@@ -71,6 +74,11 @@ public class JobTaskService
         return jobTask;
     }
 
+    private void remoteJobTask(JobTaskCallbackReq req)
+    {
+        RMap<Object, Object> map = ression.getMap(SchedulerConst.REDIS_JOB_TASK_KEY, JsonJacksonCodec.INSTANCE);
+        map.remove(getJobTaskKey(req));
+    }
 
     private Task getTask(String id)
     {

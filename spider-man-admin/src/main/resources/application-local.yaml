@@ -6,4 +6,21 @@ spring:
     url: jdbc:mysql://mysql.spiderman.xzf:3306/admin?useUnicode=true&characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=TRUE
     username: root
     password: root
+  redis:
+    host: redis.spiderman.xzf
+    port: 6379
+    database: 0
+    timeout: 210s
+  session:
+    store-type: redis
+
+
+xzf:
+  spiderman:
+    common:
+      cookie:
+        domain: spiderman.xzf
+
+#  admin.spiderman.xzf -> 登录后台管理 -> html, js
+#  api.spiderman.xzf ajax里面请求
 

@@ -37,6 +37,8 @@ public class SpiderJob implements Job
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException
     {
+        log.info("Spider Job 启动...");
+
         // 1. 找到task
         Task task = getTask(context);
 
@@ -51,6 +53,8 @@ public class SpiderJob implements Job
         saveDataToRedis(jobTask, spiderId);
 
         // 5. 准备一个http接口，spider-master会进行回调，返回结果
+
+        log.info("Spider Job 执行完成... task[" + task.getId()+"], spiderId["+spiderId+"]");
     }
 
     private JobTaskData createJobTask(Task task, String uuid)
@@ -59,6 +63,7 @@ public class SpiderJob implements Job
 
         jobTask.setTaskId(task.getId());
         jobTask.setTaskGroupId(task.getGroupId());
+        jobTask.setSpiderGroupId(task.getSpiderGroupId());
 
         //
         jobTask.setUuid(uuid);
@@ -70,14 +75,14 @@ public class SpiderJob implements Job
     private void saveDataToRedis(JobTaskData task, String spiderId)
     {
         RMap<Object, Object> map = redisson.getMap(SchedulerConst.REDIS_JOB_TASK_KEY, JsonJacksonCodec.INSTANCE);
-        String key = task.getTaskGroupId()+":"+spiderId;
+        String key = task.getSpiderGroupId()+":"+spiderId;
         map.put(key, task);
     }
 
     private String submitSpider(Task task)
     {
         SubmitSpiderReq req = new SubmitSpiderReq();
-        req.setGroupId(task.getGroupId());
+        req.setGroupId(task.getSpiderGroupId());
         Ret<String> ret = spiderMasterFeignService.submitSpider(req);
 
         if(ret.isSuccess()){
