@@ -1,6 +1,8 @@
-package xzf.spiderman.common.configuration.web;
+package xzf.spiderman.common.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,11 +10,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
+
+@Slf4j
 @Configuration
-public class SpiderManCookieConfiguration implements BeanClassLoaderAware
+public class SpiderManSessionConfiguration implements BeanClassLoaderAware
 {
     @Value("${xzf.spiderman.common.cookie.domain:localhost}")
     private String domain;

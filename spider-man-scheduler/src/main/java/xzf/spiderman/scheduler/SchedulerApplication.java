@@ -7,8 +7,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-import xzf.spiderman.common.configuration.web.EnableSpiderManCookie;
-import xzf.spiderman.common.configuration.web.EnableSpiderManExceptionHandler;
+import xzf.spiderman.common.configuration.EnableSpiderManSession;
+import xzf.spiderman.common.configuration.EnableSpiderManExceptionHandler;
 
 @SpringBootApplication
 @EnableDiscoveryClient
@@ -17,7 +17,7 @@ import xzf.spiderman.common.configuration.web.EnableSpiderManExceptionHandler;
 @EntityScan(value = "xzf.spiderman.scheduler.entity")
 @EnableRedisHttpSession
 @EnableSpiderManExceptionHandler
-@EnableSpiderManCookie
+@EnableSpiderManSession
 public class SchedulerApplication
 {
     public static void main(String[] args)

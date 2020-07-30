@@ -15,9 +15,14 @@ public class HelloController {
     @GetMapping("/admin/hello")
     public Map<String,Object> hello(HttpSession session)
     {
-        session.setAttribute("k","hahaha");
-        session.setAttribute("map", Collections.singletonMap("msg","hahakkk"));
+          session.setAttribute("map", Collections.singletonMap("msg","hahakkk"));
 
+        System.out.println("admin----sesison = "+session.getId());
+        Object kk = session.getAttribute("kk");
+        System.out.println("kk="+kk);
+
+        session.setAttribute("k","hahahaaaabc");
+//
         return Collections.singletonMap("msg","admin hello");
     }
 }

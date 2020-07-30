@@ -3,13 +3,13 @@ package xzf.spiderman.admin;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-import xzf.spiderman.common.configuration.web.EnableSpiderManCookie;
-import xzf.spiderman.common.configuration.web.EnableSpiderManExceptionHandler;
+import xzf.spiderman.common.configuration.EnableSpiderManSession;
+import xzf.spiderman.common.configuration.EnableSpiderManExceptionHandler;
 
 @SpringBootApplication
 @EnableRedisHttpSession
 @EnableSpiderManExceptionHandler
-@EnableSpiderManCookie
+@EnableSpiderManSession
 public class AdminApplication
 {
     public static void main(String[] args)
