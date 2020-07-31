@@ -1,6 +1,11 @@
 # spider-man
 
+![爬虫架构图](Document\spider.png)
+
+
+
 # 视频连接
+
 > [记录自己写一个小Java爬虫项目-0001-简单介绍](https://www.bilibili.com/video/BV1wv411z7HX/) <br/>
 > [记录自己写一个小Java爬虫项目-0002-系统设计-需求概要](https://www.bilibili.com/video/BV1rK411n7CB/) <br/>
 > [记录自己写一个小Java爬虫项目-0003-创建项目-1](https://www.bilibili.com/video/BV1b5411Y7XM/) <br/>
