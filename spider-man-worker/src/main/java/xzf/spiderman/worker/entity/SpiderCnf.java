@@ -4,7 +4,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.beans.BeanUtils;
 import xzf.spiderman.worker.data.AddSpiderCnfReq;
+import xzf.spiderman.worker.data.SpiderCnfData;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -107,6 +109,26 @@ public class SpiderCnf
         ret.setStatus(STATUS_STOPED);
         ret.setActiveFlag(ACTIVE_FLAG_ENABLE);
         ret.setCreateTime(new Date());
+
+        return ret;
+    }
+
+
+    public SpiderCnfData asSpiderCnfData()
+    {
+        SpiderCnfData ret = new SpiderCnfData();
+        BeanUtils.copyProperties(this,ret);
+
+        ret.setGroupId(this.group.getId());
+        ret.setGroupName(this.group.getName());
+        ret.setGroupDesc(this.group.getDesc());
+        ret.setGroupCreateTime(this.group.getCreateTime());
+
+        ret.setServerId(this.server.getId());
+        ret.setServerHost(this.server.getHost());
+        ret.setServerPort(this.server.getPort());
+        ret.setServerZone(this.server.getZone());
+        ret.setServerCreateTime(this.server.getCreateTime());
 
         return ret;
     }

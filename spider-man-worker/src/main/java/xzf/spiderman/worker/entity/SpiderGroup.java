@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-@NoArgsConstructor
 @ToString
 @Entity
 @Table(name = "spider_group")
@@ -27,4 +26,12 @@ public class SpiderGroup implements Serializable
 
     @Column(name = "create_time")
     private Date createTime;
+
+    public SpiderGroup(){}
+
+    public SpiderGroup(String id)
+    {
+        this.id = id;
+    }
+
 }

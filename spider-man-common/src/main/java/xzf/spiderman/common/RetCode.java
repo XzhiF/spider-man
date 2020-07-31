@@ -13,6 +13,7 @@ public interface RetCode
     String JSON_PARSER_ERROR = "json_parser_error";
     String CONFIG_NOT_VALID_ERROR = "config_not_valid_error";
     String AUTHORITY_ERROR = "authority_error";
+    String HTTP_STATUS_ERROR = "http_status_error";
 
 
 

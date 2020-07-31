@@ -10,11 +10,14 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import xzf.spiderman.admin.data.SessionAdminUser;
 import xzf.spiderman.common.Ret;
 import xzf.spiderman.common.exception.AuthorityException;
+import xzf.spiderman.common.exception.BizException;
 import xzf.spiderman.common.exception.UnknownException;
 import xzf.spiderman.gateway.configuration.GatewayProperties;
 
@@ -23,7 +26,7 @@ import xzf.spiderman.gateway.configuration.GatewayProperties;
 public class AuthorityFilter implements GlobalFilter, Ordered
 {
     @Autowired
-    private  ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @Autowired
     private GatewayProperties properties;
@@ -45,10 +48,16 @@ public class AuthorityFilter implements GlobalFilter, Ordered
             }
 
             SessionAdminUser sessionAdminUser = webSession.getAttribute(SessionAdminUser.SESSION_KEY);
-            if         (sessionAdminUser.getAuthorities().contains("*")
-                    || sessionAdminUser.getAuthorities().contains(path))
+            if(sessionAdminUser.getAuthorities().contains("*"))
             {
                 return chain.filter(exchange);
+            }
+
+            PathMatcher matcher = new AntPathMatcher();
+            for (String authority : sessionAdminUser.getAuthorities()) {
+                if(matcher.match(authority, path)){
+                    return chain.filter(exchange);
+                }
             }
 
             return errorResponse(exchange, Ret.fail(new AuthorityException("用户无访问权限。")));

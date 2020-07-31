@@ -20,4 +20,13 @@ public class SpiderCnfStore
     private String storeId;
 
 
+    public static SpiderCnfStore create(String cnfId, String storeId)
+    {
+        SpiderCnfStore r = new SpiderCnfStore();
+        r.cnfId = cnfId;
+        r.storeId = storeId;
+        return r;
+    }
+
+
 }

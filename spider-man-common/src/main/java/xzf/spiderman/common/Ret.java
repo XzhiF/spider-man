@@ -53,6 +53,16 @@ public class Ret<T>
         return new Ret<>(RetCode.UNKNOWN_ERROR, null, throwable.getMessage(), throwable.getClass().getSimpleName());
     }
 
+    public static <T> Ret<T> fail(Throwable throwable, T data)
+    {
+        if(throwable instanceof RetCodeException){
+            RetCodeException codeEx = (RetCodeException) throwable;
+            return new Ret<>(codeEx.getCode(), data, codeEx.getMessage(), codeEx.getClass().getSimpleName());
+        }
+
+        return new Ret<>(RetCode.UNKNOWN_ERROR, data, throwable.getMessage(), throwable.getClass().getSimpleName());
+    }
+
     //
 
     public boolean isSuccess()

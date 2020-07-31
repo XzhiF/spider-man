@@ -5,7 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 
 @Data
@@ -22,8 +24,8 @@ public class AddSpiderCnfReq
     @NotBlank(message = "服务器不能为空")
     private String serverId;
 
-    @NotBlank(message = "保存数据源不能为空")
-    private String storeId;
+    @NotEmpty(message = "需要配置存储库")
+    private List<String> storeIds;
 
     @NotBlank(message = "名称不能为空")
     private String name;
