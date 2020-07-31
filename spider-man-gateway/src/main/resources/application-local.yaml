@@ -1,6 +1,12 @@
 server:
   port: 8080
 
+xzf:
+  spiderman:
+    common:
+      cookie:
+        domain: spiderman.xzf
+
 spring:
   redis:
     host: redis.spiderman.xzf
@@ -29,10 +35,12 @@ spring:
             - Path=/api/scheduler/**
           filters:
             - RewritePath=/api/(?<segment>/?.*),  /$\{segment}
+            - SaveSession
         - id: spider-man-worker
           uri: lb://spider-man-worker
           predicates:
             - Path=/api/worker/**
           filters:
             - RewritePath=/api/(?<segment>/?.*),  /$\{segment}
+            - SaveSession
 

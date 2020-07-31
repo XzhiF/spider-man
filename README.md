@@ -63,6 +63,15 @@
 > [记录自己写一个小Java爬虫项目-0057-简单缓存groovy的Class](https://www.bilibili.com/video/BV175411e731/) <br/>
 > [记录自己写一个小Java爬虫项目-0058-添加KafkaPipeline](https://www.bilibili.com/video/BV1cz4y1Q7pv/) <br/>
 > [记录自己写一个小Java爬虫项目-0059-Storage工程创建](https://www.bilibili.com/video/BV17i4y137bt/) <br/>
+> [记录自己写一个小Java爬虫项目-0060-Storage消费者实现-1-基础架子](https://www.bilibili.com/video/BV17a4y1a7cn/) <br/>
+> [记录自己写一个小Java爬虫项目-0061-Storage消费者实现-2-调试](https://www.bilibili.com/video/BV1Cp4y1i7eC/) <br/>
+> [记录自己写一个小Java爬虫项目-0062-Storage消费者实现-3-缓存优化](https://www.bilibili.com/video/BV1AC4y187f6/) <br/>
+> [记录自己写一个小Java爬虫项目-0063-Storage消费者实现-4-多线程处理](https://www.bilibili.com/video/BV1m5411a78k/) <br/>
+> [记录自己写一个小Java爬虫项目-0064-Storage消费者实现-4-调整表结构](https://www.bilibili.com/video/BV1C54y1S77S/) <br/>
+> [记录自己写一个小Java爬虫项目-0065-Storage消费者实现-5-联调测试](https://www.bilibili.com/video/BV1uZ4y1M7Bt/) <br/>
+>
+>
+>
 >
 >
 

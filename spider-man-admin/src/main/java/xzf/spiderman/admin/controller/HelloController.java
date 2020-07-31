@@ -18,6 +18,8 @@ public class HelloController {
     {
 //        session.setAttribute("k","hahahaaaabc");
 //
+        System.out.println("sessionId==" + session.getId());
+
         session.setAttribute("v",v);
         return Collections.singletonMap("msg","admin hello, session-v="+v);
     }
