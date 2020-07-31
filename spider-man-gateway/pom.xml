@@ -14,6 +14,18 @@
     <dependencies>
 
         <dependency>
+            <groupId>xzf</groupId>
+            <artifactId>spider-man-common</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>xzf</groupId>
+            <artifactId>spider-man-admin-client</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>

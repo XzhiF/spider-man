@@ -1,5 +1,6 @@
 package xzf.spiderman.gateway.configuration;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +35,8 @@ public class SessionConfiguration
 
     private ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+
 //        mapper.registerModules(SecurityJackson2Modules.getModules(this.loader));
         return mapper;
     }

@@ -6,6 +6,9 @@ xzf:
     common:
       cookie:
         domain: spiderman.xzf
+    gateway:
+      skipUrls:
+        - /admin/login
 
 spring:
   redis:

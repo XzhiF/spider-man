@@ -1,5 +1,6 @@
 package xzf.spiderman.common.configuration;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -47,6 +48,7 @@ public class SpiderManSessionConfiguration implements BeanClassLoaderAware
 
     private ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
 //        mapper.registerModules(SecurityJackson2Modules.getModules(this.loader));
         return mapper;
     }
