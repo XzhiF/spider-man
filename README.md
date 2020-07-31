@@ -1,6 +1,6 @@
 # spider-man
 
-![爬虫架构图](Document\spider.png)
+![爬虫设计图](https://raw.githubusercontent.com/XzhiF/spider-man/master/Document/spider.png)
 
 
 
