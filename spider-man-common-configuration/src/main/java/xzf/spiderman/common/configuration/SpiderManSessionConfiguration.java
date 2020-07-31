@@ -33,6 +33,7 @@ public class SpiderManSessionConfiguration implements BeanClassLoaderAware
         serializer.setCookieName("SESSION");
         serializer.setCookiePath("/");
         serializer.setDomainName(domain);
+        serializer.setUseBase64Encoding(false);
         return serializer;
     }
 

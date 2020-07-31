@@ -2,6 +2,13 @@ server:
   port: 8080
 
 spring:
+  redis:
+    host: redis.spiderman.xzf
+    port: 6379
+    database: 0
+    timeout: 210s
+  session:
+    store-type: redis
   cloud:
     gateway:
       discovery:
@@ -15,6 +22,7 @@ spring:
             - Path=/api/admin/**
           filters:
             - RewritePath=/api/(?<segment>/?.*),  /$\{segment}
+            - SaveSession
         - id: spider-man-scheduler
           uri: lb://spider-man-scheduler
           predicates:
