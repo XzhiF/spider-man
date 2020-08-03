@@ -67,7 +67,8 @@ public class SpiderGroupService
         qry.setId(req.getStartWithId());
 
         ExampleMatcher matcher = ExampleMatcher.matching()
-                .withMatcher("id", m -> m.startsWith());
+                .withMatcher("id", m -> m.startsWith())
+                .withIgnoreNullValues();
 
         Example<SpiderGroup> example = Example.of(qry, matcher);
 
