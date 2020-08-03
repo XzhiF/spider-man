@@ -12,4 +12,7 @@ public interface SpiderStoreRepository extends JpaRepository<SpiderStore, String
     @Query("select o from SpiderStore o join SpiderCnfStore s on s.storeId=o.id where s.cnfId=?1")
     List<SpiderStore> findAllByCnfId(String confId);
 
+    @Query("select count(o) from SpiderCnfStore o where o.storeId=?1")
+    int usingCount(String id);
+
 }

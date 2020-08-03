@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.beans.BeanUtils;
+import xzf.spiderman.worker.data.SaveSpiderStoreReq;
 import xzf.spiderman.worker.data.SpiderStoreData;
 
 import javax.persistence.*;
@@ -55,10 +56,23 @@ public class SpiderStore
     private Integer urlType;
 
 
-    public SpiderStoreData asSpiderStoreData()
+
+    public static SpiderStore create(SaveSpiderStoreReq req)
+    {
+        SpiderStore ret = new SpiderStore();
+        BeanUtils.copyProperties(req,ret);
+        return ret;
+    }
+
+
+    public SpiderStoreData asData()
     {
         SpiderStoreData ret = new SpiderStoreData();
         BeanUtils.copyProperties(this, ret);
         return ret;
+    }
+
+    public void update(SaveSpiderStoreReq req) {
+        BeanUtils.copyProperties(req,this);
     }
 }

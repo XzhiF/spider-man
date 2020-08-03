@@ -102,7 +102,7 @@ public class SpiderCnfService
         SpiderCnfData ret =  src.asSpiderCnfData();
 
         List<SpiderStoreData> stores = spiderStoreRepository.findAllByCnfId(id)
-                .stream().map(SpiderStore::asSpiderStoreData).collect(Collectors.toList());
+                .stream().map(SpiderStore::asData).collect(Collectors.toList());
 
         ret.setStores(stores);
 
