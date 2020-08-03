@@ -4,7 +4,7 @@ import us.codecraft.webmagic.Request;
 
 public interface WorkerSpiderLifeCycleListener
 {
-    default void onBeforeStart(WorkerSpider spider) {}
+    default void onStart(WorkerSpider spider) {}
 
     default void onRequestPolled(WorkerSpider spider, Request request){}
     //
@@ -14,7 +14,7 @@ public interface WorkerSpiderLifeCycleListener
 
     default void onAfterClose(WorkerSpider spider){}
 
-    default void onStopped(WorkerSpider spider) {}
+    default void onStop(WorkerSpider spider) {}
 
 
     WorkerSpiderLifeCycleListener DEFAULT = new WorkerSpiderLifeCycleListener() {};

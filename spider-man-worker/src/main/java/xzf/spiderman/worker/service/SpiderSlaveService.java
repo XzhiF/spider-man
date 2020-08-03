@@ -2,6 +2,7 @@ package xzf.spiderman.worker.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +61,6 @@ public class SpiderSlaveService implements EventListener
     }
 
 
-    @Transactional
     public void updateSpiderStatus(String id, int status)
     {
         spiderCnfRepository.updateStatus(id, status);
@@ -74,11 +74,14 @@ public class SpiderSlaveService implements EventListener
     }
 
     @Override
+    @Transactional
     public void onEvent(Event event)
     {
         if(event instanceof SpiderStatusChangedEvent){
             SpiderStatusChangedEvent e = (SpiderStatusChangedEvent)event;
             updateSpiderStatus(e.getCnfId(), e.getStatus());
+//            ApplicationContextAware   ->
+//            AopContext.currentProxy() ->
         }
     }
 }

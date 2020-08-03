@@ -137,7 +137,7 @@ public class SpiderMasterService
         String spiderId = newSpiderId();
 
         // 2. 准备所有spider cnf
-        List<SpiderCnf> cnfs = spiderCnfRepository.findALlByGroupId(req.getGroupId());
+        List<SpiderCnf> cnfs = spiderCnfRepository.findAllByGroupIdAndEnabled(req.getGroupId());
 
         // 3. 过滤了Server启动状态中的爬虫cnf
         List<SpiderCnf> availableCnfs = getAvailableCnfServers(cnfs);

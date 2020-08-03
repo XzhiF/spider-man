@@ -11,8 +11,8 @@ import java.util.List;
 public interface SpiderCnfRepository extends JpaRepository<SpiderCnf,String>
 {
 
-    @Query("select s from SpiderCnf s where s.group.id= ?1 ")
-    List<SpiderCnf> findALlByGroupId(String groupId);
+    @Query("select s from SpiderCnf s where s.group.id= ?1 and s.status=1")
+    List<SpiderCnf> findAllByGroupIdAndEnabled(String groupId);
 
 
     @Modifying

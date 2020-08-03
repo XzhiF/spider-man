@@ -6,10 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import xzf.spiderman.common.exception.BizException;
-import xzf.spiderman.scheduler.data.AddTaskReq;
+import xzf.spiderman.scheduler.data.SaveTaskReq;
 import xzf.spiderman.scheduler.data.QryTaskReq;
 import xzf.spiderman.scheduler.data.TaskData;
-import xzf.spiderman.scheduler.data.UptTaskReq;
 import xzf.spiderman.scheduler.entity.Task;
 import xzf.spiderman.scheduler.entity.TaskArg;
 import xzf.spiderman.scheduler.repository.TaskArgRepository;
@@ -31,7 +30,7 @@ public class TaskService
     private EventPublisherRegistry eventPublisherRegistry;
 
     @Transactional
-    public void add(AddTaskReq req)
+    public void add(SaveTaskReq req)
     {
         // biz checking
         if( taskRepository.findById(req.getId()).isPresent() ){
@@ -48,7 +47,7 @@ public class TaskService
     }
 
     @Transactional
-    public void update(UptTaskReq req)
+    public void update(SaveTaskReq req)
     {
         // validation
         Task task = getTask(req.getId());

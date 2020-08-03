@@ -3,6 +3,8 @@ package xzf.spiderman.worker.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.beans.BeanUtils;
+import xzf.spiderman.worker.data.SpiderStoreData;
 
 import javax.persistence.*;
 
@@ -19,7 +21,6 @@ public class SpiderStore
 
     public static final int URL_TYPE_DB_CONNECT = 1;
     public static final int URL_TYPE_NACOS_URI = 2;
-
 
 
     @Id
@@ -53,4 +54,11 @@ public class SpiderStore
     @Column(name = "url_type")
     private Integer urlType;
 
+
+    public SpiderStoreData asSpiderStoreData()
+    {
+        SpiderStoreData ret = new SpiderStoreData();
+        BeanUtils.copyProperties(this, ret);
+        return ret;
+    }
 }

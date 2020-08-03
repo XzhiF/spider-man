@@ -3,10 +3,9 @@ package xzf.spiderman.scheduler.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import xzf.spiderman.scheduler.data.AddTaskReq;
+import xzf.spiderman.scheduler.data.SaveTaskReq;
 import xzf.spiderman.scheduler.data.TaskArgData;
 import xzf.spiderman.scheduler.data.TaskData;
-import xzf.spiderman.scheduler.data.UptTaskReq;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -75,7 +74,7 @@ public class Task implements Serializable
 
     //
 
-    public static Task create(AddTaskReq req)
+    public static Task create(SaveTaskReq req)
     {
         Task task = new Task();
         task.setId(req.getId());
@@ -108,7 +107,7 @@ public class Task implements Serializable
         return  results;
     }
 
-    public void update(UptTaskReq req)
+    public void update(SaveTaskReq req)
     {
         this.setGroupId(req.getGroupId());
         this.setName(req.getName());

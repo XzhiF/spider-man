@@ -2,7 +2,9 @@ package xzf.spiderman.worker.data;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class SpiderCnfData
@@ -53,4 +55,6 @@ public class SpiderCnfData
 
     private Date serverCreateTime;
 
+    // only for detail
+    private List<SpiderStoreData> stores = new ArrayList<>();
 }

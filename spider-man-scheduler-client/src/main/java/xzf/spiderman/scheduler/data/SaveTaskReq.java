@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class AddTaskReq
+public class SaveTaskReq
 {
     @NotBlank(message = "ID不能为空")
     private String id;

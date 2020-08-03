@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.beans.BeanUtils;
-import xzf.spiderman.worker.data.AddSpiderCnfReq;
+import xzf.spiderman.worker.data.SaveSpiderCnfReq;
 import xzf.spiderman.worker.data.SpiderCnfData;
 
 import javax.persistence.*;
@@ -85,7 +85,7 @@ public class SpiderCnf
 
 
 
-    public static SpiderCnf create(AddSpiderCnfReq req,
+    public static SpiderCnf create(SaveSpiderCnfReq req,
                                    SpiderGroup group,
                                    SpiderServer server)
     {
@@ -110,6 +110,24 @@ public class SpiderCnf
         ret.setCreateTime(new Date());
 
         return ret;
+    }
+
+
+    public void update(SaveSpiderCnfReq req, SpiderGroup group, SpiderServer server)
+    {
+        this.setId(req.getId());
+        this.setName(req.getName());
+        this.setType(req.getType());
+        this.setParams(req.getParams());
+        this.setDesc(req.getDesc());
+        this.setProcessor(req.getProcessor());
+        this.setMaxPollTimeoutCount(req.getMaxPollTimeoutCount());
+        this.setPollTimeoutSeconds(req.getPollTimeoutSeconds());
+        this.setWorkerThreads(req.getWorkerThreads());
+        this.setMode(req.getMode());
+
+        this.setServer(server);
+        this.setGroup(group);
     }
 
 
@@ -143,7 +161,17 @@ public class SpiderCnf
         return MODE_EXCLUSIVE == mode.intValue();
     }
 
+    public boolean isRunning()
+    {
+        return STATUS_RUNNING == status.intValue();
+    }
 
+    public void enable() {
+        activeFlag = ACTIVE_FLAG_ENABLE;
+    }
+    public void disable() {
+        activeFlag = ACTIVE_FLAG_DISABLE;
+    }
 }
 
 

@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @ToString
-public class AddSpiderCnfReq
+public class SaveSpiderCnfReq
 {
     @NotBlank(message = "ID不能为空")
     private String id ;

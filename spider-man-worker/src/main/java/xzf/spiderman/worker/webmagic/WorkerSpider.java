@@ -12,7 +12,6 @@ import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.pipeline.Pipeline;
 import us.codecraft.webmagic.pipeline.ResultItemsCollectorPipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
-import us.codecraft.webmagic.scheduler.QueueScheduler;
 import us.codecraft.webmagic.scheduler.Scheduler;
 import us.codecraft.webmagic.thread.CountableThreadPool;
 import us.codecraft.webmagic.utils.UrlUtils;
@@ -304,7 +303,7 @@ public class WorkerSpider implements Runnable, Task
     public void run() {
 
         currentThread = Thread.currentThread();
-        lifeCycleListener.onBeforeStart(this);
+        lifeCycleListener.onStart(this);
 
         checkRunningStat();
         initComponent();
@@ -360,7 +359,7 @@ public class WorkerSpider implements Runnable, Task
         }
 
         logger.info("Spider {} closed! {} pages downloaded.", getUUID(), pageCount.get());
-        lifeCycleListener.onStopped(this);
+        lifeCycleListener.onStop(this);
     }
 
     protected void onError(Request request) {
@@ -397,11 +396,10 @@ public class WorkerSpider implements Runnable, Task
             return ;
         }
 
+        lifeCycleListener.onBeforeClose(this);
 
         //设置他的status=stopping
         this.updateStatusStopping();
-
-        lifeCycleListener.onBeforeClose(this);
 
         destroyEach(downloader);
         destroyEach(pageProcessor);

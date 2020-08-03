@@ -22,14 +22,14 @@ public class TaskController
     private ScheCmdProducerService scheCmdProducerService;
 
     @PostMapping("/scheduler/task/add")
-    public Ret<Void> addTask(@Valid @RequestBody AddTaskReq req)
+    public Ret<Void> addTask(@Valid @RequestBody SaveTaskReq req)
     {
         taskService.add(req);
         return Ret.success();
     }
 
     @PostMapping("/scheduler/task/update")
-    public Ret<Void> addTask(@Valid @RequestBody UptTaskReq req)
+    public Ret<Void> updateTask(@Valid @RequestBody SaveTaskReq req)
     {
         taskService.update(req);
         return Ret.success();

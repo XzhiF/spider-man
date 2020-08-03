@@ -22,10 +22,6 @@ class BlogProcessor extends ContextProcessor
     @Override
     public void process(Page page)
     {
-        try {
-            Thread.sleep(1000 * 30);
-        }catch(Exception e){}
-
         log.info("BlogProcessor -- 3 -- " + Thread.currentThread());
 
         if(page.getUrl().toString().startsWith("https://www.oschina.net/blog")) {

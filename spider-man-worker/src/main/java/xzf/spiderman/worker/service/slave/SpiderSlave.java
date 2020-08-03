@@ -94,7 +94,7 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
 
                 // 1. 通知zk，spider开始进行run方法。 这时候spider running
                 @Override
-                public void onBeforeStart(WorkerSpider spider) {
+                public void onStart(WorkerSpider spider) {
                     updateRunningTaskToZk(key);
                     publishStatusChanged(key,SpiderCnf.STATUS_RUNNING);
                 }
@@ -107,12 +107,10 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
 
                 // 3. 通知zk，Spider已经停止了，这时候 spider closed
                 @Override
-                public void onStopped(WorkerSpider spider) {
-                    // Thread.interrupted. zk的api中有wait操作会报错。需要放到其他线程执行
-                    CompletableFuture.runAsync( ()->{
-                        updateClosedTaskToZk(key);
-                        publishStatusChanged(key,SpiderCnf.STATUS_STOPPED);
-                    });
+                public void onStop(WorkerSpider spider) {
+                    // WorkerSpider线程里Thread.interrupt()会使zk的api报错。
+                    CompletableFuture.runAsync(()->updateClosedTaskToZk(key));
+                    publishStatusChanged(key,SpiderCnf.STATUS_STOPPED);
                 }
             };
         }

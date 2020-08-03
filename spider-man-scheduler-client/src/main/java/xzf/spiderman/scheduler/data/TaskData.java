@@ -33,6 +33,6 @@ public class TaskData
 
     private String cron;
 
-    // only for detail
+    // only for detail， 就是约定。没啥
     private List<TaskArgData> args = new ArrayList<>();
 }
