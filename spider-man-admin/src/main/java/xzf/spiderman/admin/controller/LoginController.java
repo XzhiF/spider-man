@@ -25,19 +25,5 @@ public class LoginController
         return Ret.success(data);
     }
 
-    @PostMapping("/admin/test1")
-    public Ret<String> test1(@RequestParam("m") String m)
-    {
-        return Ret.success(m);
-    }
-
-    @PostMapping("/admin/test2")
-    public Ret<String> test2(@RequestParam("m") String m)
-    {
-        return Ret.success(m);
-    }
-
-
-
 
 }

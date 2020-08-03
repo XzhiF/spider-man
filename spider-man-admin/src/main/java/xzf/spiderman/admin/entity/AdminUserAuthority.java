@@ -19,4 +19,12 @@ public class AdminUserAuthority
 
     @Column(name = "authority")
     private String authority;
+
+    public AdminUserAuthority() {
+    }
+
+    public AdminUserAuthority(String username, String authority){
+        this.username = username;
+        this.authority = authority;
+    }
 }

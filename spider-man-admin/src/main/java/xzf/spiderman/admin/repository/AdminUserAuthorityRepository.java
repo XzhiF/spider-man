@@ -8,4 +8,6 @@ import java.util.List;
 public interface AdminUserAuthorityRepository extends JpaRepository<AdminUserAuthority, Long>
 {
     List<AdminUserAuthority> findAllByUsername(String username);
+
+    void deleteAllByUsername(String username);
 }
