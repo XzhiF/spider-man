@@ -3,6 +3,9 @@ package xzf.spiderman.worker.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.beans.BeanUtils;
+import xzf.spiderman.worker.data.SaveSpiderGroupReq;
+import xzf.spiderman.worker.data.SpiderGroupData;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -34,4 +37,26 @@ public class SpiderGroup implements Serializable
         this.id = id;
     }
 
+
+
+    public static SpiderGroup create(SaveSpiderGroupReq req)
+    {
+        SpiderGroup ret = new SpiderGroup();
+        ret.setId(req.getId());
+        ret.setName(req.getName());
+        ret.setDesc(req.getDesc());
+        ret.setCreateTime(new Date());
+        return ret;
+    }
+
+    public void update(SaveSpiderGroupReq req) {
+        this.setName(req.getName());
+        this.setDesc(req.getDesc());
+    }
+
+    public SpiderGroupData asSpiderGroupData() {
+        SpiderGroupData ret = new SpiderGroupData();
+        BeanUtils.copyProperties(this,ret);
+        return ret;
+    }
 }
