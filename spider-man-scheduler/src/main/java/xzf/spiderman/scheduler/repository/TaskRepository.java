@@ -14,4 +14,7 @@ public interface TaskRepository extends JpaRepository<Task, String>
     @Modifying
     @Query("update Task t set t.status = 0")
     int updateAllStatusToStop();
+
+
+    List<Task> findAllByGroupIdAndActiveFlag(String groupId,int activeFlag);
 }

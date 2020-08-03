@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import sun.tools.tree.UplevelReference;
 import xzf.spiderman.common.Ret;
 import xzf.spiderman.scheduler.data.ScheCmd;
 import static xzf.spiderman.scheduler.data.ScheCmd.*;
@@ -29,10 +30,37 @@ public class ScheduleController
         return Ret.success();
     }
 
+
     @PostMapping("/scheduler/schedule/trigger/{taskId}")
     public Ret<Void> trigger(@PathVariable("taskId") String taskId)
     {
         scheCmdProducerService.offer(new ScheCmd(TRIGGER, taskId));
+        return Ret.success();
+    }
+
+
+    //// -- group
+
+
+    @PostMapping("/scheduler/schedule/trigger/group/{groupId}")
+    public Ret<Void> startGroup(@PathVariable("groupId") String groupId)
+    {
+        scheCmdProducerService.offer(new ScheCmd(SCHEDULE_GROUP, groupId));
+        return Ret.success();
+    }
+
+    @PostMapping("/scheduler/schedule/trigger/group/{groupId}")
+    public Ret<Void> stopGroup(@PathVariable("groupId") String groupId)
+    {
+        scheCmdProducerService.offer(new ScheCmd(UNSCHEDULE_GROUP, groupId));
+        return Ret.success();
+    }
+
+
+    @PostMapping("/scheduler/schedule/trigger/group/{groupId}")
+    public Ret<Void> triggerGroup(@PathVariable("groupId") String groupId)
+    {
+        scheCmdProducerService.offer(new ScheCmd(TRIGGER_GROUP, groupId));
         return Ret.success();
     }
 

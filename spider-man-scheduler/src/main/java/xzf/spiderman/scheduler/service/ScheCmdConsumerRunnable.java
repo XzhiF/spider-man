@@ -3,7 +3,6 @@ package xzf.spiderman.scheduler.service;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBoundedBlockingQueue;
 import xzf.spiderman.common.exception.BizException;
-import xzf.spiderman.common.exception.RetCodeException;
 import xzf.spiderman.scheduler.configuration.SchedulerConst;
 import xzf.spiderman.scheduler.data.ScheCmd;
 import static xzf.spiderman.scheduler.data.ScheCmd.*;
@@ -36,11 +35,16 @@ public class ScheCmdConsumerRunnable implements Runnable
     private void registerCmdHandlers()
     {
         cmdHandlers.put(IDLE, new IdleCmdHandler());
+
         cmdHandlers.put(ENABLE, new EnableCmdHandler());
         cmdHandlers.put(DISABLE, new DisableCmdHandler());
         cmdHandlers.put(SCHEDULE, new ScheduleCmdHandler());
         cmdHandlers.put(UNSCHEDULE, new UnScheduleCmdHandler());
         cmdHandlers.put(TRIGGER, new TriggerCmdHandler());
+
+        cmdHandlers.put(SCHEDULE_GROUP, new ScheduleGroupCmdHandler());
+        cmdHandlers.put(UNSCHEDULE_GROUP, new UnScheduleGroupCmdHandler());
+        cmdHandlers.put(TRIGGER_GROUP, new TriggerGroupCmdHandler());
     }
 
     @Override
@@ -89,7 +93,7 @@ public class ScheCmdConsumerRunnable implements Runnable
     private void execCmd(ScheCmd cmd)
     {
         try {
-            log.info("exec cmd : taskid=" + cmd.getTaskId()+", action="+cmd.getAction());
+            log.info("exec cmd : taskid=" + cmd.getTaskOrGroupId()+", action="+cmd.getAction());
 
             CmdHandler cmdHandler = cmdHandlers.get(cmd.getAction());
             if(cmdHandler == null){
@@ -117,7 +121,7 @@ public class ScheCmdConsumerRunnable implements Runnable
     {
         @Override
         public void handle(ScheCmd cmd) {
-            registry.taskService().enable(cmd.getTaskId());
+            registry.taskService().enable(cmd.getTaskOrGroupId());
         }
     }
 
@@ -125,7 +129,7 @@ public class ScheCmdConsumerRunnable implements Runnable
     {
         @Override
         public void handle(ScheCmd cmd) {
-            registry.taskService().disable(cmd.getTaskId());
+            registry.taskService().disable(cmd.getTaskOrGroupId());
         }
     }
 
@@ -134,7 +138,7 @@ public class ScheCmdConsumerRunnable implements Runnable
     {
         @Override
         public void handle(ScheCmd cmd) {
-            registry.scheduleService().scheduleTask(cmd.getTaskId());
+            registry.scheduleService().scheduleTask(cmd.getTaskOrGroupId());
         }
     }
 
@@ -142,7 +146,7 @@ public class ScheCmdConsumerRunnable implements Runnable
     {
         @Override
         public void handle(ScheCmd cmd) {
-            registry.scheduleService().unscheduleTask(cmd.getTaskId());
+            registry.scheduleService().unscheduleTask(cmd.getTaskOrGroupId());
         }
     }
 
@@ -150,7 +154,7 @@ public class ScheCmdConsumerRunnable implements Runnable
     {
         @Override
         public void handle(ScheCmd cmd) {
-            registry.scheduleService().triggerTask(cmd.getTaskId());
+            registry.scheduleService().triggerTask(cmd.getTaskOrGroupId());
         }
     }
 
@@ -162,5 +166,31 @@ public class ScheCmdConsumerRunnable implements Runnable
         }
     }
 
+
+    /////  group
+
+    private class ScheduleGroupCmdHandler implements CmdHandler
+    {
+        @Override
+        public void handle(ScheCmd cmd) {
+            registry.scheduleService().scheduleTaskGroup(cmd.getTaskOrGroupId());
+        }
+    }
+
+    private class UnScheduleGroupCmdHandler implements CmdHandler
+    {
+        @Override
+        public void handle(ScheCmd cmd) {
+            registry.scheduleService().unscheduleTaskGroup(cmd.getTaskOrGroupId());
+        }
+    }
+
+    private class TriggerGroupCmdHandler implements CmdHandler
+    {
+        @Override
+        public void handle(ScheCmd cmd) {
+            registry.scheduleService().triggerTaskGroup(cmd.getTaskOrGroupId());
+        }
+    }
 
 }

@@ -12,6 +12,7 @@ import xzf.spiderman.common.exception.BizException;
 import xzf.spiderman.scheduler.entity.Task;
 import xzf.spiderman.scheduler.entity.TaskArg;
 import xzf.spiderman.scheduler.repository.TaskArgRepository;
+import xzf.spiderman.scheduler.repository.TaskGroupRepository;
 import xzf.spiderman.scheduler.repository.TaskRepository;
 import xzf.spiderman.scheduler.service.event.TaskDisabledEvent;
 import xzf.spiderman.scheduler.service.event.TaskEnabledEvent;
@@ -152,9 +153,13 @@ public class ScheduleService implements EventListener
     @Transactional
     public void triggerTask(String taskId)
     {
-        try{
-            Task task = getTask(taskId);
+        Task task = getTask(taskId);
+        triggerTask(task);
+    }
 
+    public void triggerTask(Task task)
+    {
+        try{
             JobKey jobKey = new JobKey(task.getId(), task.getGroupId());
 
             if (!scheduler.checkExists(jobKey)) {
@@ -175,10 +180,46 @@ public class ScheduleService implements EventListener
             scheduler.triggerJob(jobKey);
         }
         catch (Exception e){
-            log.error("Task " + taskId+", Triiger调度失败。 " + e.getMessage(), e);
-            throw new BizException("Task " + taskId+", Trigger调度失败。 " + e.getMessage(), e);
+            log.error("Task " + task.getId()+", Triiger调度失败。 " + e.getMessage(), e);
+            throw new BizException("Task " + task.getId()+", Trigger调度失败。 " + e.getMessage(), e);
         }
     }
+
+
+
+    //// TaskGroup
+
+    @Transactional
+    public void scheduleTaskGroup(String taskGroupId)
+    {
+        List<Task> tasks = taskRepository.findAllByGroupIdAndActiveFlag(taskGroupId, Task.ACTIVE_FLAG_ENABLE);
+        for (Task task : tasks)
+        {
+            scheduleTask(task);
+        }
+    }
+
+    @Transactional
+    public void unscheduleTaskGroup(String taskGroupId)
+    {
+        List<Task> tasks = taskRepository.findAllByGroupIdAndActiveFlag(taskGroupId, Task.ACTIVE_FLAG_ENABLE);
+        for (Task task : tasks)
+        {
+            unscheduleTask(task);
+        }
+    }
+
+    @Transactional
+    public void triggerTaskGroup(String taskGroupId)
+    {
+        List<Task> tasks = taskRepository.findAllByGroupIdAndActiveFlag(taskGroupId, Task.ACTIVE_FLAG_ENABLE);
+        for (Task task : tasks)
+        {
+            triggerTask(task);
+        }
+    }
+
+    ////
 
 
     private Task getTask(String taskId)

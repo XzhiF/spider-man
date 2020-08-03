@@ -8,7 +8,7 @@ import java.util.UUID;
 @Data
 public class ScheCmd implements Serializable
 {
-    // ACTION
+    // Task
     public static final int IDLE = 0;
     public static final int ENABLE = 1;
     public static final int DISABLE = 2;
@@ -16,8 +16,14 @@ public class ScheCmd implements Serializable
     public static final int UNSCHEDULE = 4;
     public static final int TRIGGER = 5;
 
+
+    // GROUP
+    public static final int SCHEDULE_GROUP = 6;
+    public static final int UNSCHEDULE_GROUP = 7;
+    public static final int TRIGGER_GROUP = 8;
+
     private Integer action = 0;
-    private String taskId;
+    private String taskOrGroupId;
 
     private String uuid;
     private Integer retryTimes;
@@ -27,9 +33,9 @@ public class ScheCmd implements Serializable
     public ScheCmd() {
     }
 
-    public ScheCmd(Integer action, String taskId) {
+    public ScheCmd(Integer action, String taskOrGroupId) {
         this.action = action;
-        this.taskId = taskId;
+        this.taskOrGroupId = taskOrGroupId;
 
         this.uuid = UUID.randomUUID().toString();
         this.retryTimes = 0;
