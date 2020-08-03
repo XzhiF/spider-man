@@ -19,9 +19,8 @@ import java.util.Date;
 @EqualsAndHashCode(of = "id")
 public class SpiderCnf
 {
-    public static final int STATUS_STOPED = 0;
+    public static final int STATUS_STOPPED = 0;
     public static final int STATUS_RUNNING = 1;
-    public static final int STATUS_WAITING = 2;
 
     public static final int ACTIVE_FLAG_DISABLE = 0;
     public static final int ACTIVE_FLAG_ENABLE = 1;
@@ -106,7 +105,7 @@ public class SpiderCnf
         ret.setServer(server);
         ret.setGroup(group);
 
-        ret.setStatus(STATUS_STOPED);
+        ret.setStatus(STATUS_STOPPED);
         ret.setActiveFlag(ACTIVE_FLAG_ENABLE);
         ret.setCreateTime(new Date());
 

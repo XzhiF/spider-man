@@ -2,7 +2,7 @@ package xzf.spiderman.worker.service.master;
 
 import xzf.spiderman.scheduler.data.JobTaskCallbackReq;
 import xzf.spiderman.worker.service.GroupSpiderKey;
-import xzf.spiderman.worker.webmagic.ApplicationServiceRegistry;
+import xzf.spiderman.worker.service.ApplicationServiceRegistry;
 
 public class SpiderNotifier
 {

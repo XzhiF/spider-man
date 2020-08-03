@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import xzf.spiderman.starter.curator.CuratorAutoConfiguration;
 import xzf.spiderman.starter.curator.CuratorFacade;
 import xzf.spiderman.worker.service.master.*;
-import xzf.spiderman.worker.webmagic.ApplicationServiceRegistry;
+import xzf.spiderman.worker.service.ApplicationServiceRegistry;
 import xzf.spiderman.worker.webmagic.BlockingPollRedisScheduler;
 
 @Configuration

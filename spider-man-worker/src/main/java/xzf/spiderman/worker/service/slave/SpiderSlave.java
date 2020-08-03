@@ -7,14 +7,17 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import xzf.spiderman.common.event.Event;
 import xzf.spiderman.common.event.EventListener;
+import xzf.spiderman.common.event.EventPublisher;
 import xzf.spiderman.common.exception.BizException;
 import xzf.spiderman.starter.curator.CuratorFacade;
 import xzf.spiderman.worker.configuration.WorkerProperties;
 import xzf.spiderman.worker.entity.SpiderCnf;
 import xzf.spiderman.worker.entity.SpiderStore;
+import xzf.spiderman.worker.service.EventPublisherRegistry;
 import xzf.spiderman.worker.service.SpiderKey;
 import xzf.spiderman.worker.service.SpiderTask;
 import xzf.spiderman.worker.service.event.CloseSpiderEvent;
+import xzf.spiderman.worker.service.event.SpiderStatusChangedEvent;
 import xzf.spiderman.worker.service.event.StartSpiderEvent;
 import xzf.spiderman.worker.webmagic.WorkerSpider;
 import xzf.spiderman.worker.webmagic.WorkerSpiderLifeCycleListener;
@@ -39,20 +42,24 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
 {
     private final CuratorFacade curatorFacade;
     private final WorkerSpiderFactory factory;
-    private final WorkerSpiderRepository repository;
+    private final WorkerSpiderRegistry registry;
     private final ExecutorService executor;
+    private final EventPublisherRegistry eventPublisherRegistry;
 
     public SpiderSlave(
             CuratorFacade curatorFacade,
             WorkerSpiderFactory factory,
-            WorkerSpiderRepository repository,
+            EventPublisherRegistry eventPublisherRegistry,
             WorkerProperties properties)
     {
         this.curatorFacade = curatorFacade;
         this.factory = factory;
-        this.repository = repository;
+        this.eventPublisherRegistry = eventPublisherRegistry;
+        this.registry = newRegistry();
         this.executor = newExecutor(properties);
     }
+
+
 
     public class StartSpiderHandler
     {
@@ -75,11 +82,10 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
             WorkerSpider spider = factory.create(new WorkerSpiderSettings(key,cnf,stores), listener);
 
             // 3. Run WorkerSpider
-            CompletableFuture.runAsync( ()->spider.run(), executor )
-                    .thenRunAsync( ()->updateClosedTaskToZk(key)  );
+            executor.execute(()->spider.run());
 
-            // 保存到本地缓存中
-            repository.put(key, spider);
+            // 4. 保存到本地缓存中
+            registry.put(key, spider);
         }
 
         private WorkerSpiderLifeCycleListener workerSpiderLifeCycleListener()
@@ -90,6 +96,7 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
                 @Override
                 public void onBeforeStart(WorkerSpider spider) {
                     updateRunningTaskToZk(key);
+                    publishStatusChanged(key,SpiderCnf.STATUS_RUNNING);
                 }
 
                 // 2. 通知zk, spider已经达到了退出的条件，这时候spider canClose
@@ -97,9 +104,21 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
                 public void onCanCloseCondition(WorkerSpider spider) {
                     updateCanCloseTaskToZk(key);
                 }
+
+                // 3. 通知zk，Spider已经停止了，这时候 spider closed
+                @Override
+                public void onStopped(WorkerSpider spider) {
+                    // Thread.interrupted. zk的api中有wait操作会报错。需要放到其他线程执行
+                    CompletableFuture.runAsync( ()->{
+                        updateClosedTaskToZk(key);
+                        publishStatusChanged(key,SpiderCnf.STATUS_STOPPED);
+                    });
+                }
             };
         }
     }
+
+
 
     public class CloseSpiderHandler
     {
@@ -113,7 +132,7 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
 
         public void handle()
         {
-            WorkerSpider spider = repository.remove(key);
+            WorkerSpider spider = registry.remove(key);
             if(spider != null) {
                 spider.close();
             }
@@ -121,6 +140,11 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
         }
     }
 
+
+    private void publishStatusChanged(SpiderKey key, int status) {
+        eventPublisherRegistry.spiderStatusEventPublisher()
+                .publish(new SpiderStatusChangedEvent(key.getCnfId(),status));
+    }
 
     private void updateRunningTaskToZk(SpiderKey key)
     {
@@ -191,6 +215,10 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
         h.handle();
     }
 
+    private WorkerSpiderRegistry newRegistry() {
+        return new WorkerSpiderRegistry();
+    }
+
 
     private ExecutorService newExecutor(WorkerProperties props)
     {
@@ -231,9 +259,10 @@ public class SpiderSlave implements EventListener, ApplicationListener<ContextCl
     {
         executor.shutdown();
 
-        for (WorkerSpider workerSpider : repository.all()) {
+        for (WorkerSpider workerSpider : registry.all()) {
             workerSpider.close();
         }
+        registry.clear();
 
         try {
             boolean isTerminated = executor.awaitTermination(10, TimeUnit.SECONDS);

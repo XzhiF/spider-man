@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class WorkerSpiderRepository
+public class WorkerSpiderRegistry
 {
     private Map<SpiderKey, WorkerSpider> data = new ConcurrentHashMap<>();
 
@@ -24,5 +24,10 @@ public class WorkerSpiderRepository
     public Collection<WorkerSpider> all()
     {
         return data.values();
+    }
+
+    public void clear()
+    {
+        data.clear();
     }
 }

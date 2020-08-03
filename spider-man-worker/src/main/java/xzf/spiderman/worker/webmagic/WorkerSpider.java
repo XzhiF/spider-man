@@ -360,6 +360,7 @@ public class WorkerSpider implements Runnable, Task
         }
 
         logger.info("Spider {} closed! {} pages downloaded.", getUUID(), pageCount.get());
+        lifeCycleListener.onStopped(this);
     }
 
     protected void onError(Request request) {
@@ -401,6 +402,7 @@ public class WorkerSpider implements Runnable, Task
         this.updateStatusStopping();
 
         lifeCycleListener.onBeforeClose(this);
+
         destroyEach(downloader);
         destroyEach(pageProcessor);
         destroyEach(scheduler);
@@ -408,6 +410,7 @@ public class WorkerSpider implements Runnable, Task
             destroyEach(pipeline);
         }
         threadPool.shutdown();
+
         lifeCycleListener.onAfterClose(this);
 
         // 使用线程中断

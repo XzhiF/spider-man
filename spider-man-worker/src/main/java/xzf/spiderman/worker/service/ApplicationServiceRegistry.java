@@ -1,4 +1,4 @@
-package xzf.spiderman.worker.webmagic;
+package xzf.spiderman.worker.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

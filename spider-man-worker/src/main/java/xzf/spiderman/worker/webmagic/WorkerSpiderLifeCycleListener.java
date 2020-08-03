@@ -8,11 +8,13 @@ public interface WorkerSpiderLifeCycleListener
 
     default void onRequestPolled(WorkerSpider spider, Request request){}
     //
-    default void onCanCloseCondition(WorkerSpider spider) {};
+    default void onCanCloseCondition(WorkerSpider spider) {}
 
-    default void onBeforeClose(WorkerSpider spider){};
+    default void onBeforeClose(WorkerSpider spider){}
 
     default void onAfterClose(WorkerSpider spider){}
+
+    default void onStopped(WorkerSpider spider) {}
 
 
     WorkerSpiderLifeCycleListener DEFAULT = new WorkerSpiderLifeCycleListener() {};

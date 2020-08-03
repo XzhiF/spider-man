@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import xzf.spiderman.common.event.Event;
+import xzf.spiderman.common.event.EventListener;
 import xzf.spiderman.worker.data.CloseSpiderReq;
 import xzf.spiderman.worker.data.StartSpiderReq;
 import xzf.spiderman.worker.entity.SpiderCnf;
@@ -11,13 +14,14 @@ import xzf.spiderman.worker.entity.SpiderStore;
 import xzf.spiderman.worker.repository.SpiderCnfRepository;
 import xzf.spiderman.worker.repository.SpiderStoreRepository;
 import xzf.spiderman.worker.service.event.CloseSpiderEvent;
+import xzf.spiderman.worker.service.event.SpiderStatusChangedEvent;
 import xzf.spiderman.worker.service.event.StartSpiderEvent;
 
 import java.util.List;
 
 @Service
 @Slf4j
-public class SpiderSlaveService
+public class SpiderSlaveService implements EventListener
 {
 
     @Autowired
@@ -53,5 +57,28 @@ public class SpiderSlaveService
         // 2.
         eventPublisherRegistry.spiderSlaveEventPublisher()
                 .publish(new CloseSpiderEvent(spiderKey, cnf));
+    }
+
+
+    @Transactional
+    public void updateSpiderStatus(String id, int status)
+    {
+        spiderCnfRepository.updateStatus(id, status);
+    }
+
+
+    @Override
+    public boolean supportEventType(Class<? extends Event> clazz)
+    {
+        return SpiderStatusChangedEvent.class.equals(clazz);
+    }
+
+    @Override
+    public void onEvent(Event event)
+    {
+        if(event instanceof SpiderStatusChangedEvent){
+            SpiderStatusChangedEvent e = (SpiderStatusChangedEvent)event;
+            updateSpiderStatus(e.getCnfId(), e.getStatus());
+        }
     }
 }
