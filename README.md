@@ -74,7 +74,14 @@
 > [记录自己写一个小Java爬虫项目-0063-Storage消费者实现-4-多线程处理](https://www.bilibili.com/video/BV1m5411a78k/) <br/>
 > [记录自己写一个小Java爬虫项目-0064-Storage消费者实现-4-调整表结构](https://www.bilibili.com/video/BV1C54y1S77S/) <br/>
 > [记录自己写一个小Java爬虫项目-0065-Storage消费者实现-5-联调测试](https://www.bilibili.com/video/BV1uZ4y1M7Bt/) <br/>
->
+> [记录自己写一个小Java爬虫项目-0066-缓存以及Redis锁优化](https://www.bilibili.com/video/BV1CT4y1j7NR/) <br/>
+> [记录自己写一个小Java爬虫项目-0067-联调测试Redis锁](https://www.bilibili.com/video/BV1ei4y1u7er/) <br/>
+> [记录自己写一个小Java爬虫项目-0068-调度与爬虫模块串联-1-SpiderJob实现] (https://www.bilibili.com/video/BV1KC4y1871M/) <br/>
+> [记录自己写一个小Java爬虫项目-0069-调度与爬虫模块串联-2-回调实现](https://www.bilibili.com/video/BV1MK411n7Xs/) <br/>
+> [记录自己写一个小Java爬虫项目-0070-调度与爬虫模块串联-3-联调测试](https://www.bilibili.com/video/BV13k4y1m7FK/) <br/>
+> [记录自己写一个小Java爬虫项目-0071-Gateway路由调整](https://www.bilibili.com/video/BV1j5411a76t/) <br/>
+> [记录自己写一个小Java爬虫项目-0072-Session共享](https://www.bilibili.com/video/BV1fC4y1b7Uu/) <br/>
+> [记录自己写一个小Java爬虫项目-0073-简单gateway集成spring session](https://www.bilibili.com/video/BV1MV411z7vA/) <br/>
 >
 >
 >
