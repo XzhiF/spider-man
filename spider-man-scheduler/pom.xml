@@ -35,10 +35,21 @@
             <artifactId>spider-man-worker-client</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>xzf</groupId>
+            <artifactId>spider-man-admin-client</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>xzf</groupId>
             <artifactId>spider-man-starter-curator</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>xzf</groupId>
+            <artifactId>spider-man-starter-swagger2</artifactId>
             <version>${revision}</version>
         </dependency>
 

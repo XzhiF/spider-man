@@ -35,4 +35,16 @@ xzf:
     common:
       cookie:
         domain: spiderman.xzf
+    swagger2:
+      enabled: true
+      basePackage: xzf.spiderman.worker
+      apiInfo:
+        title: Worker API
+        version: 1.0
 
+
+springfox:
+  documentation:
+    swagger:
+      v2:
+        path: /worker/v2/api-docs

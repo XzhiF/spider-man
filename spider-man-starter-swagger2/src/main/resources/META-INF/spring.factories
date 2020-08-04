@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+xzf.spiderman.starter.swagger2.Swagger2AutoConfiguration,\
+xzf.spiderman.starter.swagger2.gateway.Swagger2GatewayAutoConfiguration

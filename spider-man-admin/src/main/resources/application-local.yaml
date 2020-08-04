@@ -20,7 +20,18 @@ xzf:
     common:
       cookie:
         domain: spiderman.xzf
-
+    swagger2:
+      enabled: true
+      basePackage: xzf.spiderman.admin
+      apiInfo:
+        title: Admin API
+        version: 1.0
 #  admin.spiderman.xzf -> 登录后台管理 -> html, js
 #  api.spiderman.xzf ajax里面请求
 
+
+springfox:
+  documentation:
+    swagger:
+      v2:
+        path: /admin/v2/api-docs

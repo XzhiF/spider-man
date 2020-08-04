@@ -7,7 +7,7 @@ import org.apache.curator.framework.recipes.leader.Participant;
 import org.apache.curator.framework.state.ConnectionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xzf.spiderman.common.exception.BizException;
+import xzf.spiderman.starter.curator.CuratorException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -106,7 +106,7 @@ public class DefaultLeaderManager implements LeaderSelectorListener, LeaderManag
         try {
             return leaderSelector.getParticipants();
         } catch (Exception e) {
-            throw new BizException("获取选举的成员失败。" + e.getMessage(), e);
+            throw new CuratorException("获取选举的成员失败。" + e.getMessage(), e);
         }
     }
 
@@ -115,7 +115,7 @@ public class DefaultLeaderManager implements LeaderSelectorListener, LeaderManag
         try {
             return leaderSelector.getLeader();
         } catch (Exception e) {
-            throw new BizException("获取选举的Leader失败。" + e.getMessage(), e);
+            throw new CuratorException("获取选举的Leader失败。" + e.getMessage(), e);
         }
     }
 

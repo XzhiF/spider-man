@@ -42,14 +42,14 @@ public class ScheduleController
     //// -- group
 
 
-    @PostMapping("/scheduler/schedule/trigger/group/{groupId}")
+    @PostMapping("/scheduler/schedule/start/group/{groupId}")
     public Ret<Void> startGroup(@PathVariable("groupId") String groupId)
     {
         scheCmdProducerService.offer(new ScheCmd(SCHEDULE_GROUP, groupId));
         return Ret.success();
     }
 
-    @PostMapping("/scheduler/schedule/trigger/group/{groupId}")
+    @PostMapping("/scheduler/schedule/stop/group/{groupId}")
     public Ret<Void> stopGroup(@PathVariable("groupId") String groupId)
     {
         scheCmdProducerService.offer(new ScheCmd(UNSCHEDULE_GROUP, groupId));

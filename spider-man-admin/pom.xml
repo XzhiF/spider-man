@@ -25,6 +25,13 @@
             <version>${revision}</version>
         </dependency>
 
+        <!-- -->
+        <dependency>
+            <groupId>xzf</groupId>
+            <artifactId>spider-man-starter-swagger2</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!-- boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -63,6 +70,8 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+
+
 
     </dependencies>
 

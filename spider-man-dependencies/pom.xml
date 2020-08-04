@@ -21,6 +21,7 @@
         <curator.version>5.0.0</curator.version>
         <webmagic.version>0.7.3</webmagic.version>
         <hessian.version>4.0.63</hessian.version>
+        <swagger2.version>2.9.2</swagger2.version>
     </properties>
 
 
@@ -95,10 +96,24 @@
                 <version>${webmagic.version}</version>
             </dependency>
 
+            <!--hessian-->
             <dependency>
                 <groupId>com.caucho</groupId>
                 <artifactId>hessian</artifactId>
                 <version>${hessian.version}</version>
+            </dependency>
+
+
+            <!-- swagger -->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${swagger2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${swagger2.version}</version>
             </dependency>
 
         </dependencies>

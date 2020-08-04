@@ -9,6 +9,18 @@ xzf:
     gateway:
       skipUrls:
         - /admin/login
+        - /admin/v2/api-docs
+        - /worker/v2/api-docs
+        - /scheduler/v2/api-doc
+        - /swagger-ui.html
+        - /swagger-ui.html/**
+        - /v2/api-docs/**
+        - /swagger-resources/**
+        - /webjars/**
+    swagger2:
+      gateway:
+        enabled: true
+
 
 spring:
   redis:

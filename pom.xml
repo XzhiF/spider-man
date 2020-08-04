@@ -24,6 +24,7 @@
         <module>spider-man-worker-client</module>
         <module>spider-man-starter-curator</module>
         <module>spider-man-storage</module>
+        <module>spider-man-starter-swagger2</module>
     </modules>
 
 

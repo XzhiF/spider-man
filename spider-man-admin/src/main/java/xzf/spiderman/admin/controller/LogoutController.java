@@ -13,7 +13,7 @@ public class LogoutController
 {
 
     @RequestMapping(value = "/admin/logout", method = {RequestMethod.GET,RequestMethod.POST})
-    public Ret<Void> login( HttpSession session)
+    public Ret<Void> logout( HttpSession session)
     {
         session.removeAttribute(SessionAdminUser.SESSION_KEY);
         return Ret.success();

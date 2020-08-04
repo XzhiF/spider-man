@@ -2,7 +2,7 @@ package xzf.spiderman.starter.curator;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
-import xzf.spiderman.common.exception.ThirdPartyServiceInvokeException;
+//import xzf.spiderman.common.exception.ThirdPartyServiceInvokeException;
 
 @Slf4j
 public class CuratorFacade
@@ -25,7 +25,7 @@ public class CuratorFacade
             action.execute(curator);
         } catch (Exception e) {
             log.error("调用Curator方法失败。"+ e.getMessage(), e);
-            throw new ThirdPartyServiceInvokeException("调用Curator方法失败。"+ e.getMessage(), e);
+            throw new CuratorException("调用Curator方法失败。"+ e.getMessage(), e);
         }
     }
 
@@ -35,7 +35,7 @@ public class CuratorFacade
             return callback.call(curator);
         } catch (Exception e) {
             log.error("调用Curator方法失败。"+ e.getMessage(), e);
-            throw new ThirdPartyServiceInvokeException("调用Curator方法失败。"+ e.getMessage(), e);
+            throw new CuratorException("调用Curator方法失败。"+ e.getMessage(), e);
         }
     }
 
