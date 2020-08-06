@@ -1,4 +1,21 @@
-# spider-man
+# spider man 简介
+
+​		spider man 是一个分布式、易扩展的垂直型爬虫系统。系统设计简单，主要分为了后台管理、任务调度、爬虫集群以及存储模块。
+
+* 使用 Spring Boot、 Spring Cloud 作为基础框架
+* 使用 Zookeeper实现了主从选举与状态监控
+* 使用 Quartz + Zookeeper 实现高可用的任务调度
+* 使用并扩展 WebMagic 实现分布式爬虫执行引擎
+* 使用 Groovy 实现动态爬虫脚本
+* 使用 Kakfa 作为消息队列对结果数据进行异步存储
+
+
+
+​		系统整体设计简单，执行流程为：
+
+​		Scheduler -> Worker Master -> Redis Task Queue <-> Worker Spiders ->  Kafka Data Topic -> Storage
+
+
 
 ![爬虫设计图](https://raw.githubusercontent.com/XzhiF/spider-man/master/Document/spider.png)
 
