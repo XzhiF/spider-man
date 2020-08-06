@@ -13,7 +13,9 @@
 
 ​		系统整体设计简单，执行流程为：
 
-​		Scheduler -> Worker Master -> Redis Task Queue <-> Worker Spiders ->  Kafka Data Topic -> Storage
+​		Scheduler -> Worker Master -> Redis Task Queue <-> Worker Spiders ->  Kafka Data Topic -> Storages
+
+
 
 
 
