@@ -101,6 +101,20 @@
 > [记录自己写一个小Java爬虫项目-0071-Gateway路由调整](https://www.bilibili.com/video/BV1j5411a76t/) <br/>
 > [记录自己写一个小Java爬虫项目-0072-Session共享](https://www.bilibili.com/video/BV1fC4y1b7Uu/) <br/>
 > [记录自己写一个小Java爬虫项目-0073-简单gateway集成spring session](https://www.bilibili.com/video/BV1MV411z7vA/) <br/>
+> [记录自己写一个小Java爬虫项目-0074-简单登录](https://www.bilibili.com/video/BV12a4y1E75Z/) <br/>
+> [记录自己写一个小Java爬虫项目-0075-简单鉴权](https://www.bilibili.com/video/BV1ch411d789/) <br/>
+> [记录自己写一个小Java爬虫项目-0076-Gateway异常简单处理](https://www.bilibili.com/video/BV1uZ4y1K7QM/) <br/>
+> [记录自己写一个小Java爬虫项目-0077-补全SpiderCnf-CRUD-1](https://www.bilibili.com/video/BV1MK411T7jw/) <br/>
+> [记录自己写一个小Java爬虫项目-0078-补全SpiderCnf-CRUD-2](https://www.bilibili.com/video/BV1fT4y1j7Xh/) <br/>
+> [记录自己写一个小Java爬虫项目-0079-补全SpiderCnf-CRUD-2](https://www.bilibili.com/video/BV1764y1c7sF/) <br/>
+> [记录自己写一个小Java爬虫项目-0080-补全所有CRUD功能](https://www.bilibili.com/video/BV1YA411Y7ck/) <br/>
+> [记录自己写一个小Java爬虫项目-0081-Swagger集成-1](https://www.bilibili.com/video/BV1R5411a7Sv/) <br/>
+> [记录自己写一个小Java爬虫项目-0082-Swagger集成-2](https://www.bilibili.com/video/BV1B54y1i7vP/) <br/>
+> [记录自己写一个小Java爬虫项目-0083-Swagger-集成总结](https://www.bilibili.com/video/BV1Zt4y1D7eo/) <br/>
+>
+>
+>
+>
 >
 >
 >
