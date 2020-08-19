@@ -9,7 +9,7 @@ ENGINE = InnoDB;
 
 
 CREATE TABLE IF NOT EXISTS `admin`.`admin_user_authority` (
-      `id` INT(11) NOT NULL,
+      `id` INT(11) NOT NULL AUTO_INCREMENT,
       `username` VARCHAR(50) NOT NULL,
       `authority` VARCHAR(50) NOT NULL,
       PRIMARY KEY (`id`),
