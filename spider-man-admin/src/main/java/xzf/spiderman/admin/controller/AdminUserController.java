@@ -62,7 +62,7 @@ public class AdminUserController
         return Ret.success(data);
     }
 
-    @GetMapping("/admin/admin-user/list/")
+    @GetMapping("/admin/admin-user/list")
     public Ret<Page<AdminUserData>> list(QryAdminUserReq req, @PageableDefault Pageable pageable)
     {
         Page<AdminUserData> data = adminUserService.findAll(req, pageable);
