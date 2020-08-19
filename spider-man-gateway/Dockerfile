@@ -7,4 +7,15 @@ ENV SPRING_OPTS=""
 ENTRYPOINT java ${JAVA_OPTS}  ${SPRING_OPTS} -Dlogging.file.path=/logs -jar /app.jar
 
 
-# docker run -e SPRING_OPTS='-Dserver.port=8888 -Dspring.profiles.active=test' -p 8888:8888 -v /Users/xzf/Projects/dockerprj2020/spider-man-docker/spider-man-admin:/logs  xzf/spider-man-admin
+#docker run \
+#-d \
+#-e SPRING_OPTS='-Dserver.port=8080 -Dspring.profiles.active=test' \
+#-p 8080:8080 \
+#-v /opt/docker-workspace/spider-man-docker/apps/spider-man-gateway:/logs \
+#--link=nacos-standalone-mysql:nacos.spiderman.xzf \
+#--link=redis5:redis.spiderman.xzf \
+#--network spider-man-docker_default \
+#--name spider-man-gateway \
+#registry.cn-shenzhen.aliyuncs.com/xzf1989/spider-man-gateway
+
+
