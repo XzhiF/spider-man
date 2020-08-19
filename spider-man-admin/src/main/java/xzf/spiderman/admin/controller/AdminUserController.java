@@ -1,13 +1,11 @@
 package xzf.spiderman.admin.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import xzf.spiderman.admin.data.AddAdminUserReq;
-import xzf.spiderman.admin.data.UptAdminUserAuthReq;
-import xzf.spiderman.admin.data.UptAdminUserPassReq;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.*;
+import xzf.spiderman.admin.data.*;
 import xzf.spiderman.admin.service.AdminUserService;
 import xzf.spiderman.common.Ret;
 
@@ -55,6 +53,22 @@ public class AdminUserController
         adminUserService.disable(username);
         return Ret.success();
     }
+
+
+    @GetMapping("/admin/admin-user/get/{username}")
+    public Ret<AdminUserData> get(@PathVariable("username") String username)
+    {
+        AdminUserData data = adminUserService.get(username);
+        return Ret.success(data);
+    }
+
+    @GetMapping("/admin/admin-user/list/")
+    public Ret<Page<AdminUserData>> list(QryAdminUserReq req, @PageableDefault Pageable pageable)
+    {
+        Page<AdminUserData> data = adminUserService.findAll(req, pageable);
+        return Ret.success(data);
+    }
+
 
 
 }

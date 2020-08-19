@@ -2,11 +2,11 @@ package xzf.spiderman.admin.service;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import xzf.spiderman.admin.data.AddAdminUserReq;
-import xzf.spiderman.admin.data.UptAdminUserAuthReq;
-import xzf.spiderman.admin.data.UptAdminUserPassReq;
+import xzf.spiderman.admin.data.*;
 import xzf.spiderman.admin.entity.AdminUser;
 import xzf.spiderman.admin.entity.AdminUserAuthority;
 import xzf.spiderman.admin.repository.AdminUserAuthorityRepository;
@@ -86,8 +86,47 @@ public class AdminUserService
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true,propagation = Propagation.NOT_SUPPORTED)
+    public Page<AdminUserData> findAll(QryAdminUserReq req, Pageable pageable)
+    {
+        AdminUser qry = new AdminUser();
+        qry.setUsername(req.getStartWithUsername());
+        qry.setEnabled(req.getEqualsEnbaled());
 
-    public AdminUser getUser(String username)
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withMatcher("username",m->m.startsWith())
+                .withMatcher("enabled", m->m.exact())
+                .withIgnoreNullValues();
+
+        Example<AdminUser> example = Example.of(qry, matcher);
+
+        Page<AdminUser> src = userRepository.findAll(example, pageable);
+
+        List<AdminUserData> list = src.getContent().stream().map(AdminUser::asData).collect(Collectors.toList());
+
+        Page<AdminUserData> tar = new PageImpl<>(list, src.getPageable(), src.getTotalElements());
+
+        return tar;
+    }
+
+    @Transactional(readOnly = true,propagation = Propagation.NOT_SUPPORTED)
+    public AdminUserData get(String username)
+    {
+        AdminUser adminUser = getUser(username);
+
+        List<AdminUserAuthority> authorities = authorityRepository.findAllByUsername(username);
+        List<String> authoritiesData = authorities.stream().map(AdminUserAuthority::getAuthority).collect(Collectors.toList());
+
+        AdminUserData ret = adminUser.asData();
+
+        ret.setAuthorities(authoritiesData);
+
+        return ret;
+    }
+
+
+
+    private AdminUser getUser(String username)
     {
         return userRepository.findById(username).orElseThrow(()->new BizException("用户名["+username+"]未找到"));
     }

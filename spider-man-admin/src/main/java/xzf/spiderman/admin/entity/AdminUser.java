@@ -2,11 +2,13 @@ package xzf.spiderman.admin.entity;
 
 import lombok.Data;
 import lombok.ToString;
+import xzf.spiderman.admin.data.AdminUserData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name = "admin_user")
@@ -26,5 +28,15 @@ public class AdminUser
 
     @Column(name = "enabled", nullable = false)
     private Integer enabled;
+
+
+    public AdminUserData asData()
+    {
+        AdminUserData r = new AdminUserData();
+        r.setUsername(username);
+        r.setEnabled(enabled);
+        return r;
+    }
+
 
 }
