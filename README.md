@@ -112,7 +112,7 @@
 > [记录自己写一个小Java爬虫项目-0082-Swagger集成-2](https://www.bilibili.com/video/BV1B54y1i7vP/) <br/>
 > [记录自己写一个小Java爬虫项目-0083-Swagger-集成总结](https://www.bilibili.com/video/BV1Zt4y1D7eo/) <br/>
 > [记录自己写一个小Java爬虫项目-0084-配置Dockerfile](https://www.bilibili.com/video/BV1p5411h7XN/) <br/>
-> [记录自己写一个小Java爬虫项目-0085-测试环境部署](记录自己写一个小Java爬虫项目-0085-测试环境部署) <br/>
+> [记录自己写一个小Java爬虫项目-0085-测试环境部署](https://www.bilibili.com/video/BV1E54y1e7kP) <br/>
 >
 >
 >
