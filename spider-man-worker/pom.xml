@@ -19,7 +19,7 @@
         </dependency>
         <dependency>
             <groupId>xzf</groupId>
-            <artifactId>spider-common-configuration</artifactId>
+            <artifactId>spider-man-common-configuration</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
