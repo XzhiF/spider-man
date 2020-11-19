@@ -109,7 +109,7 @@ public class GatewayErrorConfiguration
 
             Ret<?> ret;
 
-            if(httpStatus != HttpStatus.INTERNAL_SERVER_ERROR.value()){
+            if(httpStatus == HttpStatus.INTERNAL_SERVER_ERROR.value()){
                 ret = Ret.fail(new HttpStatusException("服务请求失败。"),error);
             }
             else{
