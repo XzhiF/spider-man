@@ -16,7 +16,7 @@
         <spring-cloud.version>Hoxton.SR6</spring-cloud.version>
         <spring-cloud-alibaba.version>2.2.1.RELEASE</spring-cloud-alibaba.version>
 
-        <fastjson.version>1.2.58</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <redisson.version>3.13.0</redisson.version>
         <curator.version>5.0.0</curator.version>
         <webmagic.version>0.7.3</webmagic.version>
