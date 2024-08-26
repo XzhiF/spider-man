@@ -21,7 +21,7 @@
         <curator.version>5.0.0</curator.version>
         <webmagic.version>0.7.3</webmagic.version>
         <hessian.version>4.0.63</hessian.version>
-        <swagger2.version>2.9.2</swagger2.version>
+        <swagger2.version>2.10.0</swagger2.version>
     </properties>
 
 
